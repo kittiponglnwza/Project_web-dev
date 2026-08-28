@@ -12,11 +12,19 @@ CREATE TABLE tenant_profiles (
 );
 ALTER TABLE tenant_profiles DISABLE ROW LEVEL SECURITY;
 
--- 2. ตารางบิลค่าเช่า (Bills)
+-- 2. ตารางบิลค่าเช่า (Bills) - แบบละเอียด
+DROP TABLE IF EXISTS bills;
 CREATE TABLE bills (
     id SERIAL PRIMARY KEY,
     email TEXT NOT NULL,
     month TEXT NOT NULL,
+    room_no TEXT,
+    rent_fee INTEGER DEFAULT 0,
+    elec_unit INTEGER DEFAULT 0,
+    elec_fee INTEGER DEFAULT 0,
+    water_unit INTEGER DEFAULT 0,
+    water_fee INTEGER DEFAULT 0,
+    other_fee INTEGER DEFAULT 0,
     amount INTEGER NOT NULL,
     status TEXT DEFAULT 'pending',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
@@ -41,11 +49,12 @@ ALTER TABLE maintenance_requests DISABLE ROW LEVEL SECURITY;
 -- ==========================================
 
 INSERT INTO tenant_profiles (email, national_id, room_no, start_date, end_date, emergency_contact, emergency_phone)
-VALUES ('kitipongzaza566@gmail.com', '1-2345-67890-12-3', '302', '2024-07-01', '2025-06-30', 'สมศรี ตีระสี (มารดา)', '081-999-9999');
+VALUES ('kitipongzaza566@gmail.com', '1-2345-67890-12-3', '302', '2024-07-01', '2025-06-30', 'สมศรี ตีระสี (มารดา)', '081-999-9999')
+ON CONFLICT (email) DO NOTHING;
 
-INSERT INTO bills (email, month, amount, status) VALUES 
-('kitipongzaza566@gmail.com', 'ตุลาคม 2567', 4500, 'pending'),
-('kitipongzaza566@gmail.com', 'กันยายน 2567', 4800, 'paid');
+INSERT INTO bills (email, month, room_no, rent_fee, elec_unit, elec_fee, water_unit, water_fee, other_fee, amount, status) VALUES 
+('kitipongzaza566@gmail.com', 'ตุลาคม 2567', '302', 3500, 103, 721, 8, 136, 143, 4500, 'pending'),
+('kitipongzaza566@gmail.com', 'กันยายน 2567', '302', 3500, 120, 840, 10, 170, 290, 4800, 'paid');
 
 INSERT INTO maintenance_requests (email, title, description, status) VALUES 
 ('kitipongzaza566@gmail.com', 'แอร์ไม่เย็น', 'เปิด 16 องศาก็ไม่เย็นเลย รบกวนให้ช่างเข้ามาดูหน่อยครับ', 'completed');

@@ -97,11 +97,41 @@
         </div>
     </div>
 
+    <!-- Bill Detail Modal -->
+    <div id="billDetailModal" class="modal">
+        <div class="modal-content" style="width: 500px; padding: 0; overflow: hidden; text-align: left;">
+            <div style="background: #eff6ff; color: #1e40af; padding: 20px; font-size: 1.2rem; font-weight: 500; border-bottom: 1px solid #bfdbfe; display: flex; justify-content: space-between; align-items: center;">
+                <span id="detail-month">เดือน</span>
+                <span class="close-btn" style="position: static; margin: 0; color: #1e40af;" onclick="closeDetailModal()">&times;</span>
+            </div>
+            <div style="padding: 25px; color: #4b5563;">
+                <h3 style="margin-top: 0; color: #374151; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px;">รายละเอียด</h3>
+                <p><strong>- ห้องพัก :</strong> <span id="detail-room">-</span></p>
+                <hr style="border: 0; border-top: 1px solid #f3f4f6; margin: 15px 0;">
+                <p><strong>- ค่าเช่าห้องพัก :</strong> <span id="detail-rent">0</span> บาท</p>
+                <p><strong>- มิเตอร์ไฟฟ้า :</strong> <span id="detail-elec-unit">0</span> หน่วย เป็นเงิน <span id="detail-elec-fee">0</span> บาท</p>
+                <p><strong>- มิเตอร์น้ำประปา :</strong> <span id="detail-water-unit">0</span> หน่วย เป็นเงิน <span id="detail-water-fee">0</span> บาท</p>
+                <hr style="border: 0; border-top: 1px solid #f3f4f6; margin: 15px 0;">
+                <p><strong>- รวมค่าสาธารณูปโภค :</strong> <span id="detail-utility">0</span> บาท</p>
+                <p><strong>- ค่าปรับและค่าอื่น ๆ :</strong> <span id="detail-other">0</span> บาท</p>
+                <hr style="border: 0; border-top: 1px solid #f3f4f6; margin: 15px 0;">
+                <p style="font-size: 1.1rem; color: #111;"><strong>- รวมเป็นเงินทั้งสิ้น :</strong> <span id="detail-total">0</span> บาท</p>
+                <hr style="border: 0; border-top: 1px solid #f3f4f6; margin: 15px 0;">
+                <p><strong>- วันที่ออกใบเสร็จรับเงิน :</strong> <span id="detail-date">-</span></p>
+                <p style="display: flex; align-items: center; gap: 10px; margin-bottom: 0;">
+                    <strong>- ใบเสร็จรับเงินอิเล็กทรอนิกส์ :</strong> 
+                    <i class='bx bxs-file-pdf' style="color: #ef4444; font-size: 1.8rem; cursor: pointer;" title="ดาวน์โหลด PDF" onclick="alert('ระบบดาวน์โหลด PDF กำลังพัฒนา')"></i>
+                </p>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script>
         let currentBillId = null;
+        let globalBills = [];
 
         document.addEventListener("DOMContentLoaded", async () => {
             fetchBills();
@@ -125,30 +155,68 @@
                 return;
             }
             
+            globalBills = bills;
+
             bills.forEach(bill => {
                 let statusHtml = "";
                 let actionHtml = "";
                 if (bill.status === "pending") {
                     statusHtml = `<span class="status-badge status-pending">ค้างชำระ</span>`;
-                    actionHtml = `<button class="pay-btn" onclick="openPaymentModal(${bill.id}, '${bill.month}', ${bill.amount})">ชำระเงิน</button>`;
+                    actionHtml = `
+                        <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb; margin-right:5px;" onclick="openDetailModal(${bill.id})">รายละเอียด</button>
+                        <button class="pay-btn" onclick="openPaymentModal(${bill.id}, '${bill.month}', ${bill.amount})">ชำระเงิน</button>
+                    `;
                 } else if (bill.status === "checking") {
                     statusHtml = `<span class="status-badge status-pending" style="background:#e0e7ff; color:#4f46e5;">รอตรวจสอบสลิป</span>`;
-                    actionHtml = `<span style="color:#6b7280; font-size:0.9rem;">กำลังตรวจสอบ</span>`;
+                    actionHtml = `
+                        <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb; margin-right:5px;" onclick="openDetailModal(${bill.id})">รายละเอียด</button>
+                        <span style="color:#6b7280; font-size:0.9rem;">กำลังตรวจสอบ</span>
+                    `;
                 } else {
                     statusHtml = `<span class="status-badge status-paid">ชำระแล้ว</span>`;
-                    actionHtml = `-`;
+                    actionHtml = `
+                        <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb;" onclick="openDetailModal(${bill.id})">ดูใบเสร็จ</button>
+                    `;
                 }
                 
                 list.innerHTML += `
                     <tr>
                         <td>${bill.month}</td>
-                        <td>ค่าเช่าห้อง + ค่าน้ำค่าไฟ</td>
+                        <td>ค่าเช่าห้อง + สาธารณูปโภค</td>
                         <td>${bill.amount.toLocaleString()}</td>
                         <td>${statusHtml}</td>
                         <td>${actionHtml}</td>
                     </tr>
                 `;
             });
+        }
+
+        function openDetailModal(id) {
+            const bill = globalBills.find(b => b.id === id);
+            if(!bill) return;
+
+            document.getElementById('detail-month').innerText = bill.month;
+            document.getElementById('detail-room').innerText = bill.room_no || '-';
+            document.getElementById('detail-rent').innerText = (bill.rent_fee || 0).toLocaleString();
+            document.getElementById('detail-elec-unit').innerText = (bill.elec_unit || 0).toLocaleString();
+            document.getElementById('detail-elec-fee').innerText = (bill.elec_fee || 0).toLocaleString();
+            document.getElementById('detail-water-unit').innerText = (bill.water_unit || 0).toLocaleString();
+            document.getElementById('detail-water-fee').innerText = (bill.water_fee || 0).toLocaleString();
+            
+            let utility = (bill.elec_fee || 0) + (bill.water_fee || 0);
+            document.getElementById('detail-utility').innerText = utility.toLocaleString();
+            document.getElementById('detail-other').innerText = (bill.other_fee || 0).toLocaleString();
+            document.getElementById('detail-total').innerText = bill.amount.toLocaleString();
+
+            let d = new Date(bill.created_at);
+            let dateStr = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById('detail-date').innerText = dateStr;
+
+            document.getElementById('billDetailModal').style.display = 'flex';
+        }
+
+        function closeDetailModal() {
+            document.getElementById('billDetailModal').style.display = 'none';
         }
 
         function openPaymentModal(id, month, amount) {

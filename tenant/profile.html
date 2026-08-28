@@ -239,15 +239,28 @@
         }
 
         function openProfileModal() {
-            document.getElementById('t_national_id').value = currentProfileData.national_id || '';
-            document.getElementById('t_address').value = currentProfileData.address || '';
-            document.getElementById('t_em_name').value = currentProfileData.emergency_contact || '';
-            document.getElementById('t_em_phone').value = currentProfileData.emergency_phone || '';
-            document.getElementById('profile-modal').style.display = 'flex';
+            try {
+                // เผื่อกรณี currentProfileData เป็น null
+                const data = currentProfileData || {};
+                
+                document.getElementById('t_national_id').value = data.national_id || '';
+                document.getElementById('t_address').value = data.address || '';
+                document.getElementById('t_em_name').value = data.emergency_contact || '';
+                document.getElementById('t_em_phone').value = data.emergency_phone || '';
+                
+                const overlay = document.getElementById('profile-modal');
+                overlay.style.setProperty('display', 'flex', 'important');
+                overlay.style.setProperty('z-index', '9999', 'important');
+                
+                // เลื่อนหน้าจอขึ้นบนสุดเผื่อ modal ไปเปิดข้างบน (เพราะหน้าต่างนี้ scroll ได้)
+                window.scrollTo(0, 0);
+            } catch (err) {
+                alert("เกิดข้อผิดพลาด: " + err.message);
+            }
         }
 
         function closeProfileModal() {
-            document.getElementById('profile-modal').style.display = 'none';
+            document.getElementById('profile-modal').style.setProperty('display', 'none', 'important');
         }
 
         window.onclick = function(event) {

@@ -151,11 +151,6 @@
             const { data } = await supabaseClient.from('tenant_profiles').select('*').neq('role', 'admin');
             if(data) {
                 tenantProfiles = data;
-                const select = document.getElementById('b_email');
-                data.forEach(t => {
-                    const roomStr = t.room_no ? `ห้อง ${t.room_no}` : 'ยังไม่ระบุห้อง';
-                    select.innerHTML += `<option value="${t.email}">${roomStr} (${t.email})</option>`;
-                });
             }
         }
 

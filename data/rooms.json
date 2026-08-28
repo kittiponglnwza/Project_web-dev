@@ -2,28 +2,38 @@
     {
         "id": 1,
         "type": "ห้องพัดลม (Standard)",
-        "description": "ห้องขนาด 24 ตรม. มีเตียง ตู้เสื้อผ้า โต๊ะเขียนหนังสือ",
+        "description": "ห้องขนาด 24 ตรม. มีเตียง ตู้เสื้อผ้า โต๊ะเขียนหนังสือ บรรยากาศโปร่งสบาย มีระเบียงรับลม",
         "price": 3500,
         "isAvailable": true,
         "availableCount": 5,
-        "image": "images/room1.jpg"
+        "images": [
+            "https://placehold.co/600x400/2ecc71/ffffff.png?text=Standard+Room+1",
+            "https://placehold.co/600x400/27ae60/ffffff.png?text=Standard+Room+2"
+        ]
     },
     {
         "id": 2,
         "type": "ห้องแอร์ (Deluxe)",
-        "description": "ห้องขนาด 28 ตรม. แอร์ ทีวี ตู้เย็น เครื่องทำน้ำอุ่น",
+        "description": "ห้องขนาด 28 ตรม. แอร์เย็นฉ่ำ ทีวี ตู้เย็น เครื่องทำน้ำอุ่น เฟอร์นิเจอร์บิวท์อิน",
         "price": 4500,
         "isAvailable": true,
         "availableCount": 2,
-        "image": "images/room2.jpg"
+        "images": [
+            "https://placehold.co/600x400/3498db/ffffff.png?text=Deluxe+Room+1",
+            "https://placehold.co/600x400/2980b9/ffffff.png?text=Deluxe+Room+2",
+            "https://placehold.co/600x400/227093/ffffff.png?text=Deluxe+Room+3"
+        ]
     },
     {
         "id": 3,
         "type": "ห้องสูท (VIP)",
-        "description": "ห้องขนาด 35 ตรม. เฟอร์นิเจอร์ครบชุด พร้อมโซนพักผ่อนส่วนตัว",
+        "description": "ห้องขนาด 35 ตรม. กว้างขวางพิเศษ เฟอร์นิเจอร์ครบชุด พร้อมโซนพักผ่อนส่วนตัว วิวเมืองมุมสูง",
         "price": 6000,
         "isAvailable": false,
         "availableCount": 0,
-        "image": "images/room3.jpg"
+        "images": [
+            "https://placehold.co/600x400/9b59b6/ffffff.png?text=VIP+Room+1",
+            "https://placehold.co/600x400/8e44ad/ffffff.png?text=VIP+Room+2"
+        ]
     }
 ]

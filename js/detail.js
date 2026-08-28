@@ -95,9 +95,18 @@ function renderUltraPremiumDetail(room) {
                     <p class="lux-location"><i class='bx bx-map'></i> ใจกลางเมือง, เดินทางสะดวก ปลอดภัย</p>
                 </div>
                 <hr class="lux-divider">
+                
                 <div class="lux-section">
                     <h2>ภาพรวม (Overview)</h2>
                     <p class="lux-desc">${room.description}</p>
+                </div>
+
+                <!-- สลับเอาคลังภาพ (Gallery) ขึ้นมาไว้บน สิ่งอำนวยความสะดวก ตามคำขอ -->
+                <div class="lux-section">
+                    <h2>คลังภาพ (Gallery)</h2>
+                    <div class="lux-gallery">
+                        ${galleryHTML}
+                    </div>
                 </div>
                 
                 <div class="lux-section">
@@ -112,14 +121,7 @@ function renderUltraPremiumDetail(room) {
                     </div>
                 </div>
 
-                <div class="lux-section">
-                    <h2>คลังภาพ (Gallery)</h2>
-                    <div class="lux-gallery">
-                        ${galleryHTML}
-                    </div>
-                </div>
-
-                <!-- เพิ่มแผนที่ Location (Google Maps) -->
+                <!-- แผนที่ Location (Google Maps) -->
                 <div class="lux-section">
                     <h2>สถานที่ตั้ง (Location)</h2>
                     <div style="width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 15px;">

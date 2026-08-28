@@ -246,12 +246,17 @@
                 document.getElementById('e_address').value = user.address || '';
                 document.getElementById('e_start_date').value = user.start_date || '';
                 document.getElementById('e_end_date').value = user.end_date || '';
-                document.getElementById('e_emergency_contact').value = user.emergency_contact || '';
-                document.getElementById('e_emergency_phone').value = user.emergency_phone || '';
-
-                const modal = document.getElementById('edit-modal');
-                modal.style.setProperty('display', 'flex', 'important');
-                modal.style.setProperty('z-index', '9999', 'important');
+                const overlay = document.getElementById('edit-modal');
+                overlay.style.setProperty('display', 'flex', 'important');
+                overlay.style.setProperty('z-index', '9999', 'important');
+                overlay.style.setProperty('opacity', '1', 'important');
+                
+                const modalBox = overlay.querySelector('.modal');
+                if(modalBox) {
+                    modalBox.style.setProperty('display', 'block', 'important');
+                    modalBox.style.setProperty('opacity', '1', 'important');
+                    modalBox.style.setProperty('visibility', 'visible', 'important');
+                }
             } catch (err) {
                 alert("เกิดข้อผิดพลาดในระบบ Javascript: " + err.message);
                 console.error(err);
@@ -259,7 +264,15 @@
         };
 
         function closeModal() {
-            document.getElementById('edit-modal').style.display = 'none';
+            document.getElementById('edit-modal').style.setProperty('display', 'none', 'important');
+        }
+
+        // ปิด Modal เมื่อคลิกที่พื้นที่ว่าง (Overlay)
+        window.onclick = function(event) {
+            const overlay = document.getElementById('edit-modal');
+            if (event.target == overlay) {
+                closeModal();
+            }
         }
 
         document.getElementById('edit-user-form').addEventListener('submit', async (e) => {

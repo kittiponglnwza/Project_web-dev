@@ -113,60 +113,9 @@
                 </div>
             </div>
 
-            <button style="background:#111; color:#fff; border-radius:8px; display:flex; justify-content:center; align-items:center; gap:8px; margin-top:40px; width:100%; border:none; padding:15px; font-family:'Prompt'; font-size:1rem; cursor:pointer; transition:0.3s;" onclick="openProfileModal()" onmouseover="this.style.background='#d4af37'" onmouseout="this.style.background='#111'">
-                <i class='bx bx-edit-alt' style="font-size:1.2rem;"></i> แก้ไขข้อมูลส่วนตัว
+            <button style="background:#111; color:#fff; border-radius:8px; display:flex; justify-content:center; align-items:center; gap:8px; margin-top:40px; width:100%; border:none; padding:15px; font-family:'Prompt'; font-size:1rem; cursor:pointer; transition:0.3s;" onclick="alert('หากต้องการแก้ไขข้อมูลในสัญญา กรุณาติดต่อเจ้าหน้าที่สำนักงาน (Admin) ครับ')" onmouseover="this.style.background='#d4af37'" onmouseout="this.style.background='#111'">
+                <i class='bx bx-edit-alt' style="font-size:1.2rem;"></i> แจ้งขอแก้ไขข้อมูล
             </button>
-        </div>
-    </div>
-
-    <!-- Modal สำหรับผู้เช่าแก้ไขข้อมูล -->
-    <style>
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(4px); }
-        .modal { background: #fff; width: 500px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 30px; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .modal-header h3 { margin: 0; font-size: 20px; color: #111; }
-        .modal-close { background: none; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; }
-        
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 13px; color: #6b7280; margin-bottom: 5px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px 15px; border: 1px solid #d1d5db; border-radius: 8px; font-family: 'Prompt'; font-size: 14px; box-sizing: border-box; outline: none; }
-        .form-group input:focus, .form-group textarea:focus { border-color: #d4af37; }
-        
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-submit { width: 100%; background: #111; color: #fff; border: none; padding: 12px; border-radius: 8px; font-family: 'Prompt'; font-size: 15px; cursor: pointer; transition: 0.3s; margin-top: 15px; }
-        .btn-submit:hover { background: #d4af37; }
-    </style>
-
-    <div class="modal-overlay" id="profile-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>แก้ไขข้อมูลส่วนตัว</h3>
-                <button class="modal-close" onclick="closeProfileModal()"><i class='bx bx-x'></i></button>
-            </div>
-            <form id="edit-profile-form">
-                <div class="form-group">
-                    <label>เลขบัตรประชาชน / Passport Number</label>
-                    <input type="text" id="t_national_id" placeholder="กรอกเลขบัตร หรือ พาสปอร์ต">
-                </div>
-
-                <div class="form-group">
-                    <label>ที่อยู่ตามทะเบียนบ้าน (Address)</label>
-                    <textarea id="t_address" rows="3" placeholder="บ้านเลขที่ หมู่ ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์..."></textarea>
-                </div>
-
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>ชื่อผู้ติดต่อฉุกเฉิน</label>
-                        <input type="text" id="t_em_name" placeholder="ชื่อ-นามสกุล">
-                    </div>
-                    <div class="form-group">
-                        <label>เบอร์โทรผู้ติดต่อฉุกเฉิน</label>
-                        <input type="text" id="t_em_phone" placeholder="08x-xxx-xxxx">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-submit">บันทึกข้อมูล</button>
-            </form>
         </div>
     </div>
 
@@ -174,14 +123,10 @@
     <script src="../js/supabase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script>
-        let currentProfileData = {};
-        let currentUserEmail = "";
-
         document.addEventListener("DOMContentLoaded", async () => {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 const user = session.user;
-                currentUserEmail = user.email;
                 document.getElementById("p_email").innerText = user.email;
                 if (user.user_metadata) {
                     let title = user.user_metadata.title || "";
@@ -194,102 +139,45 @@
                     document.getElementById("p_phone").innerText = user.user_metadata.phone || "ไม่ระบุเบอร์โทรศัพท์";
                 }
                 
-                await loadProfileData();
+                // ดึงข้อมูลสัญญาจาก Database 
+                const { data: profile, error } = await supabaseClient
+                    .from('tenant_profiles')
+                    .select('*')
+                    .eq('email', user.email)
+                    .single();
+                    
+                if (profile && !error) {
+                    document.getElementById("p_nid").innerText = profile.national_id || "ไม่ระบุ";
+                    document.getElementById("p_address").innerText = profile.address || "ไม่ระบุ";
+                    document.getElementById("p_room").innerText = "ห้อง " + (profile.room_no || "-");
+                    document.getElementById("p_start").innerText = profile.start_date || "-";
+                    document.getElementById("p_end").innerText = profile.end_date || "-";
+                    document.getElementById("p_em_name").innerText = profile.emergency_contact || "-";
+                    document.getElementById("p_em_phone").innerText = profile.emergency_phone || "-";
+                    
+                    const statusEl = document.getElementById("p_status");
+                    if (profile.lease_status === "Active") {
+                        statusEl.innerHTML = "🟢 Active (กำลังเช่า)";
+                        statusEl.style.color = "#059669";
+                    } else {
+                        statusEl.innerHTML = "🔴 Inactive";
+                        statusEl.style.color = "#dc2626";
+                    }
+                } else {
+                    // ถ้ายังไม่มีข้อมูลแอดมินป้อนให้
+                    document.getElementById("p_nid").innerText = "ยังไม่มีข้อมูลในระบบ";
+                    document.getElementById("p_address").innerText = "-";
+                    document.getElementById("p_room").innerText = "รอการอนุมัติห้องพัก";
+                    document.getElementById("p_start").innerText = "-";
+                    document.getElementById("p_end").innerText = "-";
+                    document.getElementById("p_em_name").innerText = "-";
+                    document.getElementById("p_em_phone").innerText = "-";
+                    document.getElementById("p_status").innerText = "รอการทำสัญญา";
+                    document.getElementById("p_status").style.color = "#d97706";
+                }
+
             } else {
                 window.location.href = "../login.html";
-            }
-        });
-
-        async function loadProfileData() {
-            const { data: profile, error } = await supabaseClient
-                .from('tenant_profiles')
-                .select('*')
-                .eq('email', currentUserEmail)
-                .single();
-                
-            if (profile && !error) {
-                currentProfileData = profile;
-                document.getElementById("p_nid").innerText = profile.national_id || "ไม่ระบุ";
-                document.getElementById("p_address").innerText = profile.address || "ไม่ระบุ";
-                document.getElementById("p_room").innerText = "ห้อง " + (profile.room_no || "-");
-                document.getElementById("p_start").innerText = profile.start_date || "-";
-                document.getElementById("p_end").innerText = profile.end_date || "-";
-                document.getElementById("p_em_name").innerText = profile.emergency_contact || "-";
-                document.getElementById("p_em_phone").innerText = profile.emergency_phone || "-";
-                
-                const statusEl = document.getElementById("p_status");
-                if (profile.lease_status === "Active") {
-                    statusEl.innerHTML = "🟢 Active (กำลังเช่า)";
-                    statusEl.style.color = "#059669";
-                } else {
-                    statusEl.innerHTML = "🔴 Inactive";
-                    statusEl.style.color = "#dc2626";
-                }
-            } else {
-                document.getElementById("p_nid").innerText = "ยังไม่มีข้อมูลในระบบ";
-                document.getElementById("p_address").innerText = "-";
-                document.getElementById("p_room").innerText = "รอการอนุมัติห้องพัก";
-                document.getElementById("p_start").innerText = "-";
-                document.getElementById("p_end").innerText = "-";
-                document.getElementById("p_em_name").innerText = "-";
-                document.getElementById("p_em_phone").innerText = "-";
-                document.getElementById("p_status").innerText = "รอการทำสัญญา";
-                document.getElementById("p_status").style.color = "#d97706";
-            }
-        }
-
-        function openProfileModal() {
-            try {
-                // เผื่อกรณี currentProfileData เป็น null
-                const data = currentProfileData || {};
-                
-                document.getElementById('t_national_id').value = data.national_id || '';
-                document.getElementById('t_address').value = data.address || '';
-                document.getElementById('t_em_name').value = data.emergency_contact || '';
-                document.getElementById('t_em_phone').value = data.emergency_phone || '';
-                
-                const overlay = document.getElementById('profile-modal');
-                overlay.style.setProperty('display', 'flex', 'important');
-                overlay.style.setProperty('z-index', '9999', 'important');
-                
-                // เลื่อนหน้าจอขึ้นบนสุดเผื่อ modal ไปเปิดข้างบน (เพราะหน้าต่างนี้ scroll ได้)
-                window.scrollTo(0, 0);
-            } catch (err) {
-                alert("เกิดข้อผิดพลาด: " + err.message);
-            }
-        }
-
-        function closeProfileModal() {
-            document.getElementById('profile-modal').style.setProperty('display', 'none', 'important');
-        }
-
-        window.onclick = function(event) {
-            const overlay = document.getElementById('profile-modal');
-            if (event.target == overlay) closeProfileModal();
-        }
-
-        document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const updates = {
-                email: currentUserEmail,
-                national_id: document.getElementById('t_national_id').value.trim(),
-                address: document.getElementById('t_address').value.trim(),
-                emergency_contact: document.getElementById('t_em_name').value.trim(),
-                emergency_phone: document.getElementById('t_em_phone').value.trim()
-            };
-
-            // ใช้ upsert เพื่อให้รองรับทั้งบัญชีเก่าที่ยังไม่มีแถวข้อมูล และบัญชีใหม่
-            const { error } = await supabaseClient
-                .from('tenant_profiles')
-                .upsert(updates, { onConflict: 'email' });
-            
-            if (error) {
-                alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + error.message);
-            } else {
-                alert("บันทึกข้อมูลเรียบร้อยแล้ว!");
-                closeProfileModal();
-                await loadProfileData(); 
             }
         });
     </script>

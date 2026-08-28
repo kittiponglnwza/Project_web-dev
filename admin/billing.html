@@ -176,9 +176,14 @@
                 <button class="modal-close" onclick="closeSlipModal()"><i class='bx bx-x'></i></button>
             </div>
             <img id="slip-image-preview" src="" style="width: 100%; border-radius: 8px; margin-bottom: 20px; border: 1px solid #eee; min-height: 300px; object-fit: contain; background: #f8fafc;">
-            <button class="btn-primary" style="width: 100%; justify-content: center; background: #10b981;" id="approve-slip-btn">
-                <i class='bx bx-check-circle'></i> ตรวจสอบแล้ว อนุมัติสลิปนี้
-            </button>
+            <div class="grid-2">
+                <button class="btn-primary" style="width: 100%; justify-content: center; background: #ef4444;" id="reject-slip-btn">
+                    <i class='bx bx-x-circle'></i> ให้ส่งใหม่
+                </button>
+                <button class="btn-primary" style="width: 100%; justify-content: center; background: #10b981;" id="approve-slip-btn">
+                    <i class='bx bx-check-circle'></i> อนุมัติสลิปนี้
+                </button>
+            </div>
         </div>
     </div>
 
@@ -217,6 +222,16 @@
                 .order('created_at', { ascending: false });
 
             if (!error && data) {
+                // อัปเดตเลขห้องแบบเรียลไทม์เผื่อตอนสร้างบิลลูกบ้านยังไม่มีห้อง
+                data.forEach(bill => {
+                    if (!bill.room_no || bill.room_no === 'null') {
+                        const tenant = tenantProfiles.find(t => t.email === bill.email);
+                        if (tenant && tenant.room_no) {
+                            bill.room_no = tenant.room_no;
+                        }
+                    }
+                });
+                
                 allBills = data;
                 renderBills(data);
             }
@@ -327,7 +342,7 @@
                 water_unit: waterUnit,
                 water_fee: waterFee,
                 amount: amount,
-                status: 'unpaid'
+                status: 'pending' // แก้บั๊กจาก unpaid เป็น pending ให้ตรงกับฝั่งลูกบ้าน
             }]);
 
             if (error) {
@@ -363,6 +378,30 @@
                 closeSlipModal();
             }
         });
+
+        document.getElementById('reject-slip-btn').addEventListener('click', async () => {
+            if (currentSlipBillId) {
+                await rejectSlip(currentSlipBillId);
+                closeSlipModal();
+            }
+        });
+
+        // --- ระบบปฏิเสธสลิป ---
+        async function rejectSlip(billId) {
+            if(confirm('คุณแน่ใจหรือไม่ว่าต้องการ "ปฏิเสธ" สลิปนี้? \nบิลจะถูกเปลี่ยนกลับเป็น "ค้างชำระ" เพื่อให้ลูกบ้านส่งสลิปใหม่')) {
+                const { error } = await supabaseClient
+                    .from('bills')
+                    .update({ status: 'pending', slip_image: null })
+                    .eq('id', billId);
+                
+                if(!error) {
+                    alert('ปฏิเสธสลิปเรียบร้อยแล้ว ลูกบ้านสามารถส่งสลิปใหม่ได้');
+                    loadBills();
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + error.message);
+                }
+            }
+        }
 
         // --- ระบบตรวจสลิป (อนุมัติ) ---
         async function approveSlip(billId) {

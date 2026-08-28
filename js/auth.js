@@ -166,6 +166,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (error) throw error;
 
+                // นำอีเมลของผู้ใช้ใหม่ไปบันทึกในตารางโปรไฟล์ทันที เพื่อให้แอดมินเห็นในระบบ
+                await supabaseClient.from('tenant_profiles').insert([{ 
+                    email: email,
+                    role: 'tenant'
+                }]);
+
                 alert("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบด้วยอีเมลและรหัสผ่านที่คุณตั้งไว้");
                 window.location.href = "login.html";
 

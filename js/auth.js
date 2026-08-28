@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (error) throw error;
 
                 // เช็ค Role จากตารางโปรไฟล์
-                const { data: profile } = await supabaseClient.from('tenant_profiles').select('role').eq('id', data.user.id).single();
+                const { data: profile } = await supabaseClient.from('tenant_profiles').select('role').eq('email', data.user.email).single();
                 const isAdmin = profile && profile.role === 'admin';
 
                 alert("เข้าสู่ระบบสำเร็จ!");
@@ -200,7 +200,7 @@ async function checkLoginStatus() {
         }
         
         // เช็ค Role จาก Database
-        const { data: profile } = await supabaseClient.from('tenant_profiles').select('role').eq('id', user.id).single();
+        const { data: profile } = await supabaseClient.from('tenant_profiles').select('role').eq('email', user.email).single();
         const isAdmin = profile && profile.role === 'admin';
 
         if (loginBtn) {

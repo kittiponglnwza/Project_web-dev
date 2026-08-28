@@ -493,23 +493,42 @@
             btn.innerHTML = "กำลังบันทึกข้อมูล...";
             btn.disabled = true;
 
-            // ในระบบจริง จะมีการอัปโหลดไฟล์สลิปไปที่ Storage ก่อน
-            // สำหรับโปรเจกต์นี้ เราจะอัปเดตสถานะบิลเป็น "รอตรวจสอบ" (checking) 
-            const { error } = await supabaseClient
-                .from('bills')
-                .update({ status: 'checking' })
-                .eq('id', currentBillId);
-                
-            if(error) {
-                alert("เกิดข้อผิดพลาด: " + error.message);
-            } else {
-                alert("แจ้งโอนเงินสำเร็จ! แอดมินจะทำการตรวจสอบสลิปของคุณเร็วๆ นี้");
-                closeModal();
-                fetchBills(); // โหลดตารางใหม่
-            }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = async function() {
+                    // ย่อขนาดรูปภาพให้เล็กลงก่อนเซฟลง Database (กัน Database เต็ม)
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 500;
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    const base64Slip = canvas.toDataURL('image/jpeg', 0.6); 
 
-            btn.innerHTML = "ยืนยันการโอนเงิน";
-            btn.disabled = false;
+                    const { error } = await supabaseClient
+                        .from('bills')
+                        .update({ status: 'checking', slip_image: base64Slip })
+                        .eq('id', currentBillId);
+                        
+                    if(error) {
+                        alert("เกิดข้อผิดพลาด: " + error.message);
+                    } else {
+                        alert("แจ้งโอนเงินสำเร็จ! แอดมินจะทำการตรวจสอบสลิปของคุณเร็วๆ นี้");
+                        closeModal();
+                        fetchBills(); // โหลดตารางใหม่
+                    }
+
+                    btn.innerHTML = "ยืนยันการโอนเงิน";
+                    btn.disabled = false;
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
         }
     </script>
 </body>

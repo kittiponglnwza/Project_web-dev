@@ -11,14 +11,16 @@
         body { background-color: #f3f4f6; margin: 0; font-family: 'Prompt', sans-serif; display: flex; }
         .sidebar { width: 260px; background: #fff; height: 100vh; padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05); position: fixed; display: flex; flex-direction: column; }
         .sidebar-logo { text-align: center; font-size: 1.8rem; font-weight: 600; color: #d4af37; margin-bottom: 30px; letter-spacing: 1px; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 15px 25px; color: #4b5563; text-decoration: none; font-size: 1rem; transition: 0.3s; }
-        .nav-link:hover, .nav-link.active { background: #f9fafb; color: #d4af37; border-right: 4px solid #d4af37; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 15px 25px; color: #4b5563; text-decoration: none; font-size: 1rem; transition: 0.3s; border-left: 4px solid transparent; }
+        .nav-link:hover { background: #f9fafb; color: #d4af37; }
+        .nav-link.active { background: #faf5e5; color: #d4af37; border-left-color: #d4af37; font-weight: 500; }
         .nav-link i { font-size: 1.4rem; }
-        .logout-btn { margin-top: auto; color: #ef4444; }
-        .logout-btn:hover { background: #fef2f2; color: #dc2626; border-color: #dc2626; }
+        .logout-btn { margin-top: auto; color: #ef4444; border-top: 1px solid #f3f4f6; padding-top: 20px; }
+        .logout-btn:hover { background: #fef2f2; color: #dc2626; border-left-color: #dc2626; }
         
         .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); }
-        .recent-section { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .recent-section { background: #fff; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); max-width: 900px; margin: 0 auto; border: 1px solid #f3f4f6; }
+        .page-title { font-size: 1.8rem; margin: 0 auto 30px auto; color: #111; max-width: 900px; }
         .section-header { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; font-size: 1.2rem; font-weight: 600; }
         
         .data-table { width: 100%; border-collapse: collapse; }
@@ -30,6 +32,13 @@
         
         .pay-btn { background: #111; color: #fff; border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Prompt'; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
         .pay-btn:hover { background: #d4af37; }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background-color: #fff; padding: 40px; border-radius: 15px; width: 400px; text-align: center; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #6b7280; }
+        .close-btn:hover { color: #111; }
+        .lux-input { width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -39,12 +48,12 @@
         <a href="dashboard.html" class="nav-link"><i class='bx bx-grid-alt'></i> ภาพรวม (Dashboard)</a>
         <a href="billing.html" class="nav-link active"><i class='bx bx-receipt'></i> รายการค้างชำระ</a>
         <a href="maintenance.html" class="nav-link"><i class='bx bx-wrench'></i> แจ้งซ่อม/ปัญหา</a>
-        <a href="profile.html" class="nav-link"><i class='bx bx-user'></i> ข้อมูลส่วนตัว</a>
+        <a href="profile.html" class="nav-link"><i class='bx bx-user'></i> ข้อมูลผู้เช่า</a>
         <a href="#" class="nav-link logout-btn" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
     </div>
 
     <div class="main-content">
-        <h1 style="font-size: 1.8rem; margin: 0 0 30px 0; color: #111;">รายการค้างชำระและประวัติ</h1>
+        <h1 class="page-title">รายการค้างชำระและประวัติ</h1>
         
         <div class="recent-section">
             <div class="section-header">รอบบิลของคุณ</div>
@@ -67,11 +76,38 @@
         </div>
     </div>
 
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 style="margin-top: 0;">ชำระเงินผ่านสแกน QR</h2>
+            <p id="modal-bill-details" style="color: #6b7280; margin-bottom: 20px;">รอบบิล: - | ยอดชำระ: - บาท</p>
+            
+            <!-- Dummy QR Code image (You can replace with real PromptPay later) -->
+            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" alt="PromptPay QR" style="width: 180px; margin: 0 auto 20px auto; display: block; border: 2px solid #f3f4f6; border-radius: 10px; padding: 10px;">
+            
+            <p style="font-size: 0.95rem; font-weight: 500; color: #111;">สแกนเพื่อชำระเงินเข้าบัญชีหอพัก</p>
+            
+            <div style="margin: 20px 0; text-align: left;">
+                <label style="font-size: 0.9rem; color: #6b7280;">แนบสลิปโอนเงิน (สลิปการโอน):</label>
+                <input type="file" id="slipUpload" class="lux-input" accept="image/*" required>
+            </div>
+            
+            <button class="pay-btn" style="width: 100%; padding: 12px; font-size: 1.05rem;" id="confirmPayBtn" onclick="confirmPayment()">ยืนยันการโอนเงิน</button>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script>
+        let currentBillId = null;
+
         document.addEventListener("DOMContentLoaded", async () => {
+            fetchBills();
+        });
+
+        async function fetchBills() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) { window.location.href = "../login.html"; return; }
             
@@ -94,7 +130,10 @@
                 let actionHtml = "";
                 if (bill.status === "pending") {
                     statusHtml = `<span class="status-badge status-pending">ค้างชำระ</span>`;
-                    actionHtml = `<button class="pay-btn" onclick="alert('ระบบชำระเงินจำลอง')">ชำระเงิน</button>`;
+                    actionHtml = `<button class="pay-btn" onclick="openPaymentModal(${bill.id}, '${bill.month}', ${bill.amount})">ชำระเงิน</button>`;
+                } else if (bill.status === "checking") {
+                    statusHtml = `<span class="status-badge status-pending" style="background:#e0e7ff; color:#4f46e5;">รอตรวจสอบสลิป</span>`;
+                    actionHtml = `<span style="color:#6b7280; font-size:0.9rem;">กำลังตรวจสอบ</span>`;
                 } else {
                     statusHtml = `<span class="status-badge status-paid">ชำระแล้ว</span>`;
                     actionHtml = `-`;
@@ -110,7 +149,48 @@
                     </tr>
                 `;
             });
-        });
+        }
+
+        function openPaymentModal(id, month, amount) {
+            currentBillId = id;
+            document.getElementById('modal-bill-details').innerText = `รอบบิล: ${month} | ยอดชำระ: ${amount.toLocaleString()} บาท`;
+            document.getElementById('paymentModal').style.display = 'flex';
+            document.getElementById('slipUpload').value = ""; // clear old input
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        async function confirmPayment() {
+            const fileInput = document.getElementById('slipUpload');
+            if(!fileInput.files.length) {
+                alert("กรุณาแนบสลิปโอนเงินก่อนยืนยันครับ");
+                return;
+            }
+
+            const btn = document.getElementById('confirmPayBtn');
+            btn.innerHTML = "กำลังบันทึกข้อมูล...";
+            btn.disabled = true;
+
+            // ในระบบจริง จะมีการอัปโหลดไฟล์สลิปไปที่ Storage ก่อน
+            // สำหรับโปรเจกต์นี้ เราจะอัปเดตสถานะบิลเป็น "รอตรวจสอบ" (checking) 
+            const { error } = await supabaseClient
+                .from('bills')
+                .update({ status: 'checking' })
+                .eq('id', currentBillId);
+                
+            if(error) {
+                alert("เกิดข้อผิดพลาด: " + error.message);
+            } else {
+                alert("แจ้งโอนเงินสำเร็จ! แอดมินจะทำการตรวจสอบสลิปของคุณเร็วๆ นี้");
+                closeModal();
+                fetchBills(); // โหลดตารางใหม่
+            }
+
+            btn.innerHTML = "ยืนยันการโอนเงิน";
+            btn.disabled = false;
+        }
     </script>
 </body>
 </html>

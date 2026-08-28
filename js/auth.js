@@ -46,6 +46,30 @@ document.addEventListener("DOMContentLoaded", () => {
                 btnSubmit.disabled = false;
             }
         });
+
+        // ==========================================
+        // ระบบลืมรหัสผ่าน (Forgot Password)
+        // ==========================================
+        const forgotBtn = document.getElementById("forgotPasswordBtn");
+        if (forgotBtn) {
+            forgotBtn.addEventListener("click", async (e) => {
+                e.preventDefault();
+                
+                // ให้ผู้ใช้กรอกอีเมลผ่านหน้าต่าง Prompt ของ Browser
+                const email = prompt("กรุณากรอก 'อีเมล' ของคุณเพื่อรับลิงก์รีเซ็ตรหัสผ่าน:\n(ระบบจะส่งลิงก์ตั้งรหัสผ่านใหม่ไปที่อีเมลนี้)");
+                
+                if (email) {
+                    try {
+                        const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email);
+                        if (error) throw error;
+                        
+                        alert("✅ ส่งลิงก์รีเซ็ตรหัสผ่านสำเร็จ!\n\nกรุณาตรวจสอบกล่องข้อความ (Inbox) หรือโฟลเดอร์สแปมในอีเมลของคุณ");
+                    } catch (error) {
+                        alert("❌ เกิดข้อผิดพลาด: " + (error.message || "ไม่สามารถส่งลิงก์ได้"));
+                    }
+                }
+            });
+        }
     }
 
     // ==========================================

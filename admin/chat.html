@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบตอบแชทลูกค้า (Admin) - K. Dormitory</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background-color: #f8fafc; margin: 0; font-family: 'Prompt', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar Admin */
+        .sidebar { width: 260px; background: #0f172a; color: #fff; height: 100vh; padding: 20px 0; position: fixed; display: flex; flex-direction: column; z-index: 10; }
+        .sidebar .logo { font-size: 24px; font-weight: 600; text-align: center; color: #facc15; margin-bottom: 30px; letter-spacing: 1px; }
+        .sidebar a { display: flex; align-items: center; padding: 15px 25px; color: #cbd5e1; text-decoration: none; font-size: 15px; transition: 0.3s; }
+        .sidebar a i { font-size: 20px; margin-right: 15px; }
+        .sidebar a:hover, .sidebar a.active { background: #1e293b; color: #fff; border-left: 4px solid #facc15; }
+        .sidebar .logout { margin-top: auto; border-top: 1px solid #1e293b; color: #f87171; }
+
+        /* Main Layout */
+        .main-wrapper { margin-left: 260px; width: calc(100% - 260px); display: flex; height: 100vh; }
+        
+        /* Chat List Sidebar (Left) */
+        .chat-list-container { width: 350px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
+        .chat-list-header { padding: 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+        .chat-list-header h2 { margin: 0 0 15px 0; font-size: 20px; color: #0f172a; }
+        .search-box { position: relative; }
+        .search-box input { width: 100%; padding: 10px 15px 10px 35px; border: 1px solid #cbd5e1; border-radius: 20px; font-family: 'Prompt'; outline: none; box-sizing: border-box; }
+        .search-box i { position: absolute; left: 12px; top: 12px; color: #94a3b8; }
+        
+        .chat-list { flex: 1; overflow-y: auto; }
+        .contact-item { padding: 15px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; }
+        .contact-item:hover { background: #f8fafc; }
+        .contact-item.active { background: #eff6ff; border-left: 4px solid #3b82f6; }
+        .contact-avatar { width: 45px; height: 45px; border-radius: 50%; background: #3b82f6; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+        .contact-info { flex: 1; overflow: hidden; }
+        .contact-name { margin: 0; font-size: 15px; font-weight: 500; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .contact-room { font-size: 12px; color: #64748b; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
+        .contact-msg { margin: 5px 0 0; font-size: 13px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .unread-badge { background: #ef4444; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 10px; font-weight: bold; }
+
+        /* Chat Window (Right) */
+        .chat-window { flex: 1; display: flex; flex-direction: column; background: #f1f5f9; position: relative; }
+        
+        .chat-window-header { padding: 20px 30px; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px; }
+        .chat-window-header .contact-avatar { background: #d4af37; }
+        .chat-window-header h3 { margin: 0; font-size: 18px; color: #0f172a; }
+        .chat-window-header p { margin: 2px 0 0; font-size: 13px; color: #64748b; }
+
+        .chat-messages { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .empty-chat-state { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; z-index: 5; }
+        .empty-chat-state i { font-size: 80px; margin-bottom: 20px; color: #cbd5e1; }
+
+        /* Message Bubbles */
+        .msg-row { display: flex; width: 100%; }
+        .msg-row.admin { justify-content: flex-end; }
+        .msg-row.tenant { justify-content: flex-start; }
+
+        .msg-bubble { max-width: 60%; padding: 12px 18px; border-radius: 20px; font-size: 14px; line-height: 1.5; position: relative; }
+        .msg-row.tenant .msg-bubble { background: #fff; color: #334155; border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .msg-row.admin .msg-bubble { background: #3b82f6; color: #fff; border-bottom-right-radius: 4px; box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2); }
+        
+        .msg-time { font-size: 10px; margin-top: 5px; display: block; }
+        .msg-row.tenant .msg-time { color: #94a3b8; text-align: left; }
+        .msg-row.admin .msg-time { color: #bfdbfe; text-align: right; }
+
+        /* Chat Input Area */
+        .chat-input-area { padding: 20px 30px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 15px; align-items: center; }
+        .chat-input-area input { flex: 1; padding: 15px 25px; border: 1px solid #cbd5e1; border-radius: 30px; font-family: 'Prompt', sans-serif; font-size: 14px; outline: none; background: #f8fafc; transition: 0.3s; }
+        .chat-input-area input:focus { border-color: #3b82f6; background: #fff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .btn-send { width: 50px; height: 50px; border-radius: 50%; background: #3b82f6; color: #fff; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .btn-send:hover { background: #2563eb; transform: scale(1.05); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">K. DORM ADMIN</div>
+        <a href="dashboard.html"><i class='bx bxs-dashboard'></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html"><i class='bx bx-receipt'></i> จัดการบิล / ตรวจสลิป</a>
+        <a href="users.html"><i class='bx bx-user-pin'></i> จัดการผู้เช่า / ห้องพัก</a>
+        <a href="maintenance.html"><i class='bx bx-wrench'></i> รายการแจ้งซ่อม</a>
+        <a href="chat.html" class="active"><i class='bx bxs-message-dots'></i> ข้อความ (Chat)</a>
+        
+        <a href="#" class="logout" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        
+        <!-- Left: Contact List -->
+        <div class="chat-list-container">
+            <div class="chat-list-header">
+                <h2>กล่องข้อความ</h2>
+                <div class="search-box">
+                    <i class='bx bx-search'></i>
+                    <input type="text" id="search-input" placeholder="ค้นหาห้องพัก หรือ อีเมล...">
+                </div>
+            </div>
+            <div class="chat-list" id="contact-list">
+                <div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 14px;">กำลังโหลด...</div>
+            </div>
+        </div>
+
+        <!-- Right: Chat Window -->
+        <div class="chat-window">
+            
+            <!-- Default State (No chat selected) -->
+            <div class="empty-chat-state" id="empty-state">
+                <i class='bx bx-message-square-dots'></i>
+                <h2>ระบบจัดการแชท</h2>
+                <p>เลือกผู้เช่าจากแถบด้านซ้ายเพื่อเริ่มสนทนา</p>
+            </div>
+
+            <!-- Active Chat Header -->
+            <div class="chat-window-header" id="chat-header" style="display: none;">
+                <div class="contact-avatar"><i class='bx bx-user'></i></div>
+                <div>
+                    <h3 id="active-chat-name">ผู้เช่า</h3>
+                    <p id="active-chat-email">email@example.com</p>
+                </div>
+            </div>
+
+            <!-- Active Chat Messages -->
+            <div class="chat-messages" id="chat-box" style="display: none;">
+                <!-- Messages will be injected here -->
+            </div>
+
+            <!-- Input Form -->
+            <form class="chat-input-area" id="chat-form" style="display: none;">
+                <input type="text" id="msg-input" placeholder="พิมพ์ข้อความตอบกลับ..." autocomplete="off" required>
+                <button type="submit" class="btn-send"><i class='bx bxs-send'></i></button>
+            </form>
+
+        </div>
+    </div>
+
+    <script src="../js/supabase-config.js"></script>
+    <script>
+        let contacts = {}; // เก็บข้อมูลคนที่เราคุยด้วย key: email
+        let activeChatEmail = null;
+        let tenantProfiles = {}; // เก็บข้อมูล { email: { room_no } }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                window.location.href = "../login.html";
+                return;
+            }
+
+            // ดึงข้อมูลห้องพักของผู้เช่าทุกคนมาเก็บไว้ในหน่วยความจำ
+            const { data: profiles } = await supabaseClient.from('tenant_profiles').select('email, room_no');
+            if (profiles) {
+                profiles.forEach(p => {
+                    tenantProfiles[p.email] = p.room_no || 'ไม่ระบุห้อง';
+                });
+            }
+
+            await loadContacts();
+
+            // Polling อัปเดตข้อมูลทุกๆ 3 วินาที
+            setInterval(() => {
+                loadContacts();
+                if (activeChatEmail) {
+                    loadActiveChatMessages();
+                }
+            }, 3000);
+
+            // ระบบค้นหา
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                const keyword = e.target.value.toLowerCase();
+                const items = document.querySelectorAll('.contact-item');
+                items.forEach(item => {
+                    const text = item.innerText.toLowerCase();
+                    item.style.display = text.includes(keyword) ? 'flex' : 'none';
+                });
+            });
+        });
+
+        // ดึงรายชื่อผู้ติดต่อ (คนที่เคยแชทกับแอดมิน)
+        async function loadContacts() {
+            // ดึงแชททั้งหมดที่มีคำว่า 'admin' เกี่ยวข้อง
+            const { data: messages, error } = await supabaseClient
+                .from('messages')
+                .select('*')
+                .or('sender_email.eq.admin,receiver_email.eq.admin')
+                .order('created_at', { ascending: true });
+
+            if (error) return console.error(error);
+
+            let newContacts = {};
+
+            // จัดกลุ่มข้อความตาม Email ของผู้เช่า
+            messages.forEach(msg => {
+                const tenantEmail = msg.sender_email === 'admin' ? msg.receiver_email : msg.sender_email;
+                if (!newContacts[tenantEmail]) {
+                    newContacts[tenantEmail] = {
+                        email: tenantEmail,
+                        lastMsg: msg.message,
+                        time: msg.created_at,
+                        unreadCount: 0
+                    };
+                } else {
+                    newContacts[tenantEmail].lastMsg = msg.message;
+                    newContacts[tenantEmail].time = msg.created_at;
+                }
+
+                // นับข้อความที่ยังไม่อ่าน (ส่งจาก tenant หา admin และยังไม่อ่าน)
+                if (msg.sender_email === tenantEmail && msg.receiver_email === 'admin' && !msg.is_read) {
+                    newContacts[tenantEmail].unreadCount++;
+                }
+            });
+
+            // สร้าง Array เพื่อนำมาเรียงลำดับคนที่คุยล่าสุดขึ้นบนสุด
+            const contactArray = Object.values(newContacts).sort((a, b) => new Date(b.time) - new Date(a.time));
+            
+            renderContactList(contactArray);
+        }
+
+        function renderContactList(contactArray) {
+            const listDiv = document.getElementById('contact-list');
+            if(contactArray.length === 0) {
+                if(!listDiv.innerHTML.includes('ไม่มีประวัติ')) {
+                    listDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 14px;">ยังไม่มีประวัติการแชท</div>';
+                }
+                return;
+            }
+
+            let html = '';
+            contactArray.forEach(c => {
+                const roomNo = tenantProfiles[c.email] || 'ไม่ระบุห้อง';
+                const isActive = activeChatEmail === c.email ? 'active' : '';
+                const unreadBadge = c.unreadCount > 0 ? `<span class="unread-badge">${c.unreadCount}</span>` : '';
+                
+                const d = new Date(c.time);
+                const timeStr = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
+                html += `
+                    <div class="contact-item ${isActive}" onclick="openChat('${c.email}')">
+                        <div class="contact-avatar"><i class='bx bx-user'></i></div>
+                        <div class="contact-info">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <h4 class="contact-name">${c.email.split('@')[0]} <span class="contact-room">ห้อง ${roomNo}</span></h4>
+                                <span style="font-size:10px; color:#94a3b8;">${timeStr}</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <p class="contact-msg">${escapeHTML(c.lastMsg)}</p>
+                                ${unreadBadge}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // ตรวจสอบว่า HTML เปลี่ยนไปไหม เพื่อลดการกระตุกของการ render
+            if(listDiv.innerHTML !== html) {
+                listDiv.innerHTML = html;
+            }
+        }
+
+        async function openChat(tenantEmail) {
+            activeChatEmail = tenantEmail;
+            const roomNo = tenantProfiles[tenantEmail] || 'ไม่ระบุห้อง';
+
+            // สลับ UI
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('chat-header').style.display = 'flex';
+            document.getElementById('chat-box').style.display = 'flex';
+            document.getElementById('chat-form').style.display = 'flex';
+
+            document.getElementById('active-chat-name').innerText = `ผู้เช่าห้อง ${roomNo}`;
+            document.getElementById('active-chat-email').innerText = tenantEmail;
+
+            // เน้นสีคนที่ถูกเลือก
+            const items = document.querySelectorAll('.contact-item');
+            items.forEach(item => item.classList.remove('active'));
+            // อันที่จริงโหลดรอบหน้ามันจะ active เอง แต่ทำหลอกตาไว้ก่อนให้เนียน
+            
+            // เปลี่ยนสถานะข้อความว่า "อ่านแล้ว" (is_read = true)
+            await supabaseClient
+                .from('messages')
+                .update({ is_read: true })
+                .eq('sender_email', tenantEmail)
+                .eq('receiver_email', 'admin')
+                .eq('is_read', false);
+
+            await loadActiveChatMessages(true);
+            loadContacts(); // รีเฟรช Contact List เผื่อลบ Unread Badge
+        }
+
+        let lastMessageCount = 0;
+        
+        async function loadActiveChatMessages(forceScroll = false) {
+            if (!activeChatEmail) return;
+
+            const { data: messages, error } = await supabaseClient
+                .from('messages')
+                .select('*')
+                .or(`and(sender_email.eq.admin,receiver_email.eq.${activeChatEmail}),and(sender_email.eq.${activeChatEmail},receiver_email.eq.admin)`)
+                .order('created_at', { ascending: true });
+
+            if (error) return;
+
+            if (messages.length !== lastMessageCount || forceScroll) {
+                lastMessageCount = messages.length;
+                renderMessages(messages, forceScroll);
+            }
+        }
+
+        function renderMessages(messages, forceScroll) {
+            const chatBox = document.getElementById('chat-box');
+            let html = '';
+
+            messages.forEach(msg => {
+                const isAdmin = msg.sender_email === 'admin';
+                const d = new Date(msg.created_at);
+                const timeStr = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
+                html += `
+                    <div class="msg-row ${isAdmin ? 'admin' : 'tenant'}">
+                        <div class="msg-bubble">
+                            ${escapeHTML(msg.message)}
+                            <span class="msg-time">${timeStr}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            chatBox.innerHTML = html;
+
+            // เลื่อนลงไปล่างสุด
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // ฟังก์ชันส่งข้อความ
+        document.getElementById('chat-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!activeChatEmail) return;
+
+            const input = document.getElementById('msg-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = ''; // เคลียร์ช่องพิมพ์
+
+            const { error } = await supabaseClient
+                .from('messages')
+                .insert([{
+                    sender_email: 'admin',
+                    receiver_email: activeChatEmail,
+                    message: text,
+                    is_read: false
+                }]);
+
+            if (!error) {
+                loadActiveChatMessages(true);
+                loadContacts();
+            }
+        });
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = "../login.html";
+        }
+    </script>
+</body>
+</html>

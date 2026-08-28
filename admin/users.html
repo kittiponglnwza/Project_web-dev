@@ -231,8 +231,13 @@
 
         // --- ระบบแก้ไขข้อมูลแบบละเอียด ---
         function openEditModal(userId) {
-            const user = allUsers.find(u => u.id === userId);
-            if(!user) return;
+            // ใช้ == แทน === เผื่อกรณีที่ id เป็น string จาก HTML
+            const user = allUsers.find(u => u.id == userId);
+            
+            if(!user) {
+                alert("เกิดข้อผิดพลาด: หาข้อมูลผู้ใช้ไม่พบในระบบ (ID: " + userId + ")");
+                return;
+            }
 
             document.getElementById('e_id').value = user.id;
             document.getElementById('e_email').value = user.email || '';

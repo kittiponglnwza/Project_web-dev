@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สร้างบิลค่าเช่า - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #3b82f6;
+            --bg: #f8fafc;
+            --text: #334155;
+        }
+        body { margin: 0; padding: 0; font-family: 'Prompt', sans-serif; background: var(--bg); display: flex; color: var(--text); }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: #fff; height: 100vh; padding: 30px 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.05); position: fixed; box-sizing: border-box; z-index: 100;}
+        .sidebar .logo { font-size: 24px; font-weight: 600; color: var(--primary); margin-bottom: 40px; text-align: center; letter-spacing: 1px; }
+        .sidebar a { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #64748b; padding: 15px 20px; border-radius: 12px; margin-bottom: 10px; transition: 0.3s; font-weight: 500; }
+        .sidebar a:hover, .sidebar a.active { background: var(--primary); color: #fff; }
+        .sidebar a.logout { color: #ef4444; margin-top: auto; position: absolute; bottom: 30px; width: calc(100% - 40px); }
+        .sidebar a.logout:hover { background: #fee2e2; color: #dc2626; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); box-sizing: border-box; }
+        
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header-actions h2 { margin: 0; color: #0f172a; font-size: 24px; display: flex; align-items: center; gap: 10px; }
+        
+        .btn-secondary { background: #e2e8f0; color: #475569; border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Prompt'; font-size: 15px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .btn-secondary:hover { background: #cbd5e1; color: #0f172a; }
+
+        /* Form Card */
+        .card { background: #fff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); padding: 40px; max-width: 800px; margin: 0 auto; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 14px; color: #64748b; margin-bottom: 8px; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Prompt'; font-size: 15px; box-sizing: border-box; outline: none; transition: 0.2s; }
+        .form-group input:focus, .form-group select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .total-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; text-align: center; margin-top: 30px; margin-bottom: 30px; }
+        .total-box span { display: block; font-size: 14px; color: #64748b; margin-bottom: 5px; }
+        .total-box strong { font-size: 36px; color: #dc2626; font-weight: 600; }
+
+        .btn-submit { width: 100%; background: #0f172a; color: #fff; border: none; padding: 15px; border-radius: 12px; font-family: 'Prompt'; font-size: 16px; font-weight: 500; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-submit:hover { background: #1e293b; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(15, 23, 42, 0.2); }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo">K. DORM ADMIN</div>
+        <a href="dashboard.html"><i class='bx bxs-dashboard'></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html" class="active"><i class='bx bx-receipt'></i> จัดการบิล / ตรวจสลิป</a>
+        <a href="users.html"><i class='bx bx-user-pin'></i> จัดการผู้เช่า / ห้องพัก</a>
+        <a href="maintenance.html"><i class='bx bx-wrench'></i> รายการแจ้งซ่อม</a>
+        <a href="chat.html"><i class='bx bxs-message-dots'></i> ข้อความ (Chat)</a>
+        
+        <a href="#" class="logout" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header-actions">
+            <h2><i class='bx bx-plus-circle'></i> สร้างบิลเรียกเก็บเงิน</h2>
+            <a href="billing.html" class="btn-secondary"><i class='bx bx-arrow-back'></i> กลับไปหน้ารวมบิล</a>
+        </div>
+
+        <div class="card">
+            <form id="create-bill-form">
+                <div class="form-group">
+                    <label>เลือกผู้เช่า (ห้องพัก)</label>
+                    <select id="b_email" required>
+                        <option value="">-- เลือกผู้เช่า --</option>
+                        <!-- Options generated by JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ประจำเดือน (เช่น ตุลาคม 2567)</label>
+                    <input type="text" id="b_month" required placeholder="ต.ค. 2567">
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>ค่าเช่าห้อง (บาท)</label>
+                        <input type="number" id="b_rent" value="3500" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ค่าส่วนกลาง / ค่าปรับ (บาท)</label>
+                        <input type="number" id="b_other" value="0">
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>จำนวนหน่วยไฟฟ้า (หน่วยละ 8 บ.)</label>
+                        <input type="number" id="b_elec" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>จำนวนหน่วยน้ำประปา (หน่วยละ 18 บ.)</label>
+                        <input type="number" id="b_water" value="0" required>
+                    </div>
+                </div>
+
+                <div class="total-box">
+                    <span>ยอดที่ต้องชำระทั้งหมด</span>
+                    <strong id="b_total_display">3,500 ฿</strong>
+                </div>
+
+                <button type="submit" class="btn-submit"><i class='bx bx-send'></i> ออกบิลเรียกเก็บเงิน</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script>
+        let tenantProfiles = [];
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            await loadTenants();
+            
+            // เซ็ตเดือนปัจจุบันอัตโนมัติ
+            const thaiMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+            const d = new Date();
+            document.getElementById('b_month').value = `${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
+            calculateTotal();
+
+            // คำนวณยอดรวมแบบ Real-time ตอนกรอกฟอร์ม
+            const inputs = ['b_rent', 'b_other', 'b_elec', 'b_water'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', calculateTotal);
+            });
+        });
+
+        async function loadTenants() {
+            const { data } = await supabaseClient.from('tenant_profiles').select('*').neq('role', 'admin');
+            if(data) {
+                tenantProfiles = data;
+                const select = document.getElementById('b_email');
+                data.forEach(t => {
+                    const roomStr = t.room_no ? `ห้อง ${t.room_no}` : 'ยังไม่ระบุห้อง';
+                    select.innerHTML += `<option value="${t.email}">${roomStr} (${t.email})</option>`;
+                });
+            }
+        }
+
+        function calculateTotal() {
+            const rent = parseInt(document.getElementById('b_rent').value) || 0;
+            const other = parseInt(document.getElementById('b_other').value) || 0;
+            const elec = parseInt(document.getElementById('b_elec').value) || 0;
+            const water = parseInt(document.getElementById('b_water').value) || 0;
+
+            const total = rent + other + (elec * 8) + (water * 18);
+            document.getElementById('b_total_display').innerText = total.toLocaleString() + ' ฿';
+            return total;
+        }
+
+        document.getElementById('create-bill-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('b_email').value;
+            const profile = tenantProfiles.find(t => t.email === email);
+            if(!profile) return;
+
+            const month = document.getElementById('b_month').value;
+            const rent = parseInt(document.getElementById('b_rent').value) || 0;
+            const other = parseInt(document.getElementById('b_other').value) || 0;
+            const elecUnit = parseInt(document.getElementById('b_elec').value) || 0;
+            const waterUnit = parseInt(document.getElementById('b_water').value) || 0;
+            
+            const elecFee = elecUnit * 8;
+            const waterFee = waterUnit * 18;
+            const amount = rent + other + elecFee + waterFee;
+
+            const { error } = await supabaseClient.from('bills').insert([{
+                email: email,
+                room_no: profile.room_no,
+                month: month,
+                rent_fee: rent,
+                other_fee: other,
+                elec_unit: elecUnit,
+                elec_fee: elecFee,
+                water_unit: waterUnit,
+                water_fee: waterFee,
+                amount: amount,
+                status: 'pending' 
+            }]);
+
+            if (error) {
+                alert('เกิดข้อผิดพลาดในการสร้างบิล: ' + error.message);
+                console.error(error);
+            } else {
+                alert('สร้างบิลสำเร็จแล้ว!');
+                window.location.href = 'billing.html';
+            }
+        });
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = "../login.html";
+        }
+    </script>
+</body>
+</html>

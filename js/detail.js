@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function fetchRoomDetail(id) {
     try {
         // ใช้ Supabase API ดึงข้อมูลเฉพาะห้องที่มี id ตรงกับ URL
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('rooms')
             .select('*')
             .eq('id', id)

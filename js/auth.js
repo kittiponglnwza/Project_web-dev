@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 // เรียกใช้ Supabase Auth ของจริง!
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: emailVal,
                     password: passVal,
                 });
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 // สมัครสมาชิกผ่าน Supabase Auth
                 // และแนบข้อมูลส่วนตัว (Metadata) ไปเก็บไว้ด้วยเพื่อใช้อ้างอิง
-                const { data, error } = await supabase.auth.signUp({
+                const { data, error } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
                     options: {
@@ -130,7 +130,7 @@ async function checkLoginStatus() {
     const loginBtn = document.querySelector(".btn-login");
 
     // ดึง Session ของผู้ใช้ปัจจุบันจาก Supabase
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
 
     if (session) {
         // หากเข้าสู่ระบบแล้ว
@@ -165,7 +165,7 @@ async function checkLoginStatus() {
 async function logout() {
     if(confirm("คุณต้องการออกจากระบบหรือไม่?")) {
         // สั่ง Logout ออกจากระบบ Supabase
-        const { error } = await supabase.auth.signOut();
+        const { error } = await supabaseClient.auth.signOut();
         if (!error) {
             window.location.reload(); 
         }

@@ -231,25 +231,30 @@
 
         // --- ระบบแก้ไขข้อมูลแบบละเอียด ---
         function openEditModal(userId) {
-            // ใช้ == แทน === เผื่อกรณีที่ id เป็น string จาก HTML
-            const user = allUsers.find(u => u.id == userId);
-            
-            if(!user) {
-                alert("เกิดข้อผิดพลาด: หาข้อมูลผู้ใช้ไม่พบในระบบ (ID: " + userId + ")");
-                return;
+            try {
+                // ใช้ == แทน === เผื่อกรณีที่ id เป็น string จาก HTML
+                const user = allUsers.find(u => u.id == userId);
+                
+                if(!user) {
+                    alert("เกิดข้อผิดพลาด: หาข้อมูลผู้ใช้ไม่พบในระบบ (ID: " + userId + ")");
+                    return;
+                }
+
+                document.getElementById('e_id').value = user.id;
+                document.getElementById('e_email').value = user.email || '';
+                document.getElementById('e_room').value = user.room_no || '';
+                document.getElementById('e_national_id').value = user.national_id || '';
+                document.getElementById('e_address').value = user.address || '';
+                document.getElementById('e_start_date').value = user.start_date || '';
+                document.getElementById('e_end_date').value = user.end_date || '';
+                document.getElementById('e_emergency_contact').value = user.emergency_contact || '';
+                document.getElementById('e_emergency_phone').value = user.emergency_phone || '';
+
+                document.getElementById('edit-modal').style.display = 'flex';
+            } catch (err) {
+                alert("เกิดข้อผิดพลาดในระบบ Javascript: " + err.message);
+                console.error(err);
             }
-
-            document.getElementById('e_id').value = user.id;
-            document.getElementById('e_email').value = user.email || '';
-            document.getElementById('e_room').value = user.room_no || '';
-            document.getElementById('e_national_id').value = user.national_id || '';
-            document.getElementById('e_address').value = user.address || '';
-            document.getElementById('e_start_date').value = user.start_date || '';
-            document.getElementById('e_end_date').value = user.end_date || '';
-            document.getElementById('e_emergency_contact').value = user.emergency_contact || '';
-            document.getElementById('e_emergency_phone').value = user.emergency_phone || '';
-
-            document.getElementById('edit-modal').style.display = 'flex';
         }
 
         function closeModal() {

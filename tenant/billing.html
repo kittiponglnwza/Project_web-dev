@@ -39,6 +39,18 @@
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #6b7280; }
         .close-btn:hover { color: #111; }
         .lux-input { width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px; }
+
+        /* Invoice Modal Specific Styles */
+        .invoice-modal { background-color: #fff; padding: 0; border-radius: 16px; width: 500px; text-align: left; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow: hidden; border: 1px solid #f3f4f6; }
+        .invoice-header { background: #fff; padding: 25px 30px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; border-top: 6px solid #3b82f6; }
+        .invoice-title { font-size: 1.3rem; font-weight: 600; color: #1e40af; margin: 0; }
+        .invoice-body { padding: 30px; color: #4b5563; font-size: 1rem; }
+        .invoice-section-title { font-size: 1.1rem; color: #111; font-weight: 600; margin: 0 0 20px 0; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; }
+        .invoice-row { display: flex; justify-content: space-between; margin-bottom: 12px; align-items: flex-start; }
+        .invoice-row span.val { font-weight: 500; color: #111; text-align: right; }
+        .invoice-row span.sub-text { font-size: 0.9rem; color: #6b7280; }
+        .invoice-divider { border: 0; border-top: 1px dashed #e5e7eb; margin: 20px 0; }
+        .invoice-total { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 600; color: #111; background: #f9fafb; padding: 15px 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #f3f4f6; }
     </style>
 </head>
 <body>
@@ -99,29 +111,62 @@
 
     <!-- Bill Detail Modal -->
     <div id="billDetailModal" class="modal">
-        <div class="modal-content" style="width: 500px; padding: 0; overflow: hidden; text-align: left;">
-            <div style="background: #eff6ff; color: #1e40af; padding: 20px; font-size: 1.2rem; font-weight: 500; border-bottom: 1px solid #bfdbfe; display: flex; justify-content: space-between; align-items: center;">
-                <span id="detail-month">เดือน</span>
-                <span class="close-btn" style="position: static; margin: 0; color: #1e40af;" onclick="closeDetailModal()">&times;</span>
+        <div class="invoice-modal">
+            <div class="invoice-header">
+                <h2 class="invoice-title" id="detail-month">เดือน</h2>
+                <span class="close-btn" style="position: static; font-size: 1.8rem; color: #9ca3af;" onclick="closeDetailModal()">&times;</span>
             </div>
-            <div style="padding: 25px; color: #4b5563;">
-                <h3 style="margin-top: 0; color: #374151; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px;">รายละเอียด</h3>
-                <p><strong>- ห้องพัก :</strong> <span id="detail-room">-</span></p>
-                <hr style="border: 0; border-top: 1px solid #f3f4f6; margin: 15px 0;">
-                <p><strong>- ค่าเช่าห้องพัก :</strong> <span id="detail-rent">0</span> บาท</p>
-                <p><strong>- มิเตอร์ไฟฟ้า :</strong> <span id="detail-elec-unit">0</span> หน่วย เป็นเงิน <span id="detail-elec-fee">0</span> บาท</p>
-                <p><strong>- มิเตอร์น้ำประปา :</strong> <span id="detail-water-unit">0</span> หน่วย เป็นเงิน <span id="detail-water-fee">0</span> บาท</p>
-                <hr style="border: 0; border-top: 1px solid #f3f4f6; margin: 15px 0;">
-                <p><strong>- รวมค่าสาธารณูปโภค :</strong> <span id="detail-utility">0</span> บาท</p>
-                <p><strong>- ค่าปรับและค่าอื่น ๆ :</strong> <span id="detail-other">0</span> บาท</p>
-                <hr style="border: 0; border-top: 1px solid #f3f4f6; margin: 15px 0;">
-                <p style="font-size: 1.1rem; color: #111;"><strong>- รวมเป็นเงินทั้งสิ้น :</strong> <span id="detail-total">0</span> บาท</p>
-                <hr style="border: 0; border-top: 1px solid #f3f4f6; margin: 15px 0;">
-                <p><strong>- วันที่ออกใบเสร็จรับเงิน :</strong> <span id="detail-date">-</span></p>
-                <p style="display: flex; align-items: center; gap: 10px; margin-bottom: 0;">
-                    <strong>- ใบเสร็จรับเงินอิเล็กทรอนิกส์ :</strong> 
-                    <i class='bx bxs-file-pdf' style="color: #ef4444; font-size: 1.8rem; cursor: pointer;" title="ดาวน์โหลด PDF" onclick="alert('ระบบดาวน์โหลด PDF กำลังพัฒนา')"></i>
-                </p>
+            <div class="invoice-body">
+                <h3 class="invoice-section-title">รายละเอียด</h3>
+                
+                <div class="invoice-row">
+                    <span>- ห้องพัก :</span>
+                    <span class="val" id="detail-room">-</span>
+                </div>
+                
+                <div class="invoice-divider"></div>
+
+                <div class="invoice-row">
+                    <span>- ค่าเช่าห้องพัก :</span>
+                    <span class="val"><span id="detail-rent">0</span> บาท</span>
+                </div>
+                
+                <div class="invoice-row">
+                    <span>- มิเตอร์ไฟฟ้า : <br><span class="sub-text">(<span id="detail-elec-unit">0</span> หน่วย)</span></span>
+                    <span class="val"><br><span id="detail-elec-fee">0</span> บาท</span>
+                </div>
+
+                <div class="invoice-row">
+                    <span>- มิเตอร์น้ำประปา : <br><span class="sub-text">(<span id="detail-water-unit">0</span> หน่วย)</span></span>
+                    <span class="val"><br><span id="detail-water-fee">0</span> บาท</span>
+                </div>
+
+                <div class="invoice-divider"></div>
+
+                <div class="invoice-row">
+                    <span>- รวมค่าสาธารณูปโภค :</span>
+                    <span class="val"><span id="detail-utility">0</span> บาท</span>
+                </div>
+
+                <div class="invoice-row">
+                    <span>- ค่าปรับและค่าอื่น ๆ :</span>
+                    <span class="val"><span id="detail-other">0</span> บาท</span>
+                </div>
+
+                <div class="invoice-total">
+                    <span>- รวมเป็นเงินทั้งสิ้น :</span>
+                    <span><span id="detail-total">0</span> บาท</span>
+                </div>
+
+                <div class="invoice-row" style="align-items: center;">
+                    <span>- วันที่ออกใบเสร็จรับเงิน :</span>
+                    <span class="val" id="detail-date">-</span>
+                </div>
+
+                <div class="invoice-row" style="align-items: center; margin-top: 15px;">
+                    <span>- ใบเสร็จรับเงินอิเล็กทรอนิกส์ :</span>
+                    <i class='bx bxs-file-pdf' style="color: #ef4444; font-size: 2.2rem; cursor: pointer; transition: 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="ดาวน์โหลด PDF" onclick="alert('ระบบดาวน์โหลด PDF กำลังพัฒนา')"></i>
+                </div>
             </div>
         </div>
     </div>

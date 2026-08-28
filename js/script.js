@@ -12,12 +12,30 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchRooms();
     }
 });
+// ดึงข้อมูลห้องพักจากฐานข้อมูลจริง (Supabase)
+async function fetchRooms() {
+    try {
+        // ใช้ Supabase API ดึงข้อมูลจากตาราง rooms
+        const { data, error } = await supabaseClient
+            .from('rooms')
+            .select('*')
+            .order('id', { ascending: true });
 
-            console.error("Error fetching rooms:", error);
-            document.getElementById("room-container").innerHTML = "<p>ไม่สามารถโหลดข้อมูลห้องพักได้</p>";
-        });
+        if (error) throw error;
+        
+        // แปลงข้อมูลให้ตรงกับตัวแปรที่หน้าเว็บใช้ (snake_case -> camelCase)
+        const formattedData = data.map(room => ({
+            ...room,
+            isAvailable: room.is_available,
+            availableCount: room.available_count
+        }));
+        
+        renderRooms(formattedData);
+    } catch (error) {
+        console.error("Error fetching from Supabase:", error);
+        document.getElementById("room-container").innerHTML = "<p style='text-align:center;'>เกิดข้อผิดพลาดในการดึงข้อมูลจากฐานข้อมูล</p>";
+    }
 }
-
 // ตัวแปรเก็บสถานะสไลเดอร์ของแต่ละห้อง
 const sliderStates = {};
 

@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>รายละเอียดห้องพักสุดหรู - MyDorm</title>
     <link rel="stylesheet" href="css/style.css">
-    
-    <!-- นำเข้า Google Fonts: Prompt เพื่อความสวยงามพรีเมียม -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- นำเข้า BoxIcons เปลี่ยนจาก Emoji เป็นไอคอนมินิมอล -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body class="luxury-body">
@@ -17,6 +13,53 @@
     <main id="room-detail-container">
         <p style="text-align: center; padding: 100px; font-size: 1.2rem; color: #888;">กำลังโหลดข้อมูล...</p>
     </main>
+
+    <!-- Modal ฟอร์มนัดหมาย/จองห้องพัก -->
+    <div id="bookingModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 style="margin-bottom: 20px; color: #111; font-weight: 500;">สนใจจอง / นัดดูห้องพัก</h2>
+            
+            <!-- ส่วนฟอร์มที่ต้อง Validation -->
+            <div id="bookingFormContainer">
+                <form id="bookingForm">
+                    <div class="form-group">
+                        <label for="b_name">ชื่อ-นามสกุล <span style="color:red;">*</span></label>
+                        <input type="text" id="b_name" required placeholder="กรอกชื่อของคุณ">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="b_phone">เบอร์โทรศัพท์ <span style="color:red;">*</span></label>
+                        <input type="tel" id="b_phone" required placeholder="เช่น 0812345678">
+                        <!-- แจ้งเตือนเมื่อกรอกผิดเงื่อนไข RegEx -->
+                        <small class="error-msg" id="phoneError">กรุณากรอกเบอร์โทรศัพท์มือถือตัวเลข 10 หลัก (ขึ้นต้นด้วย 0)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="b_date">วันที่คาดว่าจะเข้าอยู่</label>
+                        <input type="date" id="b_date">
+                    </div>
+
+                    <button type="submit" class="lux-btn-reserve" style="margin-top: 15px; width: 100%;">
+                        ยืนยันข้อมูล
+                    </button>
+                </form>
+            </div>
+
+            <!-- ส่วนที่จะแสดงเมื่อ Validation ผ่าน (สมจริงแบบธุรกิจไทย) -->
+            <div id="bookingSuccess" style="display: none; text-align: center; padding: 20px 0;">
+                <i class='bx bxs-check-circle' style='color:#10b981; font-size: 4rem; margin-bottom:15px;'></i>
+                <h3 style="margin-bottom: 10px; font-weight: 500; color: #111;">บันทึกข้อมูลสำเร็จ!</h3>
+                <p style="color: #666; margin-bottom: 25px; line-height: 1.5;">แอดมินได้รับเรื่องแล้ว จะรีบติดต่อกลับไปที่เบอร์ที่คุณแจ้งไว้โดยเร็วที่สุดครับ</p>
+                <hr style="border: 0; height: 1px; background: #eee; margin-bottom: 20px;">
+                <p style="margin-bottom: 15px; font-size: 0.95rem;">ต้องการข้อมูลด่วน / แชทกับแอดมินทันที?</p>
+                <!-- ปุ่มเชื่อมไป LINE OA -->
+                <a href="#" class="line-btn">
+                    <i class='bx bxl-line' style="font-size: 1.5rem;"></i> คุยผ่าน LINE Official
+                </a>
+            </div>
+        </div>
+    </div>
 
     <script src="js/detail.js"></script>
 </body>

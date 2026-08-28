@@ -9,20 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const roomContainer = document.getElementById("room-container");
     if (roomContainer) {
-        fetchRoomsData();
+        fetchRooms();
     }
 });
 
-function fetchRoomsData() {
-    fetch("data/rooms.json")
-        .then(response => {
-            if (!response.ok) throw new Error("Network response was not ok");
-            return response.json();
-        })
-        .then(data => {
-            renderRooms(data);
-        })
-        .catch(error => {
             console.error("Error fetching rooms:", error);
             document.getElementById("room-container").innerHTML = "<p>ไม่สามารถโหลดข้อมูลห้องพักได้</p>";
         });

@@ -45,21 +45,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-function fetchRoomDetail(id) {
-    fetch("data/rooms.json")
-        .then(response => {
-            if (!response.ok) throw new Error("ไม่สามารถโหลดข้อมูลได้");
-            return response.json();
-        })
-        .then(data => {
-            const room = data.find(r => r.id == id);
-            if (room) {
-                renderUltraPremiumDetail(room);
-            } else {
-                document.getElementById("room-detail-container").innerHTML = "<p style='text-align:center; padding: 100px;'>⚠️ ไม่พบข้อมูลห้องพักที่ท่านค้นหา</p>";
-            }
-        })
-        .catch(error => console.error("Error:", error));
+async function fetchRoomDetail(id) {
+    try {
+        // ใช้ Supabase API ดึงข้อมูลเฉพาะห้องที่มี id ตรงกับ URL
+        const { data, error } = await supabase
+            .from('rooms')
+            .select('*')
+            .eq('id', id)
+            .single(); // เอาแค่ 1 แถว
+
+        if (error) throw error;
+        
+        if (data) {
+            // แปลงข้อมูลจาก DB ให้ตรงกับตัวแปรในหน้าเว็บ
+            const room = {
+                ...data,
+                isAvailable: data.is_available,
+                availableCount: data.available_count
+            };
+            renderUltraPremiumDetail(room);
+        }
+    } catch (error) {
+        console.error("Error fetching detail:", error);
+        document.getElementById("room-detail-container").innerHTML = "<p style='text-align:center; padding: 100px;'>⚠️ ไม่พบข้อมูลห้องพักที่ท่านค้นหา</p>";
+    }
 }
 
 function renderUltraPremiumDetail(room) {

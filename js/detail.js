@@ -118,6 +118,14 @@ function renderUltraPremiumDetail(room) {
                     </div>
                 </div>
                 
+                <!-- แผนผังอาคาร (Floor Plan) -->
+                <div class="lux-section">
+                    <h2>แผนผังอาคาร (Floor Plan)</h2>
+                    <div style="width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: center;">
+                        <img src="images/floorplan.png" alt="แผนผังอาคาร" style="max-width: 100%; height: auto; border-radius: 12px;">
+                    </div>
+                </div>
+                
                 <div class="lux-section">
                     <h2>สิ่งอำนวยความสะดวก (Amenities)</h2>
                     <div class="lux-amenities">

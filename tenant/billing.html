@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <style>
         body { background-color: #f3f4f6; margin: 0; font-family: 'Prompt', sans-serif; display: flex; }
         .sidebar { width: 260px; background: #fff; height: 100vh; padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05); position: fixed; display: flex; flex-direction: column; }
@@ -190,69 +191,176 @@
             const bill = globalBills.find(b => b.id === currentBillId);
             if(!bill) return;
 
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            // Helper to remove Thai chars for jsPDF standard font compatibility
+            const stripThai = (str) => {
+                if(!str) return '-';
+                return str.replace(/[ก-๙เแโใไ]/g, '').trim() || '(Omitted)';
+            };
+
             const d = new Date(bill.created_at);
             const invNo = "INV-" + d.getFullYear() + (d.getMonth()+1).toString().padStart(2,'0') + "-" + bill.id;
-            const dateStr = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
+            const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            
             const room = (globalProfile && globalProfile.room_no) ? globalProfile.room_no : '-';
-            const address = (globalProfile && globalProfile.address) ? globalProfile.address : '-';
-            const statusBadge = bill.status === 'paid' ? 'ชำระแล้ว (PAID)' : bill.status === 'checking' ? 'รอตรวจสอบสลิป' : 'ค้างชำระ (UNPAID)';
-            const statusBg = bill.status === 'paid' ? '#d1fae5' : bill.status === 'checking' ? '#e0e7ff' : '#fee2e2';
-            const statusClr = bill.status === 'paid' ? '#059669' : bill.status === 'checking' ? '#4f46e5' : '#dc2626';
+            const address = stripThai((globalProfile && globalProfile.address) ? globalProfile.address : '-');
+            const engName = stripThai(globalUserName);
 
-            const container = document.createElement('div');
-            container.id = 'pdf-export-temp';
-            container.innerHTML = `
-<div style="width:750px; padding:40px 50px; background:#fff; color:#333; font-family:'Prompt',sans-serif;">
-    <div style="display:flex; justify-content:space-between; border-bottom:3px solid #1e40af; padding-bottom:20px; margin-bottom:25px;">
-        <div><h1 style="font-size:22px; color:#111; margin:0 0 5px 0;">หอพัก K. Dormitory</h1><p style="font-size:12px; color:#666; line-height:1.8; margin:0;">123/45 ถนนสุขุมวิท ต.แสนสุข อ.เมือง จ.ชลบุรี 20130<br>โทรศัพท์: 080-123-4567<br>เลขประจำตัวผู้เสียภาษี: 0-1234-56789-01-2</p></div>
-        <div style="text-align:right;"><h2 style="font-size:22px; color:#1e40af; margin:0 0 8px 0;">ใบแจ้งหนี้ / Invoice</h2><p style="font-size:12px; margin:3px 0;"><b>เลขที่:</b> ${invNo}</p><p style="font-size:12px; margin:3px 0;"><b>วันที่:</b> ${dateStr}</p></div>
-    </div>
-    <div style="display:flex; justify-content:space-between; margin-bottom:25px;">
-        <div style="width:58%;"><h3 style="font-size:14px; color:#1e40af; border-bottom:2px solid #e5e7eb; display:inline-block; padding-bottom:5px; margin:0 0 10px 0;">ข้อมูลผู้เช่า (Billed To)</h3><p style="font-size:12px; margin:4px 0;"><b>ชื่อ-นามสกุล:</b> ${globalUserName}</p><p style="font-size:12px; margin:4px 0;"><b>ห้องพัก:</b> ${room}</p><p style="font-size:12px; margin:4px 0;"><b>ที่อยู่:</b> ${address}</p></div>
-        <div><div style="background:#f0f4ff; border:2px solid #c7d2fe; padding:15px 20px; border-radius:10px; text-align:center;"><small style="color:#6b7280;">รอบบิล (Billing Period)</small><div style="font-size:18px; font-weight:600; color:#1e40af; margin-top:5px;">${bill.month}</div></div></div>
-    </div>
-    <table style="width:100%; border-collapse:collapse; margin-bottom:10px;"><thead><tr style="background:#1e40af; color:#fff;"><th style="padding:10px; font-size:12px; text-align:center; width:8%;">ลำดับ</th><th style="padding:10px; font-size:12px; text-align:left; width:42%;">รายการ</th><th style="padding:10px; font-size:12px; text-align:center; width:25%;">จำนวน / หน่วย</th><th style="padding:10px; font-size:12px; text-align:right; width:25%;">จำนวนเงิน (บาท)</th></tr></thead>
-    <tbody>
-        <tr><td style="padding:10px; border-bottom:1px solid #e5e7eb; text-align:center;">1</td><td style="padding:10px; border-bottom:1px solid #e5e7eb;">ค่าเช่าห้องพัก</td><td style="padding:10px; border-bottom:1px solid #e5e7eb; text-align:center;">1 เดือน</td><td style="padding:10px; border-bottom:1px solid #e5e7eb; text-align:right;">${(bill.rent_fee||0).toLocaleString()}</td></tr>
-        <tr><td style="padding:10px; border-bottom:1px solid #e5e7eb; text-align:center;">2</td><td style="padding:10px; border-bottom:1px solid #e5e7eb;">ค่าไฟฟ้า</td><td style="padding:10px; border-bottom:1px solid #e5e7eb; text-align:center;">${(bill.elec_unit||0).toLocaleString()} หน่วย</td><td style="padding:10px; border-bottom:1px solid #e5e7eb; text-align:right;">${(bill.elec_fee||0).toLocaleString()}</td></tr>
-        <tr><td style="padding:10px; border-bottom:1px solid #e5e7eb; text-align:center;">3</td><td style="padding:10px; border-bottom:1px solid #e5e7eb;">ค่าน้ำประปา</td><td style="padding:10px; border-bottom:1px solid #e5e7eb; text-align:center;">${(bill.water_unit||0).toLocaleString()} หน่วย</td><td style="padding:10px; border-bottom:1px solid #e5e7eb; text-align:right;">${(bill.water_fee||0).toLocaleString()}</td></tr>
-        <tr><td style="padding:10px; text-align:center;">4</td><td style="padding:10px;">ค่าปรับและค่าอื่น ๆ</td><td style="padding:10px; text-align:center;">-</td><td style="padding:10px; text-align:right;">${(bill.other_fee||0).toLocaleString()}</td></tr>
-    </tbody></table>
-    <div style="background:#f9fafb; border:2px solid #e5e7eb; border-radius:8px; display:flex; justify-content:space-between; padding:15px 20px; font-size:16px; font-weight:600; margin-bottom:25px;"><span>รวมเป็นเงินทั้งสิ้น (Grand Total)</span><span style="color:#dc2626; font-size:20px;">${bill.amount.toLocaleString()} บาท</span></div>
-    <div style="text-align:center; margin:20px 0;"><span style="display:inline-block; padding:8px 30px; border-radius:20px; font-size:14px; font-weight:600; background:${statusBg}; color:${statusClr};">${statusBadge}</span></div>
-    <div style="display:flex; justify-content:space-between; margin-top:50px;">
-        <div style="text-align:center; width:40%;"><div style="border-top:1px solid #999; margin-bottom:8px;"></div><p style="font-size:11px; color:#666; margin:3px 0;">ลงชื่อผู้เช่า</p><p style="font-size:12px; margin:3px 0;">( ${globalUserName} )</p><p style="font-size:11px; color:#666; margin:3px 0;">วันที่ ....... / ....... / .......</p></div>
-        <div style="text-align:center; width:40%;"><div style="border-top:1px solid #999; margin-bottom:8px;"></div><p style="font-size:11px; color:#666; margin:3px 0;">ลงชื่อผู้รับเงิน</p><p style="font-size:12px; margin:3px 0;">( เจ้าหน้าที่นิติบุคคล )</p><p style="font-size:11px; color:#666; margin:3px 0;">วันที่ ....... / ....... / .......</p></div>
-    </div>
-    <p style="text-align:center; margin-top:40px; padding-top:15px; border-top:1px solid #eee; font-size:10px; color:#999; line-height:1.8;">กรุณาชำระเงินภายในวันที่ 5 ของทุกเดือน เพื่อหลีกเลี่ยงค่าปรับล่าช้า<br>เอกสารฉบับนี้ออกโดยระบบจัดการหอพัก K. Dormitory อัตโนมัติ</p>
-</div>`;
+            const thaiMonths = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+            const engMonths = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            
+            let billMonthEng = bill.month;
+            thaiMonths.forEach((th, i) => { billMonthEng = billMonthEng.replace(th, engMonths[i]); });
+            const matchYear = billMonthEng.match(/\d{4}/);
+            if(matchYear && parseInt(matchYear[0]) > 2500) {
+                billMonthEng = billMonthEng.replace(matchYear[0], (parseInt(matchYear[0]) - 543).toString());
+            }
 
-            // ซ่อนไว้สุดขอบจอเพื่อไม่ให้รบกวน UI ของผู้ใช้
-            Object.assign(container.style, { position:'absolute', top:'0', left:'-9999px', background:'#fff' });
-            document.body.appendChild(container);
+            const pageW = 210;
+            const marginL = 20;
+            const marginR = 20;
+            const contentW = pageW - marginL - marginR;
+            let y = 20; 
 
-            // รอ 500ms ให้เบราว์เซอร์จัดการฟอนต์ให้เรียบร้อยก่อนแคปภาพ
-            setTimeout(() => {
-                html2pdf().set({
-                    margin: 0.3, filename: 'Invoice_' + bill.month + '.pdf',
-                    image: { type:'jpeg', quality:1 },
-                    html2canvas: { 
-                        scale: 2, 
-                        useCORS: true,
-                        // พอ html2canvas จะแคปรูป เราสั่งให้ดึงมันกลับมาตรงกลางเฉพาะตอนแคป เพื่อไม่ให้โดนตัดขอบ
-                        onclone: (clonedDoc) => {
-                            const el = clonedDoc.getElementById('pdf-export-temp');
-                            if(el) {
-                                el.style.left = '0';
-                                el.style.position = 'relative';
-                            }
-                        }
-                    },
-                    jsPDF: { unit:'in', format:'a4', orientation:'portrait' }
-                }).from(container).save().then(() => {
-                    document.body.removeChild(container);
-                });
-            }, 500);
+            // ========== HEADER ==========
+            doc.setFontSize(18);
+            doc.setTextColor(17, 17, 17);
+            doc.text('K. Dormitory', marginL, y);
+
+            doc.setFontSize(16);
+            doc.setTextColor(30, 64, 175); 
+            doc.text('INVOICE', pageW - marginR, y, { align: 'right' });
+
+            y += 8;
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            doc.text('123/45 Sukhumvit Rd., Saensuk, Mueang, Chonburi 20130', marginL, y);
+            
+            doc.setTextColor(50,50,50);
+            doc.text('No: ' + invNo, pageW - marginR, y, { align: 'right' });
+            y += 5;
+            doc.text('Tel: 080-123-4567', marginL, y);
+            doc.text('Date: ' + dateStr, pageW - marginR, y, { align: 'right' });
+            y += 5;
+            doc.text('Tax ID: 0-1234-56789-01-2', marginL, y);
+
+            // Divider
+            y += 5;
+            doc.setDrawColor(200,200,200);
+            doc.setLineWidth(0.5);
+            doc.line(marginL, y, pageW - marginR, y);
+
+            // ========== BILLED TO ==========
+            y += 10;
+            doc.setFontSize(11);
+            doc.setTextColor(30, 64, 175);
+            doc.text('Billed To', marginL, y);
+
+            doc.setFontSize(10);
+            doc.setTextColor(30, 64, 175);
+            doc.text('Billing Period', pageW - marginR - 50, y);
+
+            y += 8;
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            doc.text('Name: ' + engName, marginL, y);
+
+            doc.setFillColor(240, 244, 255);
+            doc.setDrawColor(199, 210, 254);
+            doc.roundedRect(pageW - marginR - 55, y - 6, 55, 20, 3, 3, 'FD');
+            doc.setFontSize(12);
+            doc.setTextColor(30, 64, 175);
+            doc.text(billMonthEng, pageW - marginR - 52, y + 6);
+
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            y += 6;
+            doc.text('Room: ' + room, marginL, y);
+            y += 6;
+            doc.text('Address: ' + address, marginL, y);
+
+            y += 15;
+
+            // ========== TABLE ==========
+            doc.autoTable({
+                startY: y,
+                head: [['No.', 'Description', 'Unit', 'Amount (THB)']],
+                body: [
+                    ['1', 'Room Rent', '1 Month', (bill.rent_fee || 0).toLocaleString()],
+                    ['2', 'Electricity', (bill.elec_unit || 0) + ' Units', (bill.elec_fee || 0).toLocaleString()],
+                    ['3', 'Water', (bill.water_unit || 0) + ' Units', (bill.water_fee || 0).toLocaleString()],
+                    ['4', 'Others / Fines', '-', (bill.other_fee || 0).toLocaleString()]
+                ],
+                theme: 'grid',
+                headStyles: { fillColor: [30, 64, 175], textColor: [255, 255, 255], halign: 'center' },
+                columnStyles: {
+                    0: { halign: 'center', cellWidth: 20 },
+                    1: { halign: 'left' },
+                    2: { halign: 'center', cellWidth: 40 },
+                    3: { halign: 'right', cellWidth: 40 }
+                },
+                styles: { fontSize: 10, textColor: [50, 50, 50] }
+            });
+
+            y = doc.lastAutoTable.finalY + 10;
+
+            // ========== TOTAL ==========
+            doc.setFillColor(249, 250, 251);
+            doc.setDrawColor(229, 231, 235);
+            doc.rect(marginL, y, contentW, 15, 'FD');
+            
+            doc.setFontSize(12);
+            doc.setTextColor(17, 17, 17);
+            doc.text('Grand Total', marginL + 5, y + 10);
+            
+            doc.setFontSize(14);
+            doc.setTextColor(220, 38, 38); // red
+            doc.text(bill.amount.toLocaleString() + ' THB', pageW - marginR - 5, y + 10, { align: 'right' });
+
+            y += 30;
+
+            // ========== STATUS ==========
+            doc.setFontSize(14);
+            let statusTxt = 'UNPAID';
+            let statusColor = [220, 38, 38];
+            if(bill.status === 'paid') {
+                statusTxt = 'PAID';
+                statusColor = [5, 150, 105];
+            } else if(bill.status === 'checking') {
+                statusTxt = 'PENDING (Checking Slip)';
+                statusColor = [79, 70, 229];
+            }
+            doc.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+            doc.text('STATUS: ' + statusTxt, pageW / 2, y, { align: 'center' });
+
+            // ========== SIGNATURES ==========
+            y += 30;
+            doc.setDrawColor(150, 150, 150);
+            doc.line(marginL, y, marginL + 50, y);
+            doc.line(pageW - marginR - 50, y, pageW - marginR, y);
+
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            doc.text('Tenant Signature', marginL + 25, y + 5, { align: 'center' });
+            doc.text('Authorized Signature', pageW - marginR - 25, y + 5, { align: 'center' });
+            
+            doc.text('( ' + engName + ' )', marginL + 25, y + 10, { align: 'center' });
+            doc.text('( Admin )', pageW - marginR - 25, y + 10, { align: 'center' });
+
+            doc.text('Date: ...../...../.....', marginL + 25, y + 15, { align: 'center' });
+            doc.text('Date: ...../...../.....', pageW - marginR - 25, y + 15, { align: 'center' });
+
+            // ========== FOOTER ==========
+            y += 20;
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text('Please pay within the 5th of every month to avoid late fees.', pageW / 2, y, { align: 'center' });
+            doc.text('This document is automatically generated by K. Dormitory Management System.', pageW / 2, y + 4, { align: 'center' });
+
+            // Save PDF
+            doc.save('Invoice_' + billMonthEng.replace(' ','_') + '.pdf');
         }
 
         document.addEventListener("DOMContentLoaded", async () => {

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ - MyDorm</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- นำเข้าไอคอน -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body class="luxury-body" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+
+    <div class="login-wrapper">
+        <div class="login-left">
+            <div class="login-branding">
+                <h2>MyDorm</h2>
+                <p>ระบบจัดการหอพักระดับพรีเมียม</p>
+            </div>
+        </div>
+        <div class="login-right">
+            <a href="index.html" class="back-home"><i class='bx bx-arrow-back'></i> กลับหน้าหลัก</a>
+            
+            <div class="login-form-container">
+                <h2 style="font-size: 2.2rem; margin-bottom: 5px; color: #111; font-weight: 600;">Welcome Back</h2>
+                <p style="color: #6b7280; margin-bottom: 35px; font-weight: 300;">เข้าสู่ระบบเพื่อจัดการข้อมูลห้องพักของคุณ</p>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="l_email">อีเมล (Email)</label>
+                        <div style="position: relative;">
+                            <i class='bx bx-envelope' style="position: absolute; left: 15px; top: 16px; font-size: 1.2rem; color: #9ca3af;"></i>
+                            <input type="text" id="l_email" required placeholder="example@email.com" style="padding-left: 45px;">
+                        </div>
+                        <small class="error-msg" id="emailError">รูปแบบอีเมลไม่ถูกต้อง</small>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="l_password">รหัสผ่าน (Password)</label>
+                        <div style="position: relative;">
+                            <i class='bx bx-lock-alt' style="position: absolute; left: 15px; top: 16px; font-size: 1.2rem; color: #9ca3af;"></i>
+                            <input type="password" id="l_password" required placeholder="••••••••" style="padding-left: 45px;">
+                        </div>
+                        <small class="error-msg" id="passwordError">รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร</small>
+                    </div>
+
+                    <!-- ส่วนของ Session / Cookie simulation -->
+                    <div class="form-options" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-size: 0.95rem; font-weight: 300;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #4b5563;">
+                            <input type="checkbox" id="rememberMe" style="width: 16px; height: 16px; accent-color: #111;"> จดจำการเข้าสู่ระบบ
+                        </label>
+                        <a href="#" style="color: #d4af37; text-decoration: none; font-weight: 500;">ลืมรหัสผ่าน?</a>
+                    </div>
+
+                    <button type="submit" class="lux-btn-reserve" style="width: 100%;">
+                        เข้าสู่ระบบ <i class='bx bx-log-in-circle' style="font-size: 1.2rem;"></i>
+                    </button>
+                </form>
+                
+                <p style="text-align: center; margin-top: 25px; font-size: 0.95rem; color: #6b7280; font-weight: 300;">
+                    ยังไม่มีบัญชีผู้ใช้? <a href="#" style="color: #111; font-weight: 500; text-decoration: none;">สมัครสมาชิกใหม่</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>

@@ -291,6 +291,8 @@
                 if(!error) {
                     alert('อนุมัติบิลเรียบร้อย!');
                     loadBills(); // รีเฟรชหน้าต่าง
+                } else {
+                    alert('เกิดข้อผิดพลาดในการอนุมัติ: ' + error.message);
                 }
             }
         }
@@ -299,7 +301,11 @@
         async function deleteBill(billId) {
             if(confirm('ต้องการลบบิลนี้ทิ้งใช่หรือไม่? (ลบแล้วกู้คืนไม่ได้)')) {
                 const { error } = await supabaseClient.from('bills').delete().eq('id', billId);
-                if(!error) loadBills();
+                if(!error) {
+                    loadBills();
+                } else {
+                    alert('เกิดข้อผิดพลาดในการลบ: ' + error.message);
+                }
             }
         }
 

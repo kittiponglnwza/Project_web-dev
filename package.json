@@ -1,0 +1,24 @@
+{
+  "name": "project_webdev",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kittiponglnwza/Project_web-dev.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kittiponglnwza/Project_web-dev/issues"
+  },
+  "homepage": "https://github.com/kittiponglnwza/Project_web-dev#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.112.4",
+    "puppeteer": "^25.9.0"
+  }
+}

@@ -1,0 +1,339 @@
+<!DOCTYPE html><html lang="th"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการบิลค่าเช่า (Admin) - K. Dormitory</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background-color: #f8fafc; margin: 0; font-family: 'Prompt', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar Admin */
+        .sidebar { width: 260px; background: #0f172a; color: #fff; height: 100vh; padding: 20px 0; position: fixed; display: flex; flex-direction: column; z-index: 10; }
+        .sidebar .logo { font-size: 24px; font-weight: 600; text-align: center; color: #facc15; margin-bottom: 30px; letter-spacing: 1px; }
+        .sidebar a { display: flex; align-items: center; padding: 15px 25px; color: #cbd5e1; text-decoration: none; font-size: 15px; transition: 0.3s; }
+        .sidebar a i { font-size: 20px; margin-right: 15px; }
+        .sidebar a:hover, .sidebar a.active { background: #1e293b; color: #fff; border-left: 4px solid #facc15; }
+        .sidebar .logout { margin-top: auto; border-top: 1px solid #1e293b; color: #f87171; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 30px 40px; width: calc(100% - 260px); overflow-y: auto; box-sizing: border-box; }
+        
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header-actions h2 { margin: 0; color: #0f172a; font-size: 24px; }
+        .btn-primary { background: #3b82f6; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-family: 'Prompt'; font-size: 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .btn-primary:hover { background: #2563eb; }
+
+        /* Table Card */
+        .card { background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow: hidden; }
+        
+        .filter-bar { padding: 15px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; gap: 10px; }
+        .filter-btn { background: #fff; border: 1px solid #cbd5e1; padding: 6px 15px; border-radius: 20px; font-size: 13px; cursor: pointer; color: #64748b; transition: 0.2s; }
+        .filter-btn.active { background: #0f172a; color: #fff; border-color: #0f172a; }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 15px 20px; background: #fff; color: #64748b; font-size: 13px; font-weight: 500; border-bottom: 2px solid #f1f5f9; }
+        td { padding: 15px 20px; color: #334155; font-size: 14px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        
+        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .st-paid { background: #d1fae5; color: #059669; }
+        .st-checking { background: #e0e7ff; color: #4f46e5; }
+        .st-unpaid { background: #fee2e2; color: #dc2626; }
+
+        .action-btn { background: #f1f5f9; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: #475569; font-size: 18px; transition: 0.2s; }
+        .action-btn:hover { background: #e2e8f0; color: #0f172a; }
+        .btn-approve { background: #d1fae5; color: #059669; }
+        .btn-approve:hover { background: #10b981; color: #fff; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(4px); }
+        .modal { background: #fff; width: 500px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 30px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-header h3 { margin: 0; font-size: 20px; color: #0f172a; }
+        .modal-close { background: none; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; color: #64748b; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Prompt'; font-size: 14px; box-sizing: border-box; outline: none; }
+        .form-group input:focus, .form-group select:focus { border-color: #3b82f6; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .total-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; text-align: center; margin-top: 20px; margin-bottom: 20px; }
+        .total-box span { display: block; font-size: 12px; color: #64748b; }
+        .total-box strong { font-size: 24px; color: #dc2626; }
+
+        .btn-submit { width: 100%; background: #0f172a; color: #fff; border: none; padding: 12px; border-radius: 8px; font-family: 'Prompt'; font-size: 15px; cursor: pointer; transition: 0.3s; }
+        .btn-submit:hover { background: #1e293b; }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo">K. DORM ADMIN</div>
+        <a href="dashboard.html"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html" class="active"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
+        <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
+        <a href="maintenance.html"><i class="bx bx-wrench"></i> รายการแจ้งซ่อม</a>
+        <a href="chat.html"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
+        
+        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header-actions">
+            <h2>จัดการบิลค่าเช่า (Billing Management)</h2>
+            <a href="create_bill.html" class="btn-primary" style="text-decoration:none;"><i class="bx bx-plus"></i> สร้างบิลใหม่</a>
+        </div>
+
+        <div class="card">
+            <div class="filter-bar">
+                <button class="filter-btn active" onclick="filterBills('all', this)">ทั้งหมด</button>
+                <button class="filter-btn" onclick="filterBills('checking', this)">รอตรวจสลิป 🔴</button>
+                <button class="filter-btn" onclick="filterBills('unpaid', this)">ค้างชำระ</button>
+                <button class="filter-btn" onclick="filterBills('paid', this)">ชำระแล้ว</button>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>ห้องพัก</th>
+                        <th>เดือน (รอบบิล)</th>
+                        <th>ค่าห้อง</th>
+                        <th>น้ำ/ไฟ</th>
+                        <th>ยอดรวม (฿)</th>
+                        <th>สถานะ</th>
+                        <th style="text-align: center;">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="bills-table-body">
+                    <tr>
+                        <td style="font-weight: 500;">310</td>
+                        <td>ส.ค. 2569</td>
+                        <td>5,500</td>
+                        <td>1,068</td>
+                        <td style="font-weight: 600; color: #0f172a;">6,568</td>
+                        <td><span class="status-badge st-checking">รอตรวจสลิป</span></td>
+                        <td style="text-align: center;"><button class="action-btn btn-approve" title="ตรวจสลิป &amp; อนุมัติ" onclick="viewSlip('3')"><i class="bx bx-search-alt"></i> ดูสลิป</button></td>
+                    </tr>
+                
+                    <tr>
+                        <td style="font-weight: 500;">ไม่ระบุ</td>
+                        <td>กันยายน 2567</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td style="font-weight: 600; color: #0f172a;">4,800</td>
+                        <td><span class="status-badge st-paid">ชำระแล้ว</span></td>
+                        <td style="text-align: center;"><button class="action-btn" title="ดูรายละเอียด" onclick="alert('ยอดเยี่ยม! บิลนี้เคลียร์แล้ว')"><i class="bx bx-check-double"></i></button></td>
+                    </tr>
+                
+                    <tr>
+                        <td style="font-weight: 500;">ไม่ระบุ</td>
+                        <td>ตุลาคม 2567</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td style="font-weight: 600; color: #0f172a;">4,500</td>
+                        <td><span class="status-badge st-checking">รอตรวจสลิป</span></td>
+                        <td style="text-align: center;"><button class="action-btn btn-approve" title="ตรวจสลิป &amp; อนุมัติ" onclick="viewSlip('1')"><i class="bx bx-search-alt"></i> ดูสลิป</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal ดูสลิป (ยังคงไว้ใช้ดูสลิป) -->
+    <div class="modal-overlay" id="slip-modal">
+        <div class="modal" style="width: 450px; text-align: center;">
+            <div class="modal-header">
+                <h3>หลักฐานการโอนเงิน</h3>
+                <button class="modal-close" onclick="closeSlipModal()"><i class="bx bx-x"></i></button>
+            </div>
+            <img id="slip-image-preview" src="" style="width: 100%; border-radius: 8px; margin-bottom: 20px; border: 1px solid #eee; min-height: 300px; object-fit: contain; background: #f8fafc;">
+            <div class="grid-2">
+                <button class="btn-primary" style="width: 100%; justify-content: center; background: #ef4444;" id="reject-slip-btn">
+                    <i class="bx bx-x-circle"></i> ให้ส่งใหม่
+                </button>
+                <button class="btn-primary" style="width: 100%; justify-content: center; background: #10b981;" id="approve-slip-btn">
+                    <i class="bx bx-check-circle"></i> อนุมัติสลิปนี้
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/supabase-config.js"></script>
+    <script>
+        let allBills = [];
+        let tenantProfiles = [];
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            await loadTenants();
+            await loadBills();
+
+            
+        });
+
+        async function loadTenants() {
+            const { data } = await supabaseClient.from('tenant_profiles').select('*').neq('role', 'admin');
+            if(data) {
+                tenantProfiles = data;
+            }
+        }
+
+        async function loadBills() {
+            const { data, error } = await supabaseClient
+                .from('bills')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (!error && data) {
+                // อัปเดตเลขห้องแบบเรียลไทม์เผื่อตอนสร้างบิลลูกบ้านยังไม่มีห้อง
+                data.forEach(bill => {
+                    if (!bill.room_no || bill.room_no === 'null') {
+                        const tenant = tenantProfiles.find(t => t.email === bill.email);
+                        if (tenant && tenant.room_no) {
+                            bill.room_no = tenant.room_no;
+                        }
+                    }
+                });
+                
+                allBills = data;
+                renderBills(data);
+            }
+        }
+
+        function filterBills(status, btnElement) {
+            // สลับสีปุ่ม
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            // กรองข้อมูล
+            if(status === 'all') renderBills(allBills);
+            else renderBills(allBills.filter(b => b.status === status));
+        }
+
+        function renderBills(bills) {
+            const tbody = document.getElementById('bills-table-body');
+            tbody.innerHTML = '';
+
+            if (bills.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">ไม่มีข้อมูลบิลในระบบ</td></tr>';
+                return;
+            }
+
+            bills.forEach(bill => {
+                const utilTotal = (bill.elec_fee || 0) + (bill.water_fee || 0);
+                
+                let badge = '';
+                let actionBtn = '';
+
+                if (bill.status === 'paid') {
+                    badge = '<span class="status-badge st-paid">ชำระแล้ว</span>';
+                    actionBtn = `<button class="action-btn" title="ดูรายละเอียด" onclick="alert('ยอดเยี่ยม! บิลนี้เคลียร์แล้ว')"><i class='bx bx-check-double'></i></button>`;
+                } else if (bill.status === 'checking') {
+                    badge = '<span class="status-badge st-checking">รอตรวจสลิป</span>';
+                    // ดึง bill.id ไปหา slip_image ในฟังก์ชันแทนเพื่อกัน string ยาวเกินไปใน HTML
+                    actionBtn = `<button class="action-btn btn-approve" title="ตรวจสลิป & อนุมัติ" onclick="viewSlip('${bill.id}')"><i class='bx bx-search-alt'></i> ดูสลิป</button>`;
+                } else {
+                    badge = '<span class="status-badge st-unpaid">ค้างชำระ</span>';
+                    actionBtn = `<button class="action-btn" title="ลบบิลทิ้ง" onclick="deleteBill('${bill.id}')" style="color:#ef4444;"><i class='bx bx-trash'></i></button>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight: 500;">${bill.room_no || 'ไม่ระบุ'}</td>
+                        <td>${bill.month}</td>
+                        <td>${(bill.rent_fee || 0).toLocaleString()}</td>
+                        <td>${utilTotal.toLocaleString()}</td>
+                        <td style="font-weight: 600; color: #0f172a;">${bill.amount.toLocaleString()}</td>
+                        <td>${badge}</td>
+                        <td style="text-align: center;">${actionBtn}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        let currentSlipBillId = null;
+
+        function viewSlip(billId) {
+            currentSlipBillId = billId;
+            const bill = allBills.find(b => b.id == billId);
+            const slipImage = bill ? bill.slip_image : null;
+            
+            const imgEl = document.getElementById('slip-image-preview');
+            if (slipImage && slipImage !== 'undefined') {
+                imgEl.src = slipImage;
+            } else {
+                imgEl.src = 'https://via.placeholder.com/400x600?text=No+Slip+Image';
+            }
+            const modal = document.getElementById('slip-modal');
+            modal.style.setProperty('display', 'flex', 'important');
+            modal.style.setProperty('z-index', '9999', 'important');
+        }
+
+        function closeSlipModal() {
+            document.getElementById('slip-modal').style.setProperty('display', 'none', 'important');
+        }
+
+        document.getElementById('approve-slip-btn').addEventListener('click', async () => {
+            if (currentSlipBillId) {
+                await approveSlip(currentSlipBillId);
+                closeSlipModal();
+            }
+        });
+
+        document.getElementById('reject-slip-btn').addEventListener('click', async () => {
+            if (currentSlipBillId) {
+                await rejectSlip(currentSlipBillId);
+                closeSlipModal();
+            }
+        });
+
+        // --- ระบบปฏิเสธสลิป ---
+        async function rejectSlip(billId) {
+            if(confirm('คุณแน่ใจหรือไม่ว่าต้องการ "ปฏิเสธ" สลิปนี้? \nบิลจะถูกเปลี่ยนกลับเป็น "ค้างชำระ" เพื่อให้ลูกบ้านส่งสลิปใหม่')) {
+                const { error } = await supabaseClient
+                    .from('bills')
+                    .update({ status: 'pending', slip_image: null })
+                    .eq('id', billId);
+                
+                if(!error) {
+                    alert('ปฏิเสธสลิปเรียบร้อยแล้ว ลูกบ้านสามารถส่งสลิปใหม่ได้');
+                    loadBills();
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + error.message);
+                }
+            }
+        }
+
+        // --- ระบบตรวจสลิป (อนุมัติ) ---
+        async function approveSlip(billId) {
+            if(confirm('ยืนยันว่าตรวจสอบสลิปโอนเงินถูกต้อง และต้องการเปลี่ยนสถานะเป็น "ชำระแล้ว" ใช่หรือไม่?')) {
+                const { error } = await supabaseClient
+                    .from('bills')
+                    .update({ status: 'paid' })
+                    .eq('id', billId);
+                
+                if(!error) {
+                    alert('อนุมัติบิลเรียบร้อย!');
+                    loadBills(); // รีเฟรชหน้าต่าง
+                }
+            }
+        }
+
+        // --- ระบบลบบิล ---
+        async function deleteBill(billId) {
+            if(confirm('ต้องการลบบิลนี้ทิ้งใช่หรือไม่? (ลบแล้วกู้คืนไม่ได้)')) {
+                const { error } = await supabaseClient.from('bills').delete().eq('id', billId);
+                if(!error) loadBills();
+            }
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = "../login.html";
+        }
+    </script>
+
+
+</body></html>

@@ -200,6 +200,7 @@
             const statusClr = bill.status === 'paid' ? '#059669' : bill.status === 'checking' ? '#4f46e5' : '#dc2626';
 
             const container = document.createElement('div');
+            container.id = 'pdf-export-temp';
             container.innerHTML = `
 <div style="width:750px; padding:40px 50px; background:#fff; color:#333; font-family:'Prompt',sans-serif;">
     <div style="display:flex; justify-content:space-between; border-bottom:3px solid #1e40af; padding-bottom:20px; margin-bottom:25px;">
@@ -226,14 +227,27 @@
     <p style="text-align:center; margin-top:40px; padding-top:15px; border-top:1px solid #eee; font-size:10px; color:#999; line-height:1.8;">กรุณาชำระเงินภายในวันที่ 5 ของทุกเดือน เพื่อหลีกเลี่ยงค่าปรับล่าช้า<br>เอกสารฉบับนี้ออกโดยระบบจัดการหอพัก K. Dormitory อัตโนมัติ</p>
 </div>`;
 
-            Object.assign(container.style, { position:'fixed', top:'0', left:'0', zIndex:'-9999', background:'#fff' });
+            // ซ่อนไว้สุดขอบจอเพื่อไม่ให้รบกวน UI ของผู้ใช้
+            Object.assign(container.style, { position:'absolute', top:'0', left:'-9999px', background:'#fff' });
             document.body.appendChild(container);
 
+            // รอ 500ms ให้เบราว์เซอร์จัดการฟอนต์ให้เรียบร้อยก่อนแคปภาพ
             setTimeout(() => {
                 html2pdf().set({
                     margin: 0.3, filename: 'Invoice_' + bill.month + '.pdf',
                     image: { type:'jpeg', quality:1 },
-                    html2canvas: { scale:2, scrollX:0, scrollY:0, useCORS:true },
+                    html2canvas: { 
+                        scale: 2, 
+                        useCORS: true,
+                        // พอ html2canvas จะแคปรูป เราสั่งให้ดึงมันกลับมาตรงกลางเฉพาะตอนแคป เพื่อไม่ให้โดนตัดขอบ
+                        onclone: (clonedDoc) => {
+                            const el = clonedDoc.getElementById('pdf-export-temp');
+                            if(el) {
+                                el.style.left = '0';
+                                el.style.position = 'relative';
+                            }
+                        }
+                    },
                     jsPDF: { unit:'in', format:'a4', orientation:'portrait' }
                 }).from(container.firstChild).save().then(() => {
                     document.body.removeChild(container);

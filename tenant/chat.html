@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ติดต่อแอดมิน - MyDorm</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background-color: #f3f4f6; margin: 0; font-family: 'Prompt', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: #fff; height: 100vh; padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-logo { font-size: 24px; font-weight: 600; text-align: center; color: #111; margin-bottom: 30px; letter-spacing: 1px; }
+        .nav-link { display: flex; align-items: center; padding: 15px 25px; color: #6b7280; text-decoration: none; font-size: 15px; transition: 0.3s; }
+        .nav-link i { font-size: 20px; margin-right: 15px; }
+        .nav-link:hover, .nav-link.active { background: #f9fafb; color: #d4af37; border-left: 4px solid #d4af37; font-weight: 500; }
+        .logout-btn { margin-top: auto; border-top: 1px solid #eee; color: #ef4444; }
+        .logout-btn:hover { background: #fef2f2; color: #ef4444; border-left: 4px solid #ef4444; }
+
+        /* Main Content (Chat Area) */
+        .main-content { flex: 1; display: flex; flex-direction: column; padding: 20px 40px; background: #f8fafc; }
+        
+        /* Chat Container */
+        .chat-container { background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: calc(100vh - 80px); overflow: hidden; }
+        
+        /* Chat Header */
+        .chat-header { padding: 20px; background: #1e293b; color: #fff; display: flex; align-items: center; gap: 15px; }
+        .chat-header i { font-size: 24px; color: #facc15; }
+        .chat-header h2 { margin: 0; font-size: 18px; font-weight: 500; }
+        .chat-header p { margin: 2px 0 0; font-size: 12px; color: #94a3b8; }
+
+        /* Chat Messages Area */
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: #f1f5f9; }
+        
+        /* Message Bubbles */
+        .msg-row { display: flex; width: 100%; }
+        .msg-row.admin { justify-content: flex-start; }
+        .msg-row.tenant { justify-content: flex-end; }
+
+        .msg-bubble { max-width: 60%; padding: 12px 18px; border-radius: 20px; font-size: 14px; line-height: 1.5; position: relative; }
+        .msg-row.admin .msg-bubble { background: #fff; color: #334155; border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .msg-row.tenant .msg-bubble { background: #d4af37; color: #fff; border-bottom-right-radius: 4px; box-shadow: 0 2px 5px rgba(212, 175, 55, 0.2); }
+        
+        .msg-time { font-size: 10px; color: #94a3b8; margin-top: 5px; display: block; text-align: right; }
+        .msg-row.admin .msg-time { color: #94a3b8; text-align: left; }
+        .msg-row.tenant .msg-time { color: #fef08a; text-align: right; }
+
+        /* Chat Input Area */
+        .chat-input-area { padding: 20px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; align-items: center; }
+        .chat-input-area input { flex: 1; padding: 15px 20px; border: 1px solid #cbd5e1; border-radius: 30px; font-family: 'Prompt', sans-serif; font-size: 14px; outline: none; transition: 0.3s; }
+        .chat-input-area input:focus { border-color: #d4af37; box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1); }
+        .btn-send { width: 50px; height: 50px; border-radius: 50%; background: #1e293b; color: #fff; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .btn-send:hover { background: #0f172a; transform: scale(1.05); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">MyDorm</div>
+        <a href="dashboard.html" class="nav-link"><i class='bx bx-grid-alt'></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html" class="nav-link"><i class='bx bx-receipt'></i> รายการบิล / ชำระเงิน</a>
+        <a href="maintenance.html" class="nav-link"><i class='bx bx-wrench'></i> แจ้งซ่อม/ปัญหา</a>
+        <a href="profile.html" class="nav-link"><i class='bx bx-user'></i> ข้อมูลส่วนตัว</a>
+        <a href="chat.html" class="nav-link active"><i class='bx bx-message-square-dots'></i> ติดต่อนิติบุคคล</a>
+        <a href="#" class="nav-link logout-btn" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="chat-container">
+            <!-- Header -->
+            <div class="chat-header">
+                <i class='bx bxs-chat'></i>
+                <div>
+                    <h2>ติดต่อนิติบุคคล (Admin)</h2>
+                    <p>เจ้าหน้าที่จะตอบกลับในเวลาทำการ 09:00 - 18:00 น.</p>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="chat-messages" id="chat-box">
+                <!-- Message Example
+                <div class="msg-row admin">
+                    <div class="msg-bubble">
+                        สวัสดีครับ มีอะไรให้นิติบุคคลช่วยเหลือไหมครับ?
+                        <span class="msg-time">10:00</span>
+                    </div>
+                </div>
+                -->
+            </div>
+
+            <!-- Input Area -->
+            <form class="chat-input-area" id="chat-form">
+                <input type="text" id="msg-input" placeholder="พิมพ์ข้อความของคุณที่นี่..." autocomplete="off" required>
+                <button type="submit" class="btn-send"><i class='bx bxs-send'></i></button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/supabase-config.js"></script>
+    <script>
+        let currentUserEmail = '';
+        let lastMessageCount = 0; // เพื่อเช็คว่ามีข้อความใหม่ไหม
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                window.location.href = "../login.html";
+                return;
+            }
+            currentUserEmail = session.user.email;
+
+            // โหลดข้อความครั้งแรก
+            await loadMessages();
+
+            // ตั้งเวลารีเฟรชข้อความทุกๆ 3 วินาที (Polling)
+            setInterval(loadMessages, 3000);
+        });
+
+        // ฟังก์ชันดึงข้อความจากฐานข้อมูล
+        async function loadMessages() {
+            // ดึงข้อความที่ sender หรือ receiver เป็นอีเมลเรา (คุยกับ admin)
+            // หมายเหตุ: ในระบบเราจะใช้คำว่า 'admin' เป็น receiver_email สำหรับการส่งหานิติ
+            const { data: messages, error } = await supabaseClient
+                .from('messages')
+                .select('*')
+                .or(`and(sender_email.eq.${currentUserEmail},receiver_email.eq.admin),and(sender_email.eq.admin,receiver_email.eq.${currentUserEmail})`)
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                console.error("Error loading messages:", error);
+                return;
+            }
+
+            // ถ้าจำนวนข้อความเปลี่ยนไป (มีข้อความใหม่) ค่อยอัปเดต UI
+            if (messages.length !== lastMessageCount) {
+                lastMessageCount = messages.length;
+                renderMessages(messages);
+            }
+        }
+
+        // ฟังก์ชันวาด UI ข้อความ
+        function renderMessages(messages) {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = ''; // ล้างของเก่า
+
+            if (messages.length === 0) {
+                chatBox.innerHTML = '<div style="text-align:center; color:#94a3b8; margin-top:20px; font-size:14px;">ยังไม่มีข้อความ เริ่มต้นทักทายแอดมินได้เลย!</div>';
+                return;
+            }
+
+            messages.forEach(msg => {
+                const isMe = msg.sender_email === currentUserEmail;
+                const d = new Date(msg.created_at);
+                const timeStr = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
+                const div = document.createElement('div');
+                div.className = `msg-row ${isMe ? 'tenant' : 'admin'}`;
+                
+                div.innerHTML = `
+                    <div class="msg-bubble">
+                        ${escapeHTML(msg.message)}
+                        <span class="msg-time">${timeStr}</span>
+                    </div>
+                `;
+                chatBox.appendChild(div);
+            });
+
+            // เลื่อนลงไปล่างสุดอัตโนมัติ
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // ฟังก์ชันส่งข้อความ
+        document.getElementById('chat-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('msg-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = ''; // เคลียร์ช่องพิมพ์
+
+            // ส่งเข้า Database (ส่งหา 'admin')
+            const { error } = await supabaseClient
+                .from('messages')
+                .insert([{
+                    sender_email: currentUserEmail,
+                    receiver_email: 'admin',
+                    message: text
+                }]);
+
+            if (error) {
+                alert("ส่งข้อความไม่สำเร็จ");
+                console.error(error);
+            } else {
+                // โหลดข้อความใหม่ทันที
+                loadMessages();
+            }
+        });
+
+        // ฟังก์ชันป้องกัน XSS
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = "../login.html";
+        }
+    </script>
+</body>
+</html>

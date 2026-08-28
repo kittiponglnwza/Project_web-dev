@@ -249,7 +249,7 @@
                         }
                     },
                     jsPDF: { unit:'in', format:'a4', orientation:'portrait' }
-                }).from(container.firstChild).save().then(() => {
+                }).from(container).save().then(() => {
                     document.body.removeChild(container);
                 });
             }, 500);

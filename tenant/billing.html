@@ -303,19 +303,19 @@
             document.getElementById('pdf-other-fee').innerText = (bill.other_fee || 0).toLocaleString();
             document.getElementById('pdf-total').innerText = bill.amount.toLocaleString();
 
-            // ดึง HTML ภายในมาครอบด้วย Div ที่กำหนดขนาดชัดเจน
+            // ดึง HTML ภายในมาครอบด้วย Div ที่กำหนดขนาดชัดเจน ไม่ให้ล้น
             const templateInner = document.getElementById('pdf-invoice-template').innerHTML;
             const htmlContent = `
-                <div style="width: 800px; padding: 40px; background: #fff; color: #000; font-family: 'Prompt', sans-serif; box-sizing: border-box;">
+                <div style="width: 750px; max-width: 750px; padding: 20px; background: #fff; color: #000; font-family: 'Prompt', sans-serif; box-sizing: border-box; margin: 0 auto;">
                     ${templateInner}
                 </div>
             `;
 
             const opt = {
-                margin:       [0.4, 0.4],
+                margin:       0.4,
                 filename:     `Invoice_${bill.month}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
+                html2canvas:  { scale: 2, windowWidth: 800, useCORS: true }, // บังคับความกว้างหน้าจอตอนแคปเพื่อไม่ให้ตกขอบ
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
 

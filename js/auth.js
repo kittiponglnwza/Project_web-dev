@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert("❌ เปลี่ยนรหัสผ่านไม่สำเร็จ: " + error.message);
                 } else {
                     alert("✅ ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว! ระบบจะนำคุณเข้าสู่เว็บไซต์ทันที");
-                    window.location.href = "dashboard.html"; // เปลี่ยนรหัสเสร็จกลับไปหน้า Dashboard
+                    window.location.href = "tenant/dashboard.html"; // เปลี่ยนรหัสเสร็จกลับไปหน้า Dashboard
                 }
             } else {
                 alert("❌ คุณไม่ได้กรอกรหัสผ่าน หรือรหัสผ่านสั้นเกินไป (ยกเลิกการตั้งรหัสผ่านใหม่)");
@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (error) throw error;
 
                 alert("เข้าสู่ระบบสำเร็จ!");
-                window.location.href = "dashboard.html"; // เปลี่ยนให้เข้าหน้า Dashboard ทันที
+                window.location.href = "tenant/dashboard.html"; // เปลี่ยนให้เข้าหน้า Dashboard ในโฟลเดอร์ tenant
 
             } catch (error) {
                 console.error("Login Error:", error);
@@ -196,14 +196,14 @@ async function checkLoginStatus() {
             loginBtn.style.backgroundColor = "#d4af37";
             loginBtn.style.color = "#111";
             
-            // ให้กดแล้วเด้งไปหน้า Dashboard แทนการโชว์ปุ่มออกระบบในหน้าแรก
-            loginBtn.href = "dashboard.html";
+            // ให้กดแล้วเด้งไปหน้า Dashboard ของ tenant
+            loginBtn.href = "tenant/dashboard.html";
             loginBtn.onclick = null; 
         }
         
         // ถ้าเผลอกลับมาหน้า login หรือ register ให้เด้งไปหน้าแผงควบคุมเลย
         if (window.location.pathname.includes("login.html") || window.location.pathname.includes("register.html")) {
-            window.location.href = "dashboard.html";
+            window.location.href = "tenant/dashboard.html";
         }
     }
 }

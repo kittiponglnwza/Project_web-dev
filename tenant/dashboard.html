@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แผงควบคุมผู้เช่า - MyDorm</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        /* Dashboard V1 Styles */
+        body { background-color: #f3f4f6; margin: 0; font-family: 'Prompt', sans-serif; display: flex; }
+        .sidebar { width: 260px; background: #fff; height: 100vh; padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05); position: fixed; display: flex; flex-direction: column; }
+        .sidebar-logo { text-align: center; font-size: 1.8rem; font-weight: 600; color: #d4af37; margin-bottom: 30px; letter-spacing: 1px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 15px 25px; color: #4b5563; text-decoration: none; font-size: 1rem; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { background: #f9fafb; color: #d4af37; border-right: 4px solid #d4af37; }
+        .nav-link i { font-size: 1.4rem; }
+        .logout-btn { margin-top: auto; color: #ef4444; }
+        .logout-btn:hover { background: #fef2f2; color: #dc2626; border-color: #dc2626; }
+        
+        .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); }
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .user-profile { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+        
+        .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .card { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .card-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 15px; }
+        .card-title { color: #6b7280; font-size: 0.95rem; margin-bottom: 5px; }
+        .card-value { font-size: 1.8rem; font-weight: 600; color: #111; }
+        
+        .recent-section { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .section-header { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; font-size: 1.2rem; font-weight: 600; }
+        .btn-home { background: #111; color: #fff; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; transition: 0.3s; margin-right: 15px; }
+        .btn-home:hover { background: #d4af37; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">MyDorm</div>
+        <a href="dashboard.html" class="nav-link active"><i class='bx bx-grid-alt'></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html" class="nav-link"><i class='bx bx-receipt'></i> รายการค้างชำระ</a>
+        <a href="maintenance.html" class="nav-link"><i class='bx bx-wrench'></i> แจ้งซ่อม/ปัญหา</a>
+        <a href="profile.html" class="nav-link"><i class='bx bx-user'></i> ข้อมูลส่วนตัว</a>
+        
+        <a href="#" class="nav-link logout-btn" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-header">
+            <div>
+                <h1 style="font-size: 1.8rem; margin: 0; color: #111;">ยินดีต้อนรับสู่ระบบจัดการผู้เช่า</h1>
+                <p style="color: #6b7280; margin-top: 5px;" id="welcome-text">กำลังโหลดข้อมูล...</p>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <a href="../index.html" class="btn-home"><i class='bx bx-home'></i> กลับหน้าเว็บหลัก</a>
+                <div class="user-profile">
+                    <div style="width: 40px; height: 40px; background: #d4af37; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                        <i class='bx bx-user'></i>
+                    </div>
+                    <span id="profile-name">ผู้เช่า</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-icon" style="background: #fef3c7; color: #d97706;"><i class='bx bx-wallet'></i></div>
+                <div class="card-title">ยอดค้างชำระเดือนนี้</div>
+                <div class="card-value">4,500 <span style="font-size: 1rem; color: #6b7280; font-weight: 400;">บาท</span></div>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background: #d1fae5; color: #059669;"><i class='bx bx-wrench'></i></div>
+                <div class="card-title">สถานะแจ้งซ่อมล่าสุด</div>
+                <div class="card-value" style="font-size: 1.4rem; color: #059669;">เสร็จสิ้น (แอร์ไม่เย็น)</div>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background: #e0e7ff; color: #4f46e5;"><i class='bx bx-building-house'></i></div>
+                <div class="card-title">ห้องพักของคุณ</div>
+                <div class="card-value" style="font-size: 1.4rem;">ห้อง 302 (Standard)</div>
+            </div>
+        </div>
+
+        <div class="recent-section">
+            <div class="section-header">ข่าวประชาสัมพันธ์ล่าสุด</div>
+            <div style="padding: 15px; border-left: 4px solid #d4af37; background: #f9fafb; margin-bottom: 10px; border-radius: 4px;">
+                <strong style="display: block; color: #111; margin-bottom: 5px;">แจ้งล้างแอร์ประจำปี 2567</strong>
+                <span style="color: #6b7280; font-size: 0.9rem;">ทางหอพักจะทำการล้างแอร์ในวันที่ 15-20 เดือนนี้ ขอให้ผู้เช่าเตรียมตัวและเก็บของมีค่าให้เรียบร้อยครับ</span>
+            </div>
+            <div style="padding: 15px; border-left: 4px solid #3b82f6; background: #f9fafb; border-radius: 4px;">
+                <strong style="display: block; color: #111; margin-bottom: 5px;">อัปเดตระบบสแกนนิ้วเข้าตึก</strong>
+                <span style="color: #6b7280; font-size: 0.9rem;">กรุณาติดต่อที่สำนักงานเพื่ออัปเดตลายนิ้วมือเข้าตึกใหม่ ภายในสัปดาห์นี้</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) { window.location.href = "../login.html"; return; }
+            
+            const user = session.user;
+            let fullName = user.email;
+            if (user.user_metadata && user.user_metadata.full_name) {
+                fullName = (user.user_metadata.title || "") + user.user_metadata.full_name;
+            }
+            
+            document.getElementById("welcome-text").innerText = "สวัสดี, " + fullName;
+            document.getElementById("profile-name").innerText = fullName.split(' ')[0];
+        });
+    </script>
+</body>
+</html>

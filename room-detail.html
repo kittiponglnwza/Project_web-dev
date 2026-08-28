@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายละเอียดห้องพัก - MyDorm</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">MyDorm</div>
+        <!-- เมนูย่อสำหรับหน้า Detail -->
+        <nav class="nav-menu" style="display:block; position:static; width:auto;">
+            <ul style="flex-direction:row;">
+                <li><a href="index.html">กลับหน้าแรก</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="room-detail-container" class="detail-container">
+        <!-- ข้อมูลจะถูกโหลดผ่าน JS (detail.js) มาใส่ที่นี่ -->
+        <p class="loading-text" style="text-align: center; padding: 50px;">กำลังโหลดข้อมูลห้องพัก...</p>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 MyDorm System. โปรเจกต์วิชา Web Development.</p>
+    </footer>
+
+    <script src="js/detail.js"></script>
+</body>
+</html>

@@ -1,39 +1,69 @@
 [
     {
         "id": 1,
-        "type": "ห้องพัดลม (Standard)",
-        "description": "ห้องขนาด 24 ตรม. มีเตียง ตู้เสื้อผ้า โต๊ะเขียนหนังสือ บรรยากาศโปร่งสบาย มีระเบียงรับลม",
+        "type": "Size S",
+        "description": "ห้องพักขนาดกะทัดรัด 24 ตร.ม. ออกแบบให้ใช้พื้นที่ได้อย่างลงตัว เหมาะสำหรับนักศึกษาและคนทำงาน ภายในมีเตียง ตู้เสื้อผ้า โต๊ะทำงาน และชั้นวางของ พร้อมหน้าต่างบานใหญ่ช่วยให้ห้องสว่างและถ่ายเทอากาศได้ดี มีระเบียงส่วนตัวสำหรับพักผ่อน",
         "price": 3500,
         "isAvailable": true,
         "availableCount": 5,
         "images": [
-            "https://placehold.co/600x400/2ecc71/ffffff.png?text=Standard+Room+1",
-            "https://placehold.co/600x400/27ae60/ffffff.png?text=Standard+Room+2"
+            "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "facilities": [
+            "เตียงนอน",
+            "ตู้เสื้อผ้า",
+            "โต๊ะทำงาน",
+            "ชั้นวางของ",
+            "ระเบียงส่วนตัว",
+            "เครื่องปรับอากาศ"
         ]
     },
     {
         "id": 2,
-        "type": "ห้องแอร์ (Deluxe)",
-        "description": "ห้องขนาด 28 ตรม. แอร์เย็นฉ่ำ ทีวี ตู้เย็น เครื่องทำน้ำอุ่น เฟอร์นิเจอร์บิวท์อิน",
+        "type": "Size M",
+        "description": "ห้องพักขนาด 28 ตร.ม. สำหรับผู้ที่ต้องการพื้นที่ใช้สอยมากขึ้น ตกแต่งสไตล์โมเดิร์น พร้อมเฟอร์นิเจอร์ครบชุด มีพื้นที่สำหรับนอน ทำงาน และพักผ่อนอย่างเป็นสัดส่วน ภายในติดตั้งเครื่องปรับอากาศ ทีวี ตู้เย็น และเครื่องทำน้ำอุ่น พร้อมหน้าต่างขนาดใหญ่รับแสงธรรมชาติ",
         "price": 4500,
         "isAvailable": true,
         "availableCount": 2,
         "images": [
-            "https://placehold.co/600x400/3498db/ffffff.png?text=Deluxe+Room+1",
-            "https://placehold.co/600x400/2980b9/ffffff.png?text=Deluxe+Room+2",
-            "https://placehold.co/600x400/227093/ffffff.png?text=Deluxe+Room+3"
+            "https://images.unsplash.com/photo-1617104678098-de229db51175?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1615874959474-d609969a20ed?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "facilities": [
+            "เตียงนอน",
+            "ตู้เสื้อผ้า",
+            "โต๊ะทำงาน",
+            "เครื่องปรับอากาศ",
+            "โทรทัศน์",
+            "ตู้เย็น",
+            "เครื่องทำน้ำอุ่น",
+            "ระเบียงส่วนตัว"
         ]
     },
     {
         "id": 3,
-        "type": "ห้องสูท (VIP)",
-        "description": "ห้องขนาด 35 ตรม. กว้างขวางพิเศษ เฟอร์นิเจอร์ครบชุด พร้อมโซนพักผ่อนส่วนตัว วิวเมืองมุมสูง",
+        "type": "Size XL",
+        "description": "ห้องพักขนาดใหญ่ 35 ตร.ม. สำหรับผู้ที่ต้องการความกว้างขวางและความเป็นส่วนตัวมากขึ้น ภายในแบ่งพื้นที่ใช้งานอย่างลงตัว มีห้องนอนและโซนพักผ่อน พร้อมเฟอร์นิเจอร์ครบชุดและสิ่งอำนวยความสะดวกแบบจัดเต็ม หน้าต่างบานใหญ่เปิดรับวิวเมืองและแสงธรรมชาติ ให้บรรยากาศเหมือนพักอาศัยในคอนโดระดับพรีเมียม",
         "price": 6000,
         "isAvailable": false,
         "availableCount": 0,
         "images": [
-            "https://placehold.co/600x400/9b59b6/ffffff.png?text=VIP+Room+1",
-            "https://placehold.co/600x400/8e44ad/ffffff.png?text=VIP+Room+2"
+            "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "facilities": [
+            "เตียงขนาดใหญ่",
+            "โซนพักผ่อน",
+            "โซนทำงาน",
+            "ตู้เสื้อผ้าขนาดใหญ่",
+            "เครื่องปรับอากาศ",
+            "โทรทัศน์",
+            "ตู้เย็น",
+            "เครื่องทำน้ำอุ่น",
+            "ระเบียงส่วนตัว",
+            "วิวเมือง"
         ]
     }
 ]

@@ -57,64 +57,72 @@ header { background-color: var(--primary-color); color: #fff; padding: 15px 20px
 .btn-details:hover { background-color: #2980b9; }
 
 /* =========================================
-   สไตล์ใหม่สำหรับหน้า "ชมรายละเอียด" (room-detail.html)
+   LUXURY ROOM DETAIL PAGE (สไตล์ใหม่สุดหรู)
    ========================================= */
-.detail-container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 30px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-}
-.back-link { display: inline-block; color: var(--secondary-color); text-decoration: none; font-weight: bold; margin-bottom: 20px; transition: 0.3s; }
-.back-link:hover { color: #2980b9; transform: translateX(-5px); }
+#room-detail-container { width: 100%; }
 
-.detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-.detail-header h2 { font-size: 2rem; color: var(--primary-color); margin: 0; }
-
-.detail-gallery {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-    margin-bottom: 30px;
-}
-.detail-gallery img {
+.luxury-hero {
+    position: relative;
     width: 100%;
-    height: auto;
-    max-height: 400px;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    height: 65vh; /* ปกเต็มจอแบบโรงแรม */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+.luxury-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    /* ไล่สีดำให้ตัวหนังสือเด่น และดูแพง */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.9) 100%);
+    display: flex; flex-direction: column; justify-content: space-between; padding: 40px 10%;
+}
+.luxury-nav { padding-top: 10px; }
+.luxury-back { color: #fff; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; transition: 0.3s; font-weight: bold; }
+.luxury-back:hover { color: #d4af37; padding-left: 10px; } /* Hover แล้วเป็นสีทอง */
+.hero-text { color: #fff; padding-bottom: 30px; }
+.hero-text .subtitle { color: #d4af37; letter-spacing: 4px; font-size: 1rem; margin-bottom: 10px; text-transform: uppercase; font-weight: bold; }
+.hero-text h1 { font-size: 3.5rem; margin: 0; font-weight: 300; letter-spacing: 1px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+
+/* กล่องเนื้อหาลอยขึ้นมาทับรูปปกเล็กน้อย */
+.luxury-content {
+    max-width: 1200px;
+    margin: -60px auto 50px auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    position: relative;
+    z-index: 10;
 }
 
-.description-box {
-    background-color: var(--bg-color);
-    padding: 20px;
-    border-radius: 8px;
-    margin-top: 20px;
-    margin-bottom: 30px;
-}
-.description-box h4 { color: var(--primary-color); margin-bottom: 10px; }
-.description-box p { color: #555; line-height: 1.7; }
+.luxury-main { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
 
-.detail-info .price { font-size: 1.6rem; color: #e74c3c; font-weight: bold; border-bottom: 2px dashed #ddd; padding-bottom: 15px; }
+.section-title { font-size: 1.8rem; color: #222; margin-bottom: 25px; font-weight: 300; border-bottom: 1px solid #eaeaea; padding-bottom: 15px; margin-top: 40px; }
+.section-title:first-child { margin-top: 0; }
 
-.btn-book {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    background-color: #2ecc71;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    transition: 0.3s;
-    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
-}
-.btn-book:hover { background-color: #27ae60; transform: translateY(-3px); }
+.luxury-desc { font-size: 1.1rem; color: #555; line-height: 1.9; }
+
+.luxury-amenities { display: grid; grid-template-columns: 1fr; gap: 20px; }
+.amenity-item { display: flex; align-items: center; gap: 15px; color: #444; font-size: 1.05rem; }
+.amenity-item .icon { font-size: 1.5rem; }
+
+.luxury-gallery { display: grid; grid-template-columns: 1fr; gap: 15px; }
+.luxury-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; transition: transform 0.4s; }
+.luxury-img:hover { transform: scale(1.03); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+
+/* กล่องจองทางขวาแบบ Sticky (เลื่อนตาม) */
+.luxury-sidebar { width: 100%; }
+.booking-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 25px 50px rgba(0,0,0,0.1); position: sticky; top: 100px; }
+.price-wrap { display: flex; align-items: baseline; gap: 8px; margin-bottom: 15px; }
+.price-wrap .currency { font-size: 1.2rem; color: #888; font-weight: 300; }
+.price-wrap .price-val { font-size: 2.8rem; color: #111; font-weight: 700; }
+.price-wrap .period { color: #888; font-size: 1rem; }
+.status-wrap { display: flex; align-items: center; gap: 12px; font-size: 1.1rem; color: #555; margin-bottom: 30px; font-weight: 500; }
+.status-dot { width: 14px; height: 14px; border-radius: 50%; }
+.luxury-divider { border: 0; height: 1px; background: #eaeaea; margin-bottom: 30px; }
+
+/* ปุ่มจองหรูหรา สีดำ-ทอง */
+.luxury-btn { width: 100%; background: #111; color: #fff; border: none; padding: 18px; font-size: 1.1rem; letter-spacing: 2px; border-radius: 6px; cursor: pointer; transition: 0.3s; font-weight: bold; }
+.luxury-btn:hover { background: #d4af37; color: #111; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); }
 
 footer { text-align: center; padding: 20px; background-color: var(--primary-color); color: #fff; margin-top: 40px; }
 
@@ -129,7 +137,10 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
     .slider-wrapper { width: 40%; height: 100%; }
     .room-details { width: 60%; padding: 20px 25px; } 
 
-    /* ปรับแต่งหน้า Detail สำหรับจอใหญ่ */
-    .detail-gallery { grid-template-columns: 1fr 1fr; }
-    .detail-gallery img:first-child { grid-column: span 2; }
+    /* ปรับ Layout หน้าหรูสำหรับจอใหญ่ */
+    .luxury-content { flex-direction: row; gap: 40px; }
+    .luxury-main { width: 65%; padding: 50px; }
+    .luxury-sidebar { width: 35%; }
+    .luxury-amenities { grid-template-columns: 1fr 1fr; }
+    .luxury-gallery { grid-template-columns: 1fr 1fr; }
 }

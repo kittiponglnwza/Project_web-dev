@@ -290,17 +290,31 @@
 
         // --- ระบบสร้างบิล ---
         function openCreateModal() {
-            document.getElementById('create-modal').style.display = 'flex';
-            
-            // เซ็ตเดือนปัจจุบันอัตโนมัติ
-            const thaiMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
-            const d = new Date();
-            document.getElementById('b_month').value = `${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
-            calculateTotal();
+            try {
+                const modal = document.getElementById('create-modal');
+                modal.style.setProperty('display', 'flex', 'important');
+                modal.style.setProperty('z-index', '9999', 'important');
+                
+                // เซ็ตเดือนปัจจุบันอัตโนมัติ
+                const thaiMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+                const d = new Date();
+                document.getElementById('b_month').value = `${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
+                calculateTotal();
+            } catch (err) {
+                console.error(err);
+            }
         }
 
         function closeModal() {
-            document.getElementById('create-modal').style.display = 'none';
+            document.getElementById('create-modal').style.setProperty('display', 'none', 'important');
+        }
+
+        // ปิดเมื่อคลิกพื้นที่ว่างข้างนอก
+        window.onclick = function(event) {
+            const createModal = document.getElementById('create-modal');
+            const slipModal = document.getElementById('slip-modal');
+            if (event.target == createModal) closeModal();
+            if (event.target == slipModal) closeSlipModal();
         }
 
         function calculateTotal() {
@@ -365,11 +379,13 @@
             } else {
                 imgEl.src = 'https://via.placeholder.com/400x600?text=No+Slip+Image';
             }
-            document.getElementById('slip-modal').style.display = 'flex';
+            const modal = document.getElementById('slip-modal');
+            modal.style.setProperty('display', 'flex', 'important');
+            modal.style.setProperty('z-index', '9999', 'important');
         }
 
         function closeSlipModal() {
-            document.getElementById('slip-modal').style.display = 'none';
+            document.getElementById('slip-modal').style.setProperty('display', 'none', 'important');
         }
 
         document.getElementById('approve-slip-btn').addEventListener('click', async () => {

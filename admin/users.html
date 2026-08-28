@@ -231,9 +231,7 @@
 
         // --- ระบบแก้ไขข้อมูลแบบละเอียด ---
         window.openEditModal = function(userId) {
-            alert("เริ่มเปิดหน้าต่างแก้ไขข้อมูล ID: " + userId);
             try {
-                // ใช้ == แทน === เผื่อกรณีที่ id เป็น string จาก HTML
                 const user = allUsers.find(u => u.id == userId);
                 
                 if(!user) {
@@ -251,8 +249,9 @@
                 document.getElementById('e_emergency_contact').value = user.emergency_contact || '';
                 document.getElementById('e_emergency_phone').value = user.emergency_phone || '';
 
-                document.getElementById('edit-modal').style.display = 'flex';
-                alert("เปิดหน้าต่างสำเร็จ!");
+                const modal = document.getElementById('edit-modal');
+                modal.style.setProperty('display', 'flex', 'important');
+                modal.style.setProperty('z-index', '9999', 'important');
             } catch (err) {
                 alert("เกิดข้อผิดพลาดในระบบ Javascript: " + err.message);
                 console.error(err);

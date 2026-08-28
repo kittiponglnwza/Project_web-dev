@@ -1,130 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap');
+
 :root {
-    --primary-color: #2c3e50;
-    --secondary-color: #3498db;
-    --bg-color: #f4f6f7;
-    --text-color: #333;
+    --primary-color: #1a202c; /* ปรับสีหลักให้ดูสุขุมและแพงขึ้น (Dark Navy) */
+    --secondary-color: #d4af37; /* สีทอง */
+    --bg-color: #f9fafb;
+    --text-color: #374151;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Prompt', sans-serif; /* บังคับใช้ฟอนต์ Prompt ทั้งเว็บ */ }
 body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
 
 /* Header & Nav */
 header { background-color: var(--primary-color); color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-.logo { font-size: 1.5rem; font-weight: bold; }
+.logo { font-size: 1.5rem; font-weight: 600; letter-spacing: 1px; }
 .menu-toggle { display: flex; flex-direction: column; cursor: pointer; }
 .menu-toggle .bar { width: 25px; height: 3px; background-color: #fff; margin: 4px 0; transition: 0.3s; }
 .nav-menu { display: none; width: 100%; position: absolute; top: 60px; left: 0; background-color: var(--primary-color); }
 .nav-menu.active { display: block; }
 .nav-menu ul { list-style: none; display: flex; flex-direction: column; text-align: center; }
-.nav-menu ul li a { display: block; color: #fff; text-decoration: none; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-.nav-menu ul li a:hover { background-color: var(--secondary-color); }
-.btn-login { background-color: #e74c3c; font-weight: bold; }
+.nav-menu ul li a { display: block; color: #fff; text-decoration: none; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.nav-menu ul li a:hover { color: var(--secondary-color); }
+.btn-login { background-color: #e74c3c; font-weight: 500; border-radius: 4px; }
 
-/* --- Hero Section --- */
+/* --- Hero Section หน้าแรก --- */
 .hero { position: relative; text-align: center; min-height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; background: url('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=80') fixed no-repeat center center/cover; color: #fff; margin-bottom: 20px; }
-.hero::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); }
+.hero::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); }
 .hero-content { position: relative; z-index: 1; }
-.hero-content h1 { font-size: 3.5rem; margin-bottom: 15px; text-shadow: 2px 2px 5px rgba(0,0,0,0.6); }
-.hero-content p { font-size: 1.5rem; text-shadow: 1px 1px 4px rgba(0,0,0,0.6); }
+.hero-content h1 { font-size: 3.5rem; margin-bottom: 15px; font-weight: 600; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
+.hero-content p { font-size: 1.2rem; font-weight: 300; text-shadow: 1px 1px 5px rgba(0,0,0,0.8); }
 
 /* --- Room List Container --- */
 .room-section { padding: 40px 20px; text-align: center; background-color: var(--bg-color); }
+.room-section h2 { font-weight: 600; color: var(--primary-color); margin-bottom: 10px; }
 .list-container { display: flex; flex-direction: column; gap: 20px; max-width: 900px; margin: 20px auto; } 
 
-/* --- กล่องแนวนอน (Flexbox) --- */
-.room-box { display: flex; flex-direction: column; background: #fff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden; text-align: left; transition: transform 0.3s; }
-.room-box:hover { transform: translateY(-5px); }
-
-/* --- Image Slider ซ้ายมือ --- */
+/* --- กล่องหน้าแรก --- */
+.room-box { display: flex; flex-direction: column; background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; text-align: left; transition: 0.3s; border: 1px solid #f3f4f6; }
+.room-box:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
 .slider-wrapper { position: relative; width: 100%; height: 200px; overflow: hidden; }
 .slider-track { display: flex; height: 100%; transition: transform 0.5s ease-in-out; }
 .slider-track img { min-width: 100%; height: 100%; object-fit: cover; }
-.slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.4); color: white; border: none; padding: 10px 15px; cursor: pointer; font-size: 18px; z-index: 10; transition: 0.3s; }
-.slider-btn:hover { background: rgba(0,0,0,0.8); }
-.prev-btn { left: 0; border-radius: 0 4px 4px 0; }
-.next-btn { right: 0; border-radius: 4px 0 0 4px; }
+.slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); color: #333; border: none; padding: 10px 15px; cursor: pointer; font-size: 18px; z-index: 10; transition: 0.3s; }
+.slider-btn:hover { background: #fff; }
+.prev-btn { left: 10px; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; padding: 0; }
+.next-btn { right: 10px; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; padding: 0; }
 
-/* --- Room Details ขวามือ --- */
-.room-details { padding: 20px; display: flex; flex-direction: column; justify-content: space-evenly; gap: 5px; }
-.room-details h3 { font-size: 1.3rem; color: var(--primary-color); margin: 0; }
-.room-details .desc { color: #555; line-height: 1.4; margin: 0; font-size: 0.9rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.room-details .price { font-size: 1.1rem; color: #e74c3c; font-weight: bold; margin: 0; }
+.room-details { padding: 25px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
+.room-details h3 { font-size: 1.3rem; color: var(--primary-color); margin: 0; font-weight: 500; }
+.room-details .desc { color: #6b7280; line-height: 1.5; margin: 0; font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-weight: 300; }
+.room-details .price { font-size: 1.2rem; color: #111; font-weight: 600; margin: 0; }
 
-.status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; color: #fff; align-self: flex-start; margin: 0; }
-.status-available { background-color: #2ecc71; }
-.status-full { background-color: #e74c3c; }
+.status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: #fff; align-self: flex-start; margin: 0; font-weight: 500; }
+.status-available { background-color: #10b981; }
+.status-full { background-color: #ef4444; }
 
-.btn-details { display: inline-block; padding: 8px 15px; margin-top: 5px; background-color: var(--secondary-color); color: #fff; text-decoration: none; border-radius: 4px; text-align: center; align-self: flex-start; transition: 0.3s; font-size: 0.85rem; }
-.btn-details:hover { background-color: #2980b9; }
+.btn-details { display: inline-block; padding: 10px 20px; margin-top: 5px; background-color: var(--primary-color); color: #fff; text-decoration: none; border-radius: 8px; text-align: center; align-self: flex-start; transition: 0.3s; font-size: 0.9rem; font-weight: 500; }
+.btn-details:hover { background-color: var(--secondary-color); color: #111; }
+
+footer { text-align: center; padding: 20px; background-color: var(--primary-color); color: #fff; margin-top: 40px; font-weight: 300; font-size: 0.9rem; }
+
 
 /* =========================================
-   LUXURY ROOM DETAIL PAGE (สไตล์ใหม่สุดหรู)
+   ULTRA LUXURY ROOM DETAIL PAGE (V3)
    ========================================= */
-#room-detail-container { width: 100%; }
+.luxury-body { background-color: #fafafa; }
 
-.luxury-hero {
+.lux-hero {
     position: relative;
     width: 100%;
-    height: 65vh; /* ปกเต็มจอแบบโรงแรม */
+    height: 55vh;
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
 }
-.luxury-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    /* ไล่สีดำให้ตัวหนังสือเด่น และดูแพง */
-    background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.9) 100%);
-    display: flex; flex-direction: column; justify-content: space-between; padding: 40px 10%;
+.lux-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 30%;
+    background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
 }
-.luxury-nav { padding-top: 10px; }
-.luxury-back { color: #fff; text-decoration: none; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; transition: 0.3s; font-weight: bold; }
-.luxury-back:hover { color: #d4af37; padding-left: 10px; } /* Hover แล้วเป็นสีทอง */
-.hero-text { color: #fff; padding-bottom: 30px; }
-.hero-text .subtitle { color: #d4af37; letter-spacing: 4px; font-size: 1rem; margin-bottom: 10px; text-transform: uppercase; font-weight: bold; }
-.hero-text h1 { font-size: 3.5rem; margin: 0; font-weight: 300; letter-spacing: 1px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+.lux-nav { position: absolute; top: 30px; left: 30px; z-index: 10; }
+.lux-back {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.95); color: #111;
+    padding: 10px 20px; border-radius: 30px;
+    text-decoration: none; font-size: 0.95rem; font-weight: 500;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.3s;
+}
+.lux-back:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
 
-/* กล่องเนื้อหาลอยขึ้นมาทับรูปปกเล็กน้อย */
-.luxury-content {
-    max-width: 1200px;
-    margin: -60px auto 50px auto;
-    padding: 0 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    position: relative;
-    z-index: 10;
+.lux-wrapper {
+    max-width: 1150px; margin: 0 auto; padding: 50px 20px;
+    display: flex; flex-direction: column; gap: 40px;
 }
 
-.luxury-main { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+.lux-header { margin-bottom: 20px; }
+.lux-category { color: #d4af37; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
+.lux-title { font-size: 2.5rem; color: #111; margin: 10px 0; font-weight: 600; line-height: 1.2; }
+.lux-location { color: #6b7280; font-size: 1rem; display: flex; align-items: center; gap: 5px; font-weight: 300; }
 
-.section-title { font-size: 1.8rem; color: #222; margin-bottom: 25px; font-weight: 300; border-bottom: 1px solid #eaeaea; padding-bottom: 15px; margin-top: 40px; }
-.section-title:first-child { margin-top: 0; }
+.lux-divider { border: 0; height: 1px; background: #e5e7eb; margin: 40px 0; }
 
-.luxury-desc { font-size: 1.1rem; color: #555; line-height: 1.9; }
+.lux-section { margin-bottom: 50px; }
+.lux-section h2 { font-size: 1.3rem; color: #111; margin-bottom: 25px; font-weight: 500; }
+.lux-desc { font-size: 1.05rem; color: #4b5563; line-height: 1.8; font-weight: 300; }
 
-.luxury-amenities { display: grid; grid-template-columns: 1fr; gap: 20px; }
-.amenity-item { display: flex; align-items: center; gap: 15px; color: #444; font-size: 1.05rem; }
-.amenity-item .icon { font-size: 1.5rem; }
+.lux-amenities { display: grid; grid-template-columns: 1fr; gap: 20px; }
+.am-item { display: flex; align-items: center; gap: 15px; color: #374151; font-size: 1rem; font-weight: 300; }
+.am-item i { font-size: 1.5rem; color: #111; background: #f3f4f6; padding: 12px; border-radius: 12px; }
 
-.luxury-gallery { display: grid; grid-template-columns: 1fr; gap: 15px; }
-.luxury-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; transition: transform 0.4s; }
-.luxury-img:hover { transform: scale(1.03); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+.lux-gallery { display: grid; grid-template-columns: 1fr; gap: 15px; }
+.lux-gallery-img { width: 100%; height: 250px; object-fit: cover; border-radius: 12px; transition: 0.3s; }
+.lux-gallery-img:hover { transform: scale(1.02); }
 
-/* กล่องจองทางขวาแบบ Sticky (เลื่อนตาม) */
-.luxury-sidebar { width: 100%; }
-.booking-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 25px 50px rgba(0,0,0,0.1); position: sticky; top: 100px; }
-.price-wrap { display: flex; align-items: baseline; gap: 8px; margin-bottom: 15px; }
-.price-wrap .currency { font-size: 1.2rem; color: #888; font-weight: 300; }
-.price-wrap .price-val { font-size: 2.8rem; color: #111; font-weight: 700; }
-.price-wrap .period { color: #888; font-size: 1rem; }
-.status-wrap { display: flex; align-items: center; gap: 12px; font-size: 1.1rem; color: #555; margin-bottom: 30px; font-weight: 500; }
-.status-dot { width: 14px; height: 14px; border-radius: 50%; }
-.luxury-divider { border: 0; height: 1px; background: #eaeaea; margin-bottom: 30px; }
+.lux-sidebar { position: relative; }
+.lux-booking-card {
+    background: #fff; padding: 35px; border-radius: 20px;
+    border: 1px solid #f3f4f6; box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+    position: sticky; top: 40px;
+}
+.lux-price-row { display: flex; align-items: baseline; gap: 5px; margin-bottom: 15px; }
+.lux-price { font-size: 2.2rem; color: #111; font-weight: 600; }
+.lux-period { color: #6b7280; font-size: 1rem; font-weight: 300; }
 
-/* ปุ่มจองหรูหรา สีดำ-ทอง */
-.luxury-btn { width: 100%; background: #111; color: #fff; border: none; padding: 18px; font-size: 1.1rem; letter-spacing: 2px; border-radius: 6px; cursor: pointer; transition: 0.3s; font-weight: bold; }
-.luxury-btn:hover { background: #d4af37; color: #111; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); }
+.lux-status { display: flex; align-items: center; gap: 10px; font-size: 1rem; margin-bottom: 25px; padding: 12px 15px; background: #f9fafb; border-radius: 12px; }
+.lux-dot { width: 10px; height: 10px; border-radius: 50%; }
 
-footer { text-align: center; padding: 20px; background-color: var(--primary-color); color: #fff; margin-top: 40px; }
+.lux-promo { display: flex; gap: 15px; align-items: flex-start; font-size: 0.95rem; color: #4b5563; line-height: 1.6; margin-bottom: 30px; background: #fdfbf7; padding: 20px; border-radius: 12px; border-left: 4px solid #d4af37; font-weight: 300; }
+
+.lux-btn-reserve {
+    width: 100%; background: #111; color: #fff; border: none; padding: 18px; font-size: 1.05rem; border-radius: 12px; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; font-weight: 500;
+}
+.lux-btn-reserve:hover { background: #333; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
 
 /* Desktop View */
 @media (min-width: 768px) {
@@ -137,10 +143,10 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
     .slider-wrapper { width: 40%; height: 100%; }
     .room-details { width: 60%; padding: 20px 25px; } 
 
-    /* ปรับ Layout หน้าหรูสำหรับจอใหญ่ */
-    .luxury-content { flex-direction: row; gap: 40px; }
-    .luxury-main { width: 65%; padding: 50px; }
-    .luxury-sidebar { width: 35%; }
-    .luxury-amenities { grid-template-columns: 1fr 1fr; }
-    .luxury-gallery { grid-template-columns: 1fr 1fr; }
+    /* Layout หน้า Luxury สำหรับจอใหญ่ */
+    .lux-wrapper { flex-direction: row; gap: 60px; }
+    .lux-main { width: 60%; }
+    .lux-sidebar { width: 40%; }
+    .lux-amenities { grid-template-columns: 1fr 1fr; }
+    .lux-gallery { grid-template-columns: 1fr 1fr; }
 }

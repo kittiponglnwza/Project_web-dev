@@ -174,43 +174,152 @@
         </div>
     </div>
 
+    <!-- Hidden A4 Invoice Template for PDF Generation -->
+    <div id="pdf-invoice-template" style="display: none; position: absolute; left: -9999px; top: 0; width: 800px; padding: 40px; background: #fff; color: #000; font-family: 'Prompt', sans-serif;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #111; padding-bottom: 20px; margin-bottom: 20px;">
+            <div>
+                <h1 style="margin: 0; font-size: 24px; color: #111; font-weight: 600;">หอพัก K. Dormitory</h1>
+                <p style="margin: 5px 0 0 0; font-size: 14px; color: #444; line-height: 1.6;">
+                    123/45 ถนนสมมติ ต.สมมติ อ.เมือง จ.ชลบุรี 20000<br>
+                    โทรศัพท์: 080-123-4567<br>
+                    เลขประจำตัวผู้เสียภาษี: 0123456789012
+                </p>
+            </div>
+            <div style="text-align: right;">
+                <h1 style="margin: 0; font-size: 28px; color: #1e40af; font-weight: 600;">ใบแจ้งหนี้ / INVOICE</h1>
+                <table style="margin-top: 10px; width: 100%; font-size: 14px;">
+                    <tr><td style="text-align: right; padding-right: 10px; font-weight: bold;">เลขที่ (No.):</td><td style="text-align: left;" id="pdf-inv-no">INV-0000</td></tr>
+                    <tr><td style="text-align: right; padding-right: 10px; font-weight: bold;">วันที่ (Date):</td><td style="text-align: left;" id="pdf-date">01/01/2024</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+            <div style="width: 60%;">
+                <h3 style="margin: 0 0 10px 0; font-size: 16px; border-bottom: 1px solid #ccc; display: inline-block; font-weight: 600;">ข้อมูลผู้เช่า (Billed To)</h3>
+                <p style="margin: 5px 0; font-size: 14px;"><strong>ชื่อ-นามสกุล:</strong> <span id="pdf-tenant-name">-</span></p>
+                <p style="margin: 5px 0; font-size: 14px;"><strong>ห้องพัก (Room No):</strong> <span id="pdf-tenant-room">-</span></p>
+                <p style="margin: 5px 0; font-size: 14px;"><strong>ที่อยู่:</strong> <span id="pdf-tenant-address">-</span></p>
+            </div>
+            <div style="width: 35%;">
+                <div style="background: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px;">
+                    <p style="margin: 0 0 5px 0; font-size: 14px; color: #6b7280;"><strong>รอบบิล (Billing Month)</strong></p>
+                    <p style="margin: 0; font-size: 20px; color: #1e40af; font-weight: 600;" id="pdf-bill-month">-</p>
+                </div>
+            </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 14px;">
+            <thead>
+                <tr style="background: #1e40af; color: #fff;">
+                    <th style="padding: 12px; border: 1px solid #1e40af; text-align: center; width: 10%;">ลำดับ</th>
+                    <th style="padding: 12px; border: 1px solid #1e40af; text-align: left; width: 50%;">รายการ (Description)</th>
+                    <th style="padding: 12px; border: 1px solid #1e40af; text-align: center; width: 20%;">จำนวน / หน่วย</th>
+                    <th style="padding: 12px; border: 1px solid #1e40af; text-align: right; width: 20%;">จำนวนเงิน (Amount)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">1</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">ค่าเช่าห้องพัก (Room Rent)</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">1 เดือน</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: right;"><span id="pdf-rent">0</span></td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">2</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">ค่าไฟฟ้า (Electricity)</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;"><span id="pdf-elec-unit">0</span> หน่วย</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: right;"><span id="pdf-elec-fee">0</span></td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">3</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">ค่าน้ำประปา (Water)</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;"><span id="pdf-water-unit">0</span> หน่วย</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: right;"><span id="pdf-water-fee">0</span></td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">4</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">ค่าปรับและค่าอื่นๆ (Other Fees)</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">-</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: right;"><span id="pdf-other-fee">0</span></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr style="font-weight: bold; background: #f9fafb;">
+                    <td colspan="3" style="padding: 15px; border: 1px solid #ddd; text-align: right; font-size: 15px;">รวมเป็นเงินทั้งสิ้น (Grand Total)</td>
+                    <td style="padding: 15px; border: 1px solid #ddd; text-align: right; color: #dc2626; font-size: 18px;"><span id="pdf-total">0</span> บาท</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 60px;">
+            <div style="text-align: center; width: 40%;">
+                <p style="margin-bottom: 50px; font-size: 14px;">ลงชื่อ ....................................................... ผู้เช่า</p>
+                <p style="font-size: 14px;">( <span id="pdf-sign-tenant">..........................................</span> )</p>
+                <p style="margin-top: 5px; font-size: 12px; color: #666;">วันที่ ....... / ....... / .......</p>
+            </div>
+            <div style="text-align: center; width: 40%;">
+                <p style="margin-bottom: 50px; font-size: 14px;">ลงชื่อ ....................................................... ผู้รับเงิน</p>
+                <p style="font-size: 14px;">( เจ้าหน้าที่นิติบุคคล )</p>
+                <p style="margin-top: 5px; font-size: 12px; color: #666;">วันที่ ....... / ....... / .......</p>
+            </div>
+        </div>
+        
+        <p style="text-align: center; margin-top: 40px; font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 15px;">
+            กรุณาชำระเงินภายในวันที่ 5 ของทุกเดือน เพื่อหลีกเลี่ยงค่าปรับล่าช้า<br>
+            เอกสารฉบับนี้สร้างโดยระบบจัดการหอพักอัตโนมัติ
+        </p>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script>
         let currentBillId = null;
         let globalBills = [];
+        let globalProfile = null;
+        let globalUserName = "-";
 
         function downloadPDF() {
-            const element = document.querySelector('.invoice-modal');
-            const closeBtn = document.querySelector('.close-btn');
-            const pdfRow = document.querySelector('.bxs-file-pdf').parentNode;
-            
-            // ซ่อนปุ่มต่างๆ ก่อนแคปหน้าจอทำ PDF
-            closeBtn.style.display = 'none';
-            pdfRow.style.display = 'none';
-            element.style.boxShadow = 'none';
-            element.style.border = 'none';
-            element.style.width = '600px'; // ล็อคความกว้างให้ PDF สวยงาม
+            const bill = globalBills.find(b => b.id === currentBillId);
+            if(!bill) return;
 
-            const month = document.getElementById('detail-month').innerText.trim();
-            const filename = `Invoice_${month}.pdf`;
+            // เอาหน้าแบบฟอร์มเต็มมาเตรียมไว้
+            const element = document.getElementById('pdf-invoice-template');
+            
+            // ใส่ข้อมูลลงแบบฟอร์ม
+            let d = new Date(bill.created_at);
+            document.getElementById('pdf-inv-no').innerText = "INV-" + d.getFullYear() + (d.getMonth()+1).toString().padStart(2, '0') + "-" + bill.id;
+            document.getElementById('pdf-date').innerText = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+            
+            document.getElementById('pdf-tenant-name').innerText = globalUserName;
+            document.getElementById('pdf-tenant-room').innerText = (globalProfile && globalProfile.room_no) ? globalProfile.room_no : "-";
+            document.getElementById('pdf-tenant-address').innerText = (globalProfile && globalProfile.address) ? globalProfile.address : "-";
+            document.getElementById('pdf-sign-tenant').innerText = globalUserName;
+
+            document.getElementById('pdf-bill-month').innerText = bill.month;
+            document.getElementById('pdf-rent').innerText = (bill.rent_fee || 0).toLocaleString();
+            document.getElementById('pdf-elec-unit').innerText = (bill.elec_unit || 0).toLocaleString();
+            document.getElementById('pdf-elec-fee').innerText = (bill.elec_fee || 0).toLocaleString();
+            document.getElementById('pdf-water-unit').innerText = (bill.water_unit || 0).toLocaleString();
+            document.getElementById('pdf-water-fee').innerText = (bill.water_fee || 0).toLocaleString();
+            document.getElementById('pdf-other-fee').innerText = (bill.other_fee || 0).toLocaleString();
+            document.getElementById('pdf-total').innerText = bill.amount.toLocaleString();
+
+            // แสดงก่อนให้ html2pdf มองเห็น
+            element.style.display = 'block';
 
             const opt = {
-                margin:       [0.4, 0],
-                filename:     filename,
+                margin:       [0.4, 0.4],
+                filename:     `Invoice_${bill.month}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
-                // คืนค่าการแสดงผลกลับมาเหมือนเดิม
-                closeBtn.style.display = 'block';
-                pdfRow.style.display = 'flex';
-                element.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
-                element.style.border = '1px solid #f3f4f6';
-                element.style.width = '500px';
+                // ซ่อนกลับ
+                element.style.display = 'none';
             });
         }
 
@@ -222,6 +331,16 @@
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) { window.location.href = "../login.html"; return; }
             
+            globalUserName = session.user.user_metadata?.full_name || session.user.email;
+            
+            // ดึงข้อมูลผู้เช่า
+            const { data: profile } = await supabaseClient
+                .from('tenant_profiles')
+                .select('address, room_no')
+                .eq('email', session.user.email)
+                .single();
+            globalProfile = profile;
+
             const { data: bills, error } = await supabaseClient
                 .from('bills')
                 .select('*')
@@ -278,6 +397,7 @@
         }
 
         function openDetailModal(id) {
+            currentBillId = id;
             const bill = globalBills.find(b => b.id === id);
             if(!bill) return;
 

@@ -168,6 +168,20 @@
         </div>
     </div>
 
+    <!-- Modal ดูสลิป -->
+    <div class="modal-overlay" id="slip-modal">
+        <div class="modal" style="width: 450px; text-align: center;">
+            <div class="modal-header">
+                <h3>หลักฐานการโอนเงิน</h3>
+                <button class="modal-close" onclick="closeSlipModal()"><i class='bx bx-x'></i></button>
+            </div>
+            <img id="slip-image-preview" src="" style="width: 100%; border-radius: 8px; margin-bottom: 20px; border: 1px solid #eee; min-height: 300px; object-fit: contain; background: #f8fafc;">
+            <button class="btn-primary" style="width: 100%; justify-content: center; background: #10b981;" id="approve-slip-btn">
+                <i class='bx bx-check-circle'></i> ตรวจสอบแล้ว อนุมัติสลิปนี้
+            </button>
+        </div>
+    </div>
+
     <script src="../js/supabase-config.js"></script>
     <script>
         let allBills = [];
@@ -239,7 +253,7 @@
                 } else if (bill.status === 'checking') {
                     badge = '<span class="status-badge st-checking">รอตรวจสลิป</span>';
                     // ปุ่มสีเขียวเด่นๆ ให้แอดมินกดยืนยัน
-                    actionBtn = `<button class="action-btn btn-approve" title="ตรวจสลิป & อนุมัติ" onclick="approveSlip(${bill.id})"><i class='bx bx-check-circle'></i> อนุมัติ</button>`;
+                    actionBtn = `<button class="action-btn btn-approve" title="ตรวจสลิป & อนุมัติ" onclick="viewSlip(${bill.id}, '${bill.slip_image || ''}')"><i class='bx bx-search-alt'></i> ดูสลิป</button>`;
                 } else {
                     badge = '<span class="status-badge st-unpaid">ค้างชำระ</span>';
                     actionBtn = `<button class="action-btn" title="ลบบิลทิ้ง" onclick="deleteBill(${bill.id})" style="color:#ef4444;"><i class='bx bx-trash'></i></button>`;
@@ -323,6 +337,30 @@
                 alert('สร้างบิลสำเร็จแล้ว!');
                 closeModal();
                 loadBills(); // รีเฟรชตาราง
+            }
+        });
+
+        let currentSlipBillId = null;
+
+        function viewSlip(billId, slipImage) {
+            currentSlipBillId = billId;
+            const imgEl = document.getElementById('slip-image-preview');
+            if (slipImage && slipImage !== 'undefined') {
+                imgEl.src = slipImage;
+            } else {
+                imgEl.src = 'https://via.placeholder.com/400x600?text=No+Slip+Image';
+            }
+            document.getElementById('slip-modal').style.display = 'flex';
+        }
+
+        function closeSlipModal() {
+            document.getElementById('slip-modal').style.display = 'none';
+        }
+
+        document.getElementById('approve-slip-btn').addEventListener('click', async () => {
+            if (currentSlipBillId) {
+                await approveSlip(currentSlipBillId);
+                closeSlipModal();
             }
         });
 

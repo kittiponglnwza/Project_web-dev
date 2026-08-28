@@ -267,8 +267,8 @@
                     actionBtn = `<button class="action-btn" title="ดูรายละเอียด" onclick="alert('ยอดเยี่ยม! บิลนี้เคลียร์แล้ว')"><i class='bx bx-check-double'></i></button>`;
                 } else if (bill.status === 'checking') {
                     badge = '<span class="status-badge st-checking">รอตรวจสลิป</span>';
-                    // ปุ่มสีเขียวเด่นๆ ให้แอดมินกดยืนยัน
-                    actionBtn = `<button class="action-btn btn-approve" title="ตรวจสลิป & อนุมัติ" onclick="viewSlip(${bill.id}, '${bill.slip_image || ''}')"><i class='bx bx-search-alt'></i> ดูสลิป</button>`;
+                    // ดึง bill.id ไปหา slip_image ในฟังก์ชันแทนเพื่อกัน string ยาวเกินไปใน HTML
+                    actionBtn = `<button class="action-btn btn-approve" title="ตรวจสลิป & อนุมัติ" onclick="viewSlip(${bill.id})"><i class='bx bx-search-alt'></i> ดูสลิป</button>`;
                 } else {
                     badge = '<span class="status-badge st-unpaid">ค้างชำระ</span>';
                     actionBtn = `<button class="action-btn" title="ลบบิลทิ้ง" onclick="deleteBill(${bill.id})" style="color:#ef4444;"><i class='bx bx-trash'></i></button>`;
@@ -356,7 +356,7 @@
                 water_unit: waterUnit,
                 water_fee: waterFee,
                 amount: amount,
-                status: 'pending' // แก้บั๊กจาก unpaid เป็น pending ให้ตรงกับฝั่งลูกบ้าน
+                status: 'pending' 
             }]);
 
             if (error) {
@@ -371,8 +371,11 @@
 
         let currentSlipBillId = null;
 
-        function viewSlip(billId, slipImage) {
+        function viewSlip(billId) {
             currentSlipBillId = billId;
+            const bill = allBills.find(b => b.id === billId);
+            const slipImage = bill ? bill.slip_image : null;
+            
             const imgEl = document.getElementById('slip-image-preview');
             if (slipImage && slipImage !== 'undefined') {
                 imgEl.src = slipImage;

@@ -19,12 +19,13 @@
         .logout-btn:hover { background: #fef2f2; color: #dc2626; border-left-color: #dc2626; }
         
         .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); }
-        .recent-section { background: #fff; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); max-width: 900px; margin: 0 auto; border: 1px solid #f3f4f6; }
-        .page-title { font-size: 1.8rem; margin: 0 auto 30px auto; color: #111; max-width: 900px; }
+        .recent-section { background: #fff; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); max-width: 1100px; margin: 0 auto; border: 1px solid #f3f4f6; }
+        .page-title { font-size: 1.8rem; margin: 0 auto 30px auto; color: #111; max-width: 1100px; }
         .section-header { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; font-size: 1.2rem; font-weight: 600; }
         
         .data-table { width: 100%; border-collapse: collapse; }
-        .data-table th, .data-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .data-table th, .data-table td { padding: 18px 15px; text-align: left; border-bottom: 1px solid #eee; white-space: nowrap; }
+        .data-table td:nth-child(2) { white-space: normal; min-width: 200px; }
         .data-table th { color: #6b7280; font-weight: 500; font-size: 0.95rem; }
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; }
         .status-pending { background: #fef3c7; color: #d97706; }
@@ -208,19 +209,25 @@
                 if (bill.status === "pending") {
                     statusHtml = `<span class="status-badge status-pending">ค้างชำระ</span>`;
                     actionHtml = `
-                        <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb; margin-right:5px;" onclick="openDetailModal(${bill.id})">รายละเอียด</button>
-                        <button class="pay-btn" onclick="openPaymentModal(${bill.id}, '${bill.month}', ${bill.amount})">ชำระเงิน</button>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb;" onclick="openDetailModal(${bill.id})">รายละเอียด</button>
+                            <button class="pay-btn" onclick="openPaymentModal(${bill.id}, '${bill.month}', ${bill.amount})">ชำระเงิน</button>
+                        </div>
                     `;
                 } else if (bill.status === "checking") {
                     statusHtml = `<span class="status-badge status-pending" style="background:#e0e7ff; color:#4f46e5;">รอตรวจสอบสลิป</span>`;
                     actionHtml = `
-                        <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb; margin-right:5px;" onclick="openDetailModal(${bill.id})">รายละเอียด</button>
-                        <span style="color:#6b7280; font-size:0.9rem;">กำลังตรวจสอบ</span>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb;" onclick="openDetailModal(${bill.id})">รายละเอียด</button>
+                            <span style="color:#6b7280; font-size:0.9rem;">กำลังตรวจสอบ</span>
+                        </div>
                     `;
                 } else {
                     statusHtml = `<span class="status-badge status-paid">ชำระแล้ว</span>`;
                     actionHtml = `
-                        <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb;" onclick="openDetailModal(${bill.id})">ดูใบเสร็จ</button>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb;" onclick="openDetailModal(${bill.id})">ดูใบเสร็จ</button>
+                        </div>
                     `;
                 }
                 

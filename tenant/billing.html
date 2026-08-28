@@ -400,7 +400,9 @@
             bills.forEach(bill => {
                 let statusHtml = "";
                 let actionHtml = "";
-                if (bill.status === "pending") {
+                
+                // รองรับทั้ง pending (ใหม่) และ unpaid (บิลเก่าในระบบ)
+                if (bill.status === "pending" || bill.status === "unpaid") {
                     statusHtml = `<span class="status-badge status-pending">ค้างชำระ</span>`;
                     actionHtml = `
                         <div style="display: flex; align-items: center; gap: 10px;">

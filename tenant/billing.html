@@ -7,8 +7,6 @@
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <style>
         body { background-color: #f3f4f6; margin: 0; font-family: 'Prompt', sans-serif; display: flex; }
         .sidebar { width: 260px; background: #fff; height: 100vh; padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05); position: fixed; display: flex; flex-direction: column; }
@@ -191,143 +189,183 @@
             const bill = globalBills.find(b => b.id === currentBillId);
             if(!bill) return;
 
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4'); // A4: 210 x 297 mm
+            const d = new Date(bill.created_at);
+            const invNo = "INV-" + d.getFullYear() + (d.getMonth()+1).toString().padStart(2,'0') + "-" + bill.id;
+            const dateStr = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
+            const room = (globalProfile && globalProfile.room_no) ? globalProfile.room_no : '-';
+            const address = (globalProfile && globalProfile.address) ? globalProfile.address : '-';
+            const utility = (bill.elec_fee || 0) + (bill.water_fee || 0);
 
-            const pageW = 210;
-            const marginL = 20;
-            const marginR = 20;
-            const contentW = pageW - marginL - marginR;
-            let y = 20; // cursor Y position
+            const invoiceHTML = `<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ใบแจ้งหนี้ ${bill.month}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Prompt', sans-serif; padding: 40px 50px; color: #333; background: #fff; max-width: 800px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; border-bottom: 3px solid #1e40af; padding-bottom: 20px; margin-bottom: 25px; }
+        .header-left h1 { font-size: 22px; color: #111; margin-bottom: 5px; }
+        .header-left p { font-size: 12px; color: #666; line-height: 1.8; }
+        .header-right { text-align: right; }
+        .header-right h2 { font-size: 24px; color: #1e40af; margin-bottom: 8px; }
+        .header-right table td { font-size: 12px; padding: 2px 0; }
+        .header-right table td:first-child { font-weight: 600; text-align: right; padding-right: 8px; }
 
-            // ========== HEADER ==========
-            doc.setFontSize(18);
-            doc.setTextColor(17, 17, 17);
-            doc.text('K. Dormitory', marginL, y);
+        .info-section { display: flex; justify-content: space-between; margin-bottom: 25px; }
+        .info-left { width: 60%; }
+        .info-left h3 { font-size: 14px; color: #1e40af; border-bottom: 2px solid #e5e7eb; display: inline-block; padding-bottom: 5px; margin-bottom: 10px; }
+        .info-left p { font-size: 12px; margin: 4px 0; }
+        .info-left p strong { color: #111; }
+        .billing-box { background: #f0f4ff; border: 2px solid #c7d2fe; padding: 15px 20px; border-radius: 10px; text-align: center; }
+        .billing-box small { color: #6b7280; font-size: 11px; }
+        .billing-box .month { font-size: 18px; font-weight: 600; color: #1e40af; margin-top: 5px; }
 
-            doc.setFontSize(16);
-            doc.setTextColor(30, 64, 175); // blue
-            doc.text('INVOICE', pageW - marginR, y, { align: 'right' });
+        table.invoice-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        table.invoice-table th { background: #1e40af; color: #fff; padding: 10px 12px; font-size: 12px; font-weight: 500; }
+        table.invoice-table th:first-child { border-radius: 8px 0 0 0; }
+        table.invoice-table th:last-child { border-radius: 0 8px 0 0; }
+        table.invoice-table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 12px; }
+        table.invoice-table tr:last-child td { border-bottom: none; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
 
-            y += 8;
-            doc.setFontSize(9);
-            doc.setTextColor(100, 100, 100);
-            doc.text('123/45 Sukhumvit Rd., Saensuk, Mueang, Chonburi 20130', marginL, y);
-            
-            let d = new Date(bill.created_at);
-            let invNo = "INV-" + d.getFullYear() + (d.getMonth()+1).toString().padStart(2, '0') + "-" + bill.id;
-            let dateStr = d.toLocaleDateString('en-GB');
-            
-            doc.setTextColor(50,50,50);
-            doc.text('No: ' + invNo, pageW - marginR, y, { align: 'right' });
-            y += 5;
-            doc.text('Tel: 080-123-4567', marginL, y);
-            doc.text('Date: ' + dateStr, pageW - marginR, y, { align: 'right' });
-            y += 5;
-            doc.text('Tax ID: 0-1234-56789-01-2', marginL, y);
+        .total-row { background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 0 0 8px 8px; display: flex; justify-content: space-between; padding: 15px 20px; font-size: 16px; font-weight: 600; margin-bottom: 30px; }
+        .total-row .amount { color: #dc2626; font-size: 20px; }
 
-            // Divider
-            y += 5;
-            doc.setDrawColor(17,17,17);
-            doc.setLineWidth(0.5);
-            doc.line(marginL, y, pageW - marginR, y);
+        .status-section { text-align: center; margin: 25px 0; }
+        .status-badge { display: inline-block; padding: 8px 30px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+        .status-paid { background: #d1fae5; color: #059669; }
+        .status-unpaid { background: #fee2e2; color: #dc2626; }
+        .status-checking { background: #e0e7ff; color: #4f46e5; }
 
-            // ========== BILLED TO ==========
-            y += 10;
-            doc.setFontSize(11);
-            doc.setTextColor(30, 64, 175);
-            doc.text('Billed To', marginL, y);
+        .signatures { display: flex; justify-content: space-between; margin-top: 50px; }
+        .sig-block { text-align: center; width: 40%; }
+        .sig-block .line { border-top: 1px solid #999; margin-bottom: 8px; }
+        .sig-block p { font-size: 11px; color: #666; }
+        .sig-block .name { font-size: 12px; color: #333; font-weight: 500; }
 
-            doc.setFontSize(11);
-            doc.setTextColor(30, 64, 175);
-            doc.text('Billing Period', pageW - marginR - 50, y);
+        .footer { text-align: center; margin-top: 40px; padding-top: 15px; border-top: 1px solid #eee; font-size: 10px; color: #999; line-height: 1.8; }
 
-            y += 8;
-            doc.setFontSize(10);
-            doc.setTextColor(50, 50, 50);
-            doc.text('Name: ' + globalUserName, marginL, y);
+        @media print {
+            body { padding: 20px 30px; }
+            @page { size: A4; margin: 15mm; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>หอพัก K. Dormitory</h1>
+            <p>
+                123/45 ถนนสุขุมวิท ต.แสนสุข อ.เมือง จ.ชลบุรี 20130<br>
+                โทรศัพท์: 080-123-4567<br>
+                เลขประจำตัวผู้เสียภาษี: 0-1234-56789-01-2
+            </p>
+        </div>
+        <div class="header-right">
+            <h2>ใบแจ้งหนี้ / Invoice</h2>
+            <table>
+                <tr><td>เลขที่:</td><td>${invNo}</td></tr>
+                <tr><td>วันที่:</td><td>${dateStr}</td></tr>
+            </table>
+        </div>
+    </div>
 
-            // Billing month box
-            doc.setFillColor(249, 250, 251);
-            doc.setDrawColor(229, 231, 235);
-            doc.roundedRect(pageW - marginR - 55, y - 6, 55, 20, 3, 3, 'FD');
-            doc.setFontSize(12);
-            doc.setTextColor(30, 64, 175);
-            doc.text(bill.month, pageW - marginR - 52, y + 7);
+    <div class="info-section">
+        <div class="info-left">
+            <h3>ข้อมูลผู้เช่า (Billed To)</h3>
+            <p><strong>ชื่อ-นามสกุล:</strong> ${globalUserName}</p>
+            <p><strong>ห้องพัก:</strong> ${room}</p>
+            <p><strong>ที่อยู่:</strong> ${address}</p>
+        </div>
+        <div>
+            <div class="billing-box">
+                <small>รอบบิล (Billing Period)</small>
+                <div class="month">${bill.month}</div>
+            </div>
+        </div>
+    </div>
 
-            doc.setFontSize(10);
-            doc.setTextColor(50, 50, 50);
-            y += 6;
-            let room = (globalProfile && globalProfile.room_no) ? globalProfile.room_no : '-';
-            doc.text('Room: ' + room, marginL, y);
-            y += 6;
-            let address = (globalProfile && globalProfile.address) ? globalProfile.address : '-';
-            doc.text('Address: ' + address, marginL, y, { maxWidth: 100 });
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th class="text-center" style="width:8%;">ลำดับ</th>
+                <th style="width:42%;">รายการ</th>
+                <th class="text-center" style="width:25%;">จำนวน / หน่วย</th>
+                <th class="text-right" style="width:25%;">จำนวนเงิน (บาท)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="text-center">1</td>
+                <td>ค่าเช่าห้องพัก</td>
+                <td class="text-center">1 เดือน</td>
+                <td class="text-right">${(bill.rent_fee || 0).toLocaleString()}</td>
+            </tr>
+            <tr>
+                <td class="text-center">2</td>
+                <td>ค่าไฟฟ้า</td>
+                <td class="text-center">${(bill.elec_unit || 0).toLocaleString()} หน่วย</td>
+                <td class="text-right">${(bill.elec_fee || 0).toLocaleString()}</td>
+            </tr>
+            <tr>
+                <td class="text-center">3</td>
+                <td>ค่าน้ำประปา</td>
+                <td class="text-center">${(bill.water_unit || 0).toLocaleString()} หน่วย</td>
+                <td class="text-right">${(bill.water_fee || 0).toLocaleString()}</td>
+            </tr>
+            <tr>
+                <td class="text-center">4</td>
+                <td>ค่าปรับและค่าอื่น ๆ</td>
+                <td class="text-center">-</td>
+                <td class="text-right">${(bill.other_fee || 0).toLocaleString()}</td>
+            </tr>
+        </tbody>
+    </table>
 
-            // ========== TABLE ==========
-            y += 12;
-            const tableData = [
-                ['1', 'Room Rent', '1 month', (bill.rent_fee || 0).toLocaleString()],
-                ['2', 'Electricity', (bill.elec_unit || 0) + ' units', (bill.elec_fee || 0).toLocaleString()],
-                ['3', 'Water', (bill.water_unit || 0) + ' units', (bill.water_fee || 0).toLocaleString()],
-                ['4', 'Other Fees', '-', (bill.other_fee || 0).toLocaleString()],
-            ];
+    <div class="total-row">
+        <span>รวมเป็นเงินทั้งสิ้น (Grand Total)</span>
+        <span class="amount">${bill.amount.toLocaleString()} บาท</span>
+    </div>
 
-            doc.autoTable({
-                startY: y,
-                margin: { left: marginL, right: marginR },
-                head: [['No.', 'Description', 'Quantity', 'Amount (THB)']],
-                body: tableData,
-                foot: [['', '', 'Grand Total', bill.amount.toLocaleString() + ' THB']],
-                theme: 'grid',
-                headStyles: { fillColor: [30, 64, 175], textColor: 255, fontSize: 10, halign: 'center' },
-                bodyStyles: { fontSize: 10, textColor: [50,50,50] },
-                footStyles: { fillColor: [249, 250, 251], textColor: [220, 38, 38], fontSize: 12, fontStyle: 'bold' },
-                columnStyles: {
-                    0: { halign: 'center', cellWidth: 15 },
-                    1: { halign: 'left', cellWidth: 'auto' },
-                    2: { halign: 'center', cellWidth: 35 },
-                    3: { halign: 'right', cellWidth: 35 },
-                },
-            });
+    <div class="status-section">
+        ${bill.status === 'paid' ? '<span class="status-badge status-paid">✅ ชำระแล้ว (PAID)</span>' : bill.status === 'checking' ? '<span class="status-badge status-checking">🔄 รอตรวจสอบสลิป</span>' : '<span class="status-badge status-unpaid">⚠️ ค้างชำระ (UNPAID)</span>'}
+    </div>
 
-            y = doc.lastAutoTable.finalY + 15;
+    <div class="signatures">
+        <div class="sig-block">
+            <div class="line"></div>
+            <p>ลงชื่อผู้เช่า</p>
+            <p class="name">( ${globalUserName} )</p>
+            <p>วันที่ ....... / ....... / .......</p>
+        </div>
+        <div class="sig-block">
+            <div class="line"></div>
+            <p>ลงชื่อผู้รับเงิน</p>
+            <p class="name">( เจ้าหน้าที่นิติบุคคล )</p>
+            <p>วันที่ ....... / ....... / .......</p>
+        </div>
+    </div>
 
-            // ========== STATUS ==========
-            let statusText = bill.status === 'paid' ? 'PAID' : bill.status === 'checking' ? 'PENDING REVIEW' : 'UNPAID';
-            let statusColor = bill.status === 'paid' ? [5, 150, 105] : [220, 38, 38];
-            doc.setFontSize(14);
-            doc.setTextColor(...statusColor);
-            doc.text('Status: ' + statusText, pageW / 2, y, { align: 'center' });
+    <div class="footer">
+        กรุณาชำระเงินภายในวันที่ 5 ของทุกเดือน เพื่อหลีกเลี่ยงค่าปรับล่าช้า<br>
+        เอกสารฉบับนี้ออกโดยระบบจัดการหอพัก K. Dormitory อัตโนมัติ
+    </div>
 
-            // ========== SIGNATURES ==========
-            y += 25;
-            doc.setTextColor(100, 100, 100);
-            doc.setFontSize(9);
-            doc.setDrawColor(150,150,150);
+    <script>
+        // รอให้ฟอนต์โหลดเสร็จ แล้วค่อยเปิด Print Dialog
+        document.fonts.ready.then(() => {
+            setTimeout(() => { window.print(); }, 300);
+        });
+    </script>
+</body>
+</html>`;
 
-            // Left signature
-            doc.line(marginL + 10, y, marginL + 70, y);
-            doc.text('Tenant', marginL + 35, y + 5, { align: 'center' });
-            doc.text('( ' + globalUserName + ' )', marginL + 35, y + 10, { align: 'center' });
-
-            // Right signature
-            doc.line(pageW - marginR - 70, y, pageW - marginR - 10, y);
-            doc.text('Authorized', pageW - marginR - 40, y + 5, { align: 'center' });
-            doc.text('( Admin )', pageW - marginR - 40, y + 10, { align: 'center' });
-
-            // ========== FOOTER ==========
-            y += 25;
-            doc.setDrawColor(200,200,200);
-            doc.line(marginL, y, pageW - marginR, y);
-            y += 5;
-            doc.setFontSize(8);
-            doc.setTextColor(150, 150, 150);
-            doc.text('Please pay by the 5th of each month to avoid late fees.', pageW / 2, y, { align: 'center' });
-            doc.text('This document was generated by K. Dormitory Management System.', pageW / 2, y + 4, { align: 'center' });
-
-            // Save
-            doc.save('Invoice_' + bill.month + '.pdf');
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(invoiceHTML);
+            printWindow.document.close();
         }
 
         document.addEventListener("DOMContentLoaded", async () => {

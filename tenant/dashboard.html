@@ -107,12 +107,26 @@
             
             const user = session.user;
             let fullName = user.email;
+            let shortName = "ผู้เช่า";
+
             if (user.user_metadata && user.user_metadata.full_name) {
-                fullName = (user.user_metadata.title || "") + user.user_metadata.full_name;
+                let title = user.user_metadata.title || "";
+                let fName = user.user_metadata.full_name.trim();
+                
+                // แก้บั๊กคำนำหน้าซ้ำซ้อน
+                if (fName.startsWith(title)) {
+                    fullName = fName;
+                } else {
+                    fullName = title + " " + fName;
+                }
+
+                // สกัดเอาเฉพาะชื่อคำแรกไปแสดงมุมขวาบน (ตัดคำนำหน้าออก)
+                let nameWithoutTitle = fName.replace(/^(นาย|นางสาว|นาง)\s*/, '');
+                shortName = nameWithoutTitle.split(' ')[0];
             }
             
             document.getElementById("welcome-text").innerText = "สวัสดี, " + fullName;
-            document.getElementById("profile-name").innerText = fullName.split(' ')[0];
+            document.getElementById("profile-name").innerText = shortName;
         });
     </script>
 </body>

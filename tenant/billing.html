@@ -83,8 +83,8 @@
             <h2 style="margin-top: 0;">ชำระเงินผ่านสแกน QR</h2>
             <p id="modal-bill-details" style="color: #6b7280; margin-bottom: 20px;">รอบบิล: - | ยอดชำระ: - บาท</p>
             
-            <!-- Dummy QR Code image (You can replace with real PromptPay later) -->
-            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" alt="PromptPay QR" style="width: 180px; margin: 0 auto 20px auto; display: block; border: 2px solid #f3f4f6; border-radius: 10px; padding: 10px;">
+            <!-- Dynamic PromptPay QR Code -->
+            <img id="qr-image" src="" alt="PromptPay QR" style="width: 200px; margin: 0 auto 20px auto; display: block; border: 2px solid #f3f4f6; border-radius: 10px; padding: 10px;">
             
             <p style="font-size: 0.95rem; font-weight: 500; color: #111;">สแกนเพื่อชำระเงินเข้าบัญชีหอพัก</p>
             
@@ -154,6 +154,12 @@
         function openPaymentModal(id, month, amount) {
             currentBillId = id;
             document.getElementById('modal-bill-details').innerText = `รอบบิล: ${month} | ยอดชำระ: ${amount.toLocaleString()} บาท`;
+            
+            // Generate Real PromptPay QR Code
+            // รูปแบบ URL: https://promptpay.io/[เบอร์โทรศัพท์_หรือ_เลขบัตรประชาชน]/[จำนวนเงิน].png
+            const promptPayID = "0638498495"; 
+            document.getElementById('qr-image').src = `https://promptpay.io/${promptPayID}/${amount}.png`;
+
             document.getElementById('paymentModal').style.display = 'flex';
             document.getElementById('slipUpload').value = ""; // clear old input
         }

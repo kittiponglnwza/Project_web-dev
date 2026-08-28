@@ -8,20 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("room-detail-container").innerHTML = "<p style='text-align:center; padding: 100px;'>⚠️ ไม่พบข้อมูลห้องพัก กรุณากลับไปเลือกใหม่</p>";
     }
 
-    // ==========================================
-    // ระบบ Modal & Form Validation (RegEx) 
-    // สำหรับคะแนน Rubric ข้อ 3 โดยเฉพาะ
-    // ==========================================
     const modal = document.getElementById("bookingModal");
     const closeBtn = document.querySelector(".close-modal");
     
-    // เปิด/ปิด Modal
     if (closeBtn && modal) {
         closeBtn.addEventListener("click", () => {
             modal.classList.remove("show");
         });
 
-        // กดพื้นที่ว่างข้างนอกเพื่อปิด
         window.addEventListener("click", (e) => {
             if (e.target == modal) {
                 modal.classList.remove("show");
@@ -29,29 +23,21 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // จัดการการส่งฟอร์ม + Validation
     const bookingForm = document.getElementById("bookingForm");
     if (bookingForm) {
         bookingForm.addEventListener("submit", (e) => {
-            e.preventDefault(); // ป้องกันเว็บโหลดใหม่ (สำคัญเวลาใช้ Ajax/JS จัดการ)
-
+            e.preventDefault(); 
             const phoneInput = document.getElementById("b_phone");
             const phoneError = document.getElementById("phoneError");
             const phoneVal = phoneInput.value.trim();
-
-            // เช็ค RegEx: ต้องขึ้นด้วย 0 และตามด้วยตัวเลขอีก 9 หลัก (รวมเป็น 10)
             const phoneRegex = /^0\d{9}$/;
 
             if (!phoneRegex.test(phoneVal)) {
-                // กรอกเบอร์ผิดรูปแบบ โชว์ตัวแดงเตือน
                 phoneInput.classList.add("invalid");
                 phoneError.style.display = "block";
             } else {
-                // กรอกถูกรูปแบบ ผ่าน!
                 phoneInput.classList.remove("invalid");
                 phoneError.style.display = "none";
-
-                // จำลองว่าบันทึกข้อมูลแล้ว ปิดฟอร์ม โชว์ปุ่มแอด LINE
                 document.getElementById("bookingFormContainer").style.display = "none";
                 document.getElementById("bookingSuccess").style.display = "block";
             }
@@ -79,18 +65,14 @@ function fetchRoomDetail(id) {
 function renderUltraPremiumDetail(room) {
     const container = document.getElementById("room-detail-container");
     const formattedPrice = new Intl.NumberFormat('th-TH').format(room.price);
-    
     const statusText = room.isAvailable ? `Available (${room.availableCount} Rooms)` : "Fully Booked (เต็มแล้ว)";
     const statusColor = room.isAvailable ? "#10b981" : "#ef4444"; 
-
     const mainImage = room.images[0];
     let galleryHTML = '';
     
     if (room.images.length > 1) {
         room.images.forEach((imgUrl, index) => {
-            if (index > 0) {
-                galleryHTML += `<img src="${imgUrl}" alt="Gallery ${index}" class="lux-gallery-img">`;
-            }
+            if (index > 0) galleryHTML += `<img src="${imgUrl}" alt="Gallery ${index}" class="lux-gallery-img">`;
         });
     } else {
         galleryHTML = `<img src="${mainImage}" alt="Gallery 1" class="lux-gallery-img">`;
@@ -136,6 +118,27 @@ function renderUltraPremiumDetail(room) {
                         ${galleryHTML}
                     </div>
                 </div>
+
+                <!-- เพิ่มแผนที่ Location (Google Maps) -->
+                <div class="lux-section">
+                    <h2>สถานที่ตั้ง (Location)</h2>
+                    <div style="width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 15px;">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3874.33156272559!2d100.51139427508365!3d13.824510786575184!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29b7134371457%3A0xcbb98305342a7!2z4Lih4Lir4Liy4Lin4Li04LiX4Lii4Liy4Lil4Lix4Lii4LmA4LiX4LiE4LmC4LiZ4LmC4Lil4Lii4Li14Lie4Lij4Liw4LiI4Lit4Lih4LmA4LiB4Lil4LmJ4Liy4Lie4Lij4Liw4LiZ4LiE4Lij4LmA4Lir4LiZ4Li34Lit!5e0!3m2!1sth!2sth!4v1714500000000!5m2!1sth!2sth" 
+                            width="100%" 
+                            height="350" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                    <p style="color: #4b5563; font-size: 1rem; display: flex; gap: 8px; align-items: flex-start; line-height: 1.6;">
+                        <i class='bx bxs-map' style="color: #ef4444; font-size: 1.3rem; margin-top: 3px;"></i> 
+                        <span>ทำเลทอง ใกล้มหาวิทยาลัยและแหล่งชุมชน เดินทางสะดวกสบายด้วยรถสาธารณะ มีร้านสะดวกซื้อ 7-11 ป้ายรถเมล์ และวินมอเตอร์ไซค์หน้าปากซอย</span>
+                    </p>
+                </div>
+
             </div>
 
             <div class="lux-sidebar">
@@ -158,7 +161,6 @@ function renderUltraPremiumDetail(room) {
                         </div>
                     </div>
 
-                    <!-- เปลี่ยนปุ่มให้เรียกใช้งาน ฟังก์ชันเปิด Modal -->
                     <button class="lux-btn-reserve" onclick="openBookingModal()">
                         สนใจจอง / นัดดูห้องพัก <i class='bx bx-right-arrow-alt'></i>
                     </button>
@@ -168,12 +170,10 @@ function renderUltraPremiumDetail(room) {
     `;
 }
 
-// ฟังก์ชันเปิด Modal
 window.openBookingModal = function() {
     const modal = document.getElementById("bookingModal");
     modal.classList.add("show");
     
-    // เคลียร์ค่าฟอร์มกลับเป็นค่าเริ่มต้นทุกครั้งที่เปิดใหม่
     document.getElementById("bookingFormContainer").style.display = "block";
     document.getElementById("bookingSuccess").style.display = "none";
     document.getElementById("bookingForm").reset();

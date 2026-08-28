@@ -1,8 +1,10 @@
 -- 1. ตารางข้อมูลโปรไฟล์และสัญญาเช่าผู้เช่า (Tenant Profiles)
+DROP TABLE IF EXISTS tenant_profiles CASCADE;
 CREATE TABLE tenant_profiles (
     id SERIAL PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
     national_id TEXT,
+    address TEXT,
     room_no TEXT,
     lease_status TEXT DEFAULT 'Active',
     start_date DATE,
@@ -48,8 +50,8 @@ ALTER TABLE maintenance_requests DISABLE ROW LEVEL SECURITY;
 -- หมายเหตุ: ระบบจะอ้างอิงจากอีเมลของคุณ "kitipongzaza566@gmail.com"
 -- ==========================================
 
-INSERT INTO tenant_profiles (email, national_id, room_no, start_date, end_date, emergency_contact, emergency_phone)
-VALUES ('kitipongzaza566@gmail.com', '1-2345-67890-12-3', '302', '2024-07-01', '2025-06-30', 'สมศรี ตีระสี (มารดา)', '081-999-9999')
+INSERT INTO tenant_profiles (email, national_id, address, room_no, start_date, end_date, emergency_contact, emergency_phone)
+VALUES ('kitipongzaza566@gmail.com', '1-2345-67890-12-3', '123/45 หมู่ 6 ถ.สุขุมวิท ต.แสนสุข อ.เมือง จ.ชลบุรี 20130', '302', '2024-07-01', '2025-06-30', 'สมศรี ตีระสี (มารดา)', '081-999-9999')
 ON CONFLICT (email) DO NOTHING;
 
 INSERT INTO bills (email, month, room_no, rent_fee, elec_unit, elec_fee, water_unit, water_fee, other_fee, amount, status) VALUES 

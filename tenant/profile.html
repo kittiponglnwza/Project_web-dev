@@ -70,6 +70,10 @@
                     <label>เบอร์โทรศัพท์ (Phone Number)</label>
                     <div class="info-val" id="p_phone">กำลังโหลด...</div>
                 </div>
+                <div class="info-group" style="grid-column: 1 / -1;">
+                    <label>ที่อยู่ตามทะเบียนบ้าน (Address)</label>
+                    <div class="info-val" id="p_address">กำลังโหลด...</div>
+                </div>
             </div>
 
             <div class="divider"></div>
@@ -143,6 +147,7 @@
                     
                 if (profile && !error) {
                     document.getElementById("p_nid").innerText = profile.national_id || "ไม่ระบุ";
+                    document.getElementById("p_address").innerText = profile.address || "ไม่ระบุ";
                     document.getElementById("p_room").innerText = "ห้อง " + (profile.room_no || "-");
                     document.getElementById("p_start").innerText = profile.start_date || "-";
                     document.getElementById("p_end").innerText = profile.end_date || "-";
@@ -160,6 +165,7 @@
                 } else {
                     // ถ้ายังไม่มีข้อมูลแอดมินป้อนให้
                     document.getElementById("p_nid").innerText = "ยังไม่มีข้อมูลในระบบ";
+                    document.getElementById("p_address").innerText = "-";
                     document.getElementById("p_room").innerText = "รอการอนุมัติห้องพัก";
                     document.getElementById("p_start").innerText = "-";
                     document.getElementById("p_end").innerText = "-";

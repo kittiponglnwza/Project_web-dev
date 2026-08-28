@@ -116,24 +116,6 @@
         </div>
     </div>
 
-    <!-- Modal ดูสลิป (ยังคงไว้ใช้ดูสลิป) -->
-    <div class="modal-overlay" id="slip-modal">
-        <div class="modal" style="width: 450px; text-align: center;">
-            <div class="modal-header">
-                <h3>หลักฐานการโอนเงิน</h3>
-                <button class="modal-close" onclick="closeSlipModal()"><i class='bx bx-x'></i></button>
-            </div>
-            <img id="slip-image-preview" src="" style="width: 100%; border-radius: 8px; margin-bottom: 20px; border: 1px solid #eee; min-height: 300px; object-fit: contain; background: #f8fafc;">
-            <div class="grid-2">
-                <button class="btn-primary" style="width: 100%; justify-content: center; background: #ef4444;" id="reject-slip-btn">
-                    <i class='bx bx-x-circle'></i> ให้ส่งใหม่
-                </button>
-                <button class="btn-primary" style="width: 100%; justify-content: center; background: #10b981;" id="approve-slip-btn">
-                    <i class='bx bx-check-circle'></i> อนุมัติสลิปนี้
-                </button>
-            </div>
-        </div>
-    </div>
 
     <script src="../js/supabase-config.js"></script>
     <script>
@@ -206,8 +188,11 @@
                     actionBtn = `<button class="action-btn" title="ดูรายละเอียด" onclick="alert('ยอดเยี่ยม! บิลนี้เคลียร์แล้ว')"><i class='bx bx-check-double'></i></button>`;
                 } else if (bill.status === 'checking') {
                     badge = '<span class="status-badge st-checking">รอตรวจสลิป</span>';
-                    // ดึง bill.id ไปหา slip_image ในฟังก์ชันแทนเพื่อกัน string ยาวเกินไปใน HTML
-                    actionBtn = `<button class="action-btn btn-approve" title="ตรวจสลิป & อนุมัติ" onclick="viewSlip('${bill.id}')"><i class='bx bx-search-alt'></i> ดูสลิป</button>`;
+                    actionBtn = `
+                        <button class="action-btn" title="ดูสลิป" onclick="viewSlipNewTab('${bill.id}')" style="color:#3b82f6;"><i class='bx bx-image'></i></button>
+                        <button class="action-btn btn-approve" title="อนุมัติสลิป" onclick="approveSlip('${bill.id}')" style="color:#10b981;"><i class='bx bx-check'></i></button>
+                        <button class="action-btn" title="ให้ส่งใหม่" onclick="rejectSlip('${bill.id}')" style="color:#ef4444;"><i class='bx bx-x'></i></button>
+                    `;
                 } else {
                     badge = '<span class="status-badge st-unpaid">ค้างชำระ</span>';
                     actionBtn = `<button class="action-btn" title="ลบบิลทิ้ง" onclick="deleteBill('${bill.id}')" style="color:#ef4444;"><i class='bx bx-trash'></i></button>`;
@@ -227,41 +212,24 @@
             });
         }
 
-        let currentSlipBillId = null;
-
-        function viewSlip(billId) {
-            currentSlipBillId = billId;
+        function viewSlipNewTab(billId) {
             const bill = allBills.find(b => b.id == billId);
             const slipImage = bill ? bill.slip_image : null;
             
-            const imgEl = document.getElementById('slip-image-preview');
             if (slipImage && slipImage !== 'undefined') {
-                imgEl.src = slipImage;
+                const w = window.open("");
+                w.document.write(`
+                    <html>
+                    <head><title>สลิปโอนเงิน (บิล ${bill.month})</title></head>
+                    <body style="margin:0; display:flex; justify-content:center; align-items:center; background:#0f172a; min-height:100vh;">
+                        <img src="${slipImage}" style="max-width:100%; max-height:100vh; object-fit:contain; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
+                    </body>
+                    </html>
+                `);
             } else {
-                imgEl.src = 'https://via.placeholder.com/400x600?text=No+Slip+Image';
+                alert("บิลนี้ไม่มีรูปสลิปในระบบครับ");
             }
-            const modal = document.getElementById('slip-modal');
-            modal.style.setProperty('display', 'flex', 'important');
-            modal.style.setProperty('z-index', '9999', 'important');
         }
-
-        function closeSlipModal() {
-            document.getElementById('slip-modal').style.setProperty('display', 'none', 'important');
-        }
-
-        document.getElementById('approve-slip-btn').addEventListener('click', async () => {
-            if (currentSlipBillId) {
-                await approveSlip(currentSlipBillId);
-                closeSlipModal();
-            }
-        });
-
-        document.getElementById('reject-slip-btn').addEventListener('click', async () => {
-            if (currentSlipBillId) {
-                await rejectSlip(currentSlipBillId);
-                closeSlipModal();
-            }
-        });
 
         // --- ระบบปฏิเสธสลิป ---
         async function rejectSlip(billId) {

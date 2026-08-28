@@ -42,6 +42,29 @@
         .role-badge { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e0e7ff; color: #4f46e5; }
         .role-admin { background: #fef08a; color: #854d0e; }
 
+        .action-btn { background: #f1f5f9; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: #475569; font-size: 16px; transition: 0.2s; margin-left: 5px; }
+        .action-btn:hover { background: #e2e8f0; color: #0f172a; }
+        .btn-edit { color: #3b82f6; }
+        .btn-delete { color: #ef4444; }
+        .btn-delete:hover { background: #fee2e2; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(4px); }
+        .modal { background: #fff; width: 550px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 30px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-header h3 { margin: 0; font-size: 20px; color: #0f172a; }
+        .modal-close { background: none; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; color: #64748b; margin-bottom: 5px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Prompt'; font-size: 14px; box-sizing: border-box; outline: none; }
+        .form-group input:focus, .form-group textarea:focus { border-color: #3b82f6; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .btn-submit { width: 100%; background: #0f172a; color: #fff; border: none; padding: 12px; border-radius: 8px; font-family: 'Prompt'; font-size: 15px; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        .btn-submit:hover { background: #1e293b; }
+
     </style>
 </head>
 <body>
@@ -63,16 +86,16 @@
         </div>
 
         <div class="card">
-            <p style="color: #64748b; margin-top: 0; font-size: 14px;">เมื่อมีผู้ใช้สมัครสมาชิกใหม่ ระบบจะยังไม่กำหนดห้องพักให้ (แสดงเป็น "ยังไม่ระบุ") แอดมินสามารถกำหนดเลขห้องพักได้ที่นี่ เพื่อให้ระบบคำนวณบิลได้อย่างถูกต้อง</p>
+            <p style="color: #64748b; margin-top: 0; font-size: 14px;">จัดการข้อมูลส่วนตัว, กำหนดเลขห้องพัก, และลบผู้ใช้ออกจากระบบได้ที่นี่</p>
             
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 30%;">อีเมลผู้ใช้ (Email)</th>
+                        <th style="width: 25%;">อีเมลผู้ใช้ (Email)</th>
                         <th>สิทธิ์การใช้งาน</th>
-                        <th>ข้อมูลที่อยู่เดิม</th>
-                        <th style="text-align: center;">หมายเลขห้องพัก (Room No.)</th>
-                        <th style="text-align: center;">บันทึก</th>
+                        <th style="width: 20%; text-align: center;">หมายเลขห้องพัก</th>
+                        <th style="text-align: center;">กำหนดห้องด่วน</th>
+                        <th style="text-align: center;">จัดการเพิ่มเติม</th>
                     </tr>
                 </thead>
                 <tbody id="users-table-body">
@@ -82,8 +105,68 @@
         </div>
     </div>
 
+    <!-- Modal ดู/แก้ไขข้อมูลผู้เช่า -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>ข้อมูลส่วนตัวผู้เช่า</h3>
+                <button class="modal-close" onclick="closeModal()"><i class='bx bx-x'></i></button>
+            </div>
+            <form id="edit-user-form">
+                <input type="hidden" id="e_id">
+                
+                <div class="form-group">
+                    <label>อีเมล (Email) - ห้ามแก้ไข</label>
+                    <input type="text" id="e_email" readonly style="background: #f1f5f9; color: #94a3b8;">
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>หมายเลขห้อง (Room No.)</label>
+                        <input type="text" id="e_room" placeholder="เช่น 302">
+                    </div>
+                    <div class="form-group">
+                        <label>รหัสบัตรประชาชน</label>
+                        <input type="text" id="e_national_id" placeholder="x-xxxx-xxxxx-xx-x">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ที่อยู่ตามทะเบียนบ้าน</label>
+                    <textarea id="e_address" rows="3" placeholder="บ้านเลขที่ หมู่ ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์..."></textarea>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>วันที่เริ่มสัญญา (Start Date)</label>
+                        <input type="date" id="e_start_date">
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่สิ้นสุดสัญญา (End Date)</label>
+                        <input type="date" id="e_end_date">
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>ผู้ติดต่อฉุกเฉิน</label>
+                        <input type="text" id="e_emergency_contact" placeholder="ชื่อ-นามสกุล (ความสัมพันธ์)">
+                    </div>
+                    <div class="form-group">
+                        <label>เบอร์โทรฉุกเฉิน</label>
+                        <input type="text" id="e_emergency_phone" placeholder="08x-xxx-xxxx">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit"><i class='bx bx-save'></i> บันทึกข้อมูล</button>
+            </form>
+        </div>
+    </div>
+
     <script src="../js/supabase-config.js"></script>
     <script>
+        let allUsers = [];
+
         document.addEventListener("DOMContentLoaded", async () => {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
@@ -94,11 +177,10 @@
         });
 
         async function loadUsers() {
-            // ดึงผู้ใช้ทั้งหมด
             const { data: users, error } = await supabaseClient
                 .from('tenant_profiles')
                 .select('*')
-                .order('role', { ascending: true }) // เอา admin ขึ้นก่อน หรือเรียงตามสิทธิ์
+                .order('role', { ascending: true }) 
                 .order('room_no', { ascending: true });
 
             if (error) {
@@ -106,6 +188,7 @@
                 return;
             }
 
+            allUsers = users; // เก็บไว้ในหน่วยความจำเพื่อส่งให้ Modal
             const tbody = document.getElementById('users-table-body');
             tbody.innerHTML = '';
 
@@ -120,17 +203,18 @@
 
                 tbody.innerHTML += `
                     <tr>
-                        <td style="font-weight: 500;">
-                            ${user.email} 
-                            <div style="font-size: 12px; color: #94a3b8; font-weight: 400;">เข้าร่วม: ${new Date(user.created_at).toLocaleDateString('th-TH')}</div>
-                        </td>
+                        <td style="font-weight: 500;">${user.email}</td>
                         <td>${roleBadge}</td>
-                        <td style="font-size: 13px;">${user.address || '-'}</td>
+                        <td style="text-align: center;">${roomDisplay}</td>
                         <td style="text-align: center;">
-                            <input type="text" id="room_input_${user.id}" class="input-room" value="${roomVal}" placeholder="เช่น 101">
+                            <div style="display:flex; justify-content:center; align-items:center;">
+                                <input type="text" id="room_input_${user.id}" class="input-room" value="${roomVal}" placeholder="ห้อง">
+                                <button class="btn-save" style="margin-left:5px;" onclick="updateRoom(${user.id}, '${user.email}')" title="บันทึกเลขห้องด่วน"><i class='bx bx-save'></i></button>
+                            </div>
                         </td>
                         <td style="text-align: center;">
-                            <button class="btn-save" onclick="updateRoom(${user.id}, '${user.email}')" title="บันทึกเลขห้อง"><i class='bx bx-save'></i></button>
+                            <button class="action-btn btn-edit" onclick="openEditModal(${user.id})" title="ดู/แก้ไขข้อมูล"><i class='bx bx-edit'></i></button>
+                            <button class="action-btn btn-delete" onclick="deleteUser(${user.id}, '${user.email}')" title="ลบผู้ใช้"><i class='bx bx-trash'></i></button>
                         </td>
                     </tr>
                 `;
@@ -139,17 +223,73 @@
 
         async function updateRoom(id, email) {
             const newRoom = document.getElementById(`room_input_${id}`).value.trim();
+            const { error } = await supabaseClient.from('tenant_profiles').update({ room_no: newRoom || null }).eq('id', id);
             
-            const { error } = await supabaseClient
-                .from('tenant_profiles')
-                .update({ room_no: newRoom || null })
-                .eq('id', id);
+            if (error) alert('อัปเดตข้อมูลล้มเหลว: ' + error.message);
+            else { alert(`อัปเดตห้องพักของ ${email} เป็น ${newRoom || 'ว่าง'} สำเร็จ!`); loadUsers(); }
+        }
+
+        // --- ระบบแก้ไขข้อมูลแบบละเอียด ---
+        function openEditModal(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if(!user) return;
+
+            document.getElementById('e_id').value = user.id;
+            document.getElementById('e_email').value = user.email || '';
+            document.getElementById('e_room').value = user.room_no || '';
+            document.getElementById('e_national_id').value = user.national_id || '';
+            document.getElementById('e_address').value = user.address || '';
+            document.getElementById('e_start_date').value = user.start_date || '';
+            document.getElementById('e_end_date').value = user.end_date || '';
+            document.getElementById('e_emergency_contact').value = user.emergency_contact || '';
+            document.getElementById('e_emergency_phone').value = user.emergency_phone || '';
+
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+        }
+
+        document.getElementById('edit-user-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('e_id').value;
+            
+            const updates = {
+                room_no: document.getElementById('e_room').value.trim() || null,
+                national_id: document.getElementById('e_national_id').value.trim(),
+                address: document.getElementById('e_address').value.trim(),
+                start_date: document.getElementById('e_start_date').value || null,
+                end_date: document.getElementById('e_end_date').value || null,
+                emergency_contact: document.getElementById('e_emergency_contact').value.trim(),
+                emergency_phone: document.getElementById('e_emergency_phone').value.trim(),
+            };
+
+            const { error } = await supabaseClient.from('tenant_profiles').update(updates).eq('id', id);
             
             if (error) {
-                alert('อัปเดตข้อมูลล้มเหลว: ' + error.message);
+                alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + error.message);
             } else {
-                alert(`อัปเดตห้องพักของ ${email} เป็น ${newRoom || 'ว่าง'} สำเร็จ!`);
-                loadUsers(); // รีโหลดตาราง
+                alert("อัปเดตข้อมูลส่วนตัวผู้เช่าเรียบร้อยแล้ว!");
+                closeModal();
+                loadUsers();
+            }
+        });
+
+        // --- ระบบลบผู้ใช้ ---
+        async function deleteUser(id, email) {
+            const confirmMsg = `คำเตือน! คุณต้องการลบผู้ใช้ "${email}" ออกจากระบบหอพักอย่างถาวรใช่หรือไม่?\n\n(การลบข้อมูลนี้จะไม่สามารถกู้คืนได้)`;
+            
+            if (confirm(confirmMsg)) {
+                // ลบจากตาราง tenant_profiles
+                const { error } = await supabaseClient.from('tenant_profiles').delete().eq('id', id);
+                
+                if (error) {
+                    alert("ไม่สามารถลบผู้ใช้ได้: " + error.message);
+                } else {
+                    alert(`ลบผู้ใช้ ${email} ออกจากระบบเรียบร้อยแล้ว`);
+                    loadUsers();
+                }
             }
         }
 

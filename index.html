@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyDorm - ระบบจัดการหอพัก</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Rubric 4: Semantic Layout -->
+    <header>
+        <div class="logo">MyDorm</div>
+        
+        <!-- Hamburger Icon for Mobile -->
+        <div class="menu-toggle" id="mobile-menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+        
+        <nav class="nav-menu" id="nav-menu">
+            <ul>
+                <li><a href="index.html">หน้าแรก</a></li>
+                <li><a href="#rooms">ดูห้องว่าง</a></li>
+                <!-- ลิงก์ไปยังหน้าล็อกอิน (เราจะสร้างภายหลัง) -->
+                <li><a href="login.html" class="btn-login">เข้าสู่ระบบ</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>ยินดีต้อนรับสู่ MyDorm</h1>
+            <p>หอพักที่ตอบโจทย์ทุกไลฟ์สไตล์ สะดวก ปลอดภัย ใกล้มหาวิทยาลัย</p>
+        </section>
+
+        <section id="rooms" class="room-section">
+            <h2>อัปเดตสถานะห้องพักล่าสุด</h2>
+            <p>ข้อมูลด้านล่างถูกดึงแบบเรียลไทม์ผ่านระบบ JSON & Ajax</p>
+            
+            <!-- Container สำหรับใส่ข้อมูลห้องที่ดึงจาก JS -->
+            <div id="room-container" class="grid-container">
+                <p class="loading-text">กำลังโหลดข้อมูลห้องพัก...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 MyDorm System. โปรเจกต์วิชา Web Development.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

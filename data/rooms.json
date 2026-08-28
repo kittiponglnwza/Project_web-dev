@@ -1,0 +1,29 @@
+[
+    {
+        "id": 1,
+        "type": "ห้องพัดลม (Standard)",
+        "description": "ห้องขนาด 24 ตรม. มีเตียง ตู้เสื้อผ้า โต๊ะเขียนหนังสือ",
+        "price": 3500,
+        "isAvailable": true,
+        "availableCount": 5,
+        "image": "images/room1.jpg"
+    },
+    {
+        "id": 2,
+        "type": "ห้องแอร์ (Deluxe)",
+        "description": "ห้องขนาด 28 ตรม. แอร์ ทีวี ตู้เย็น เครื่องทำน้ำอุ่น",
+        "price": 4500,
+        "isAvailable": true,
+        "availableCount": 2,
+        "image": "images/room2.jpg"
+    },
+    {
+        "id": 3,
+        "type": "ห้องสูท (VIP)",
+        "description": "ห้องขนาด 35 ตรม. เฟอร์นิเจอร์ครบชุด พร้อมโซนพักผ่อนส่วนตัว",
+        "price": 6000,
+        "isAvailable": false,
+        "availableCount": 0,
+        "image": "images/room3.jpg"
+    }
+]

@@ -1,0 +1,63 @@
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --bg-color: #f4f6f7;
+    --text-color: #333;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+header { background-color: var(--primary-color); color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+.logo { font-size: 1.5rem; font-weight: bold; }
+.menu-toggle { display: flex; flex-direction: column; cursor: pointer; }
+.menu-toggle .bar { width: 25px; height: 3px; background-color: #fff; margin: 4px 0; transition: 0.3s; }
+.nav-menu { display: none; width: 100%; position: absolute; top: 60px; left: 0; background-color: var(--primary-color); }
+.nav-menu.active { display: block; }
+.nav-menu ul { list-style: none; display: flex; flex-direction: column; text-align: center; }
+.nav-menu ul li a { display: block; color: #fff; text-decoration: none; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.nav-menu ul li a:hover { background-color: var(--secondary-color); }
+.btn-login { background-color: #e74c3c; font-weight: bold; }
+.hero { text-align: center; padding: 50px 20px; background-color: #fff; margin-bottom: 20px; }
+.room-section { padding: 20px; text-align: center; }
+.grid-container { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+
+/* --- CSS สำหรับ Card และรูปภาพ --- */
+.card { 
+    background: #fff; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+    text-align: left; 
+    transition: transform 0.3s; 
+    overflow: hidden; /* บังคับให้รูปภาพมุมโค้งตามการ์ด */
+}
+.card:hover { transform: translateY(-5px); }
+
+/* รูปภาพในห้อง */
+.room-img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+}
+
+/* พื้นที่ข้อความในการ์ด */
+.card-content {
+    padding: 20px;
+}
+.card-content h3 { margin-bottom: 10px; }
+
+/* ย้ายเส้นสีสถานะจากด้านซ้ายมาเป็นขอบล่างแทนเพื่อให้เข้ากับรูป */
+.card[data-status="available"] { border-bottom: 5px solid #2ecc71; }
+.card[data-status="full"] { border-bottom: 5px solid #e74c3c; }
+
+.status-badge { display: inline-block; padding: 5px 10px; border-radius: 12px; font-size: 0.85rem; color: #fff; margin-top: 10px; }
+.status-available { background-color: #2ecc71; }
+.status-full { background-color: #e74c3c; }
+footer { text-align: center; padding: 20px; background-color: var(--primary-color); color: #fff; margin-top: 40px; }
+
+@media (min-width: 768px) {
+    .menu-toggle { display: none; }
+    .nav-menu { display: block; position: static; width: auto; }
+    .nav-menu ul { flex-direction: row; }
+    .nav-menu ul li a { padding: 10px 20px; border-bottom: none; }
+    .grid-container { grid-template-columns: repeat(3, 1fr); }
+}

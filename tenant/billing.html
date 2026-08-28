@@ -303,24 +303,37 @@
             document.getElementById('pdf-other-fee').innerText = (bill.other_fee || 0).toLocaleString();
             document.getElementById('pdf-total').innerText = bill.amount.toLocaleString();
 
-            // ดึง HTML ภายในมาครอบด้วย Div ที่กำหนดขนาดชัดเจน ไม่ให้ล้น
+            // วิธีแก้ปัญหาภาพตัดขอบ: สร้าง Container จำลองที่พิกัด 0,0 ของหน้าจอ
             const templateInner = document.getElementById('pdf-invoice-template').innerHTML;
-            const htmlContent = `
-                <div style="width: 750px; max-width: 750px; padding: 20px; background: #fff; color: #000; font-family: 'Prompt', sans-serif; box-sizing: border-box; margin: 0 auto;">
-                    ${templateInner}
-                </div>
-            `;
+            const printContainer = document.createElement('div');
+            printContainer.innerHTML = templateInner;
+            
+            Object.assign(printContainer.style, {
+                width: '800px',
+                padding: '40px',
+                background: '#fff',
+                color: '#000',
+                fontFamily: "'Prompt', sans-serif",
+                boxSizing: 'border-box',
+                position: 'fixed',
+                top: '0',
+                left: '0',
+                zIndex: '-9999' // ซ่อนไว้ด้านหลัง
+            });
+            
+            document.body.appendChild(printContainer);
 
             const opt = {
-                margin:       0.4,
+                margin:       0.3,
                 filename:     `Invoice_${bill.month}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, windowWidth: 800, useCORS: true }, // บังคับความกว้างหน้าจอตอนแคปเพื่อไม่ให้ตกขอบ
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, scrollX: 0, scrollY: 0, useCORS: true }, // scrollX, scrollY แก้ปัญหาตัดขอบเวลาเลื่อนจอ
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
 
-            // ใช้ html2pdf ส่ง string เข้าไปประมวลผล (ป้องกันหน้าขาวจาก display:none)
-            html2pdf().set(opt).from(htmlContent).save();
+            html2pdf().set(opt).from(printContainer).save().then(() => {
+                document.body.removeChild(printContainer); // ลบออกเมื่อเสร็จ
+            });
         }
 
         document.addEventListener("DOMContentLoaded", async () => {

@@ -188,8 +188,11 @@
         let globalUserName = "-";
 
         function downloadPDF() {
-            const bill = globalBills.find(b => b.id === currentBillId);
-            if(!bill) return;
+            const bill = globalBills.find(b => b.id == currentBillId);
+            if (!bill) {
+                alert("ไม่พบบิลที่ต้องการ");
+                return;
+            }
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
@@ -406,22 +409,22 @@
                     statusHtml = `<span class="status-badge status-pending">ค้างชำระ</span>`;
                     actionHtml = `
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb;" onclick="openDetailModal(${bill.id})">รายละเอียด</button>
-                            <button class="pay-btn" onclick="openPaymentModal(${bill.id}, '${bill.month}', ${bill.amount})">ชำระเงิน</button>
+                            <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb;" onclick="openDetailModal('${bill.id}')">รายละเอียด</button>
+                            <button class="pay-btn" onclick="openPaymentModal('${bill.id}', '${bill.month}', ${bill.amount})">ชำระเงิน</button>
                         </div>
                     `;
                 } else if (bill.status === "checking") {
                     statusHtml = `<span class="status-badge status-pending" style="background:#e0e7ff; color:#4f46e5;">รอตรวจสอบสลิป</span>`;
                     actionHtml = `
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb;" onclick="openDetailModal(${bill.id})">รายละเอียด</button>
+                            <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb;" onclick="openDetailModal('${bill.id}')">รายละเอียด</button>
                         </div>
                     `;
                 } else {
                     statusHtml = `<span class="status-badge status-paid">ชำระแล้ว</span>`;
                     actionHtml = `
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb;" onclick="openDetailModal(${bill.id})">ดูใบเสร็จ</button>
+                            <button class="pay-btn" style="background:#f3f4f6; color:#111; border:1px solid #e5e7eb;" onclick="openDetailModal('${bill.id}')">ดูใบเสร็จ</button>
                         </div>
                     `;
                 }
@@ -440,7 +443,7 @@
 
         function openDetailModal(id) {
             currentBillId = id;
-            const bill = globalBills.find(b => b.id === id);
+            const bill = globalBills.find(b => b.id == id);
             if(!bill) return;
 
             document.getElementById('detail-month').innerText = bill.month;

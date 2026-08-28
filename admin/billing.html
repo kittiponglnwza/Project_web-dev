@@ -207,10 +207,10 @@
                 } else if (bill.status === 'checking') {
                     badge = '<span class="status-badge st-checking">รอตรวจสลิป</span>';
                     // ดึง bill.id ไปหา slip_image ในฟังก์ชันแทนเพื่อกัน string ยาวเกินไปใน HTML
-                    actionBtn = `<button class="action-btn btn-approve" title="ตรวจสลิป & อนุมัติ" onclick="viewSlip(${bill.id})"><i class='bx bx-search-alt'></i> ดูสลิป</button>`;
+                    actionBtn = `<button class="action-btn btn-approve" title="ตรวจสลิป & อนุมัติ" onclick="viewSlip('${bill.id}')"><i class='bx bx-search-alt'></i> ดูสลิป</button>`;
                 } else {
                     badge = '<span class="status-badge st-unpaid">ค้างชำระ</span>';
-                    actionBtn = `<button class="action-btn" title="ลบบิลทิ้ง" onclick="deleteBill(${bill.id})" style="color:#ef4444;"><i class='bx bx-trash'></i></button>`;
+                    actionBtn = `<button class="action-btn" title="ลบบิลทิ้ง" onclick="deleteBill('${bill.id}')" style="color:#ef4444;"><i class='bx bx-trash'></i></button>`;
                 }
 
                 tbody.innerHTML += `
@@ -231,7 +231,7 @@
 
         function viewSlip(billId) {
             currentSlipBillId = billId;
-            const bill = allBills.find(b => b.id === billId);
+            const bill = allBills.find(b => b.id == billId);
             const slipImage = bill ? bill.slip_image : null;
             
             const imgEl = document.getElementById('slip-image-preview');

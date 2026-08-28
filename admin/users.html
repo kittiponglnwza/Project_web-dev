@@ -209,12 +209,12 @@
                         <td style="text-align: center;">
                             <div style="display:flex; justify-content:center; align-items:center;">
                                 <input type="text" id="room_input_${user.id}" class="input-room" value="${roomVal}" placeholder="ห้อง">
-                                <button class="btn-save" style="margin-left:5px;" onclick="updateRoom(${user.id}, '${user.email}')" title="บันทึกเลขห้องด่วน"><i class='bx bx-save'></i></button>
+                                <button class="btn-save" style="margin-left:5px;" onclick="updateRoom('${user.id}', '${user.email}')" title="บันทึกเลขห้องด่วน"><i class='bx bx-save'></i></button>
                             </div>
                         </td>
                         <td style="text-align: center;">
-                            <button class="action-btn btn-edit" onclick="openEditModal(${user.id})" title="ดู/แก้ไขข้อมูล"><i class='bx bx-edit'></i></button>
-                            <button class="action-btn btn-delete" onclick="deleteUser(${user.id}, '${user.email}')" title="ลบผู้ใช้"><i class='bx bx-trash'></i></button>
+                            <button class="action-btn btn-edit" onclick="openEditModal('${user.id}')" title="ดู/แก้ไขข้อมูล"><i class='bx bx-edit'></i></button>
+                            <button class="action-btn btn-delete" onclick="deleteUser('${user.id}', '${user.email}')" title="ลบผู้ใช้"><i class='bx bx-trash'></i></button>
                         </td>
                     </tr>
                 `;

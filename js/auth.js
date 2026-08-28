@@ -1,4 +1,28 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // ==========================================
+    // ดักจับ Event เมื่อกดลิงก์ "กู้รหัสผ่าน" จากอีเมล
+    // ==========================================
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+            // เมื่อตรวจพบว่ามาจากลิงก์กู้รหัสผ่าน ให้เด้งหน้าต่างถามรหัสใหม่
+            const newPassword = prompt("🔑 ระบบตรวจสอบพบการขอกู้คืนบัญชี!\nกรุณากรอก 'รหัสผ่านใหม่' ที่คุณต้องการตั้ง (ขั้นต่ำ 6 ตัวอักษร):");
+            
+            if (newPassword && newPassword.length >= 6) {
+                // ส่งคำสั่งอัปเดตรหัสผ่านใหม่ไปที่ Supabase
+                const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+                
+                if (error) {
+                    alert("❌ เปลี่ยนรหัสผ่านไม่สำเร็จ: " + error.message);
+                } else {
+                    alert("✅ ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว! ระบบจะนำคุณเข้าสู่เว็บไซต์ทันที");
+                    window.location.href = "index.html"; // เปลี่ยนรหัสเสร็จกลับไปหน้าแรก
+                }
+            } else {
+                alert("❌ คุณไม่ได้กรอกรหัสผ่าน หรือรหัสผ่านสั้นเกินไป (ยกเลิกการตั้งรหัสผ่านใหม่)");
+            }
+        }
+    });
+
     // 1. เช็คสถานะล็อกอินทันทีที่โหลดหน้าเว็บผ่าน Supabase Auth
     checkLoginStatus();
 

@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert("❌ เปลี่ยนรหัสผ่านไม่สำเร็จ: " + error.message);
                 } else {
                     alert("✅ ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว! ระบบจะนำคุณเข้าสู่เว็บไซต์ทันที");
-                    window.location.href = "index.html"; // เปลี่ยนรหัสเสร็จกลับไปหน้าแรก
+                    window.location.href = "dashboard.html"; // เปลี่ยนรหัสเสร็จกลับไปหน้า Dashboard
                 }
             } else {
                 alert("❌ คุณไม่ได้กรอกรหัสผ่าน หรือรหัสผ่านสั้นเกินไป (ยกเลิกการตั้งรหัสผ่านใหม่)");
@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (error) throw error;
 
                 alert("เข้าสู่ระบบสำเร็จ!");
-                window.location.href = "index.html"; // กลับไปหน้าแรก
+                window.location.href = "dashboard.html"; // เปลี่ยนให้เข้าหน้า Dashboard ทันที
 
             } catch (error) {
                 console.error("Login Error:", error);
@@ -192,20 +192,18 @@ async function checkLoginStatus() {
         }
         
         if (loginBtn) {
-            loginBtn.innerHTML = `<i class='bx bx-user'></i> ${displayName} (ออกระบบ)`;
+            loginBtn.innerHTML = `<i class='bx bxs-dashboard'></i> แผงควบคุม`;
             loginBtn.style.backgroundColor = "#d4af37";
             loginBtn.style.color = "#111";
             
-            loginBtn.href = "#";
-            loginBtn.onclick = (e) => {
-                e.preventDefault();
-                logout();
-            };
+            // ให้กดแล้วเด้งไปหน้า Dashboard แทนการโชว์ปุ่มออกระบบในหน้าแรก
+            loginBtn.href = "dashboard.html";
+            loginBtn.onclick = null; 
         }
         
-        // ถ้าเผลอกลับมาหน้า login หรือ register ให้เด้งไปหน้าแรก
+        // ถ้าเผลอกลับมาหน้า login หรือ register ให้เด้งไปหน้าแผงควบคุมเลย
         if (window.location.pathname.includes("login.html") || window.location.pathname.includes("register.html")) {
-            window.location.href = "index.html";
+            window.location.href = "dashboard.html";
         }
     }
 }

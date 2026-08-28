@@ -217,3 +217,46 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
     .login-left { width: 100%; height: 250px; padding: 30px; }
     .login-right { width: 100%; padding: 40px 25px; }
 }
+
+/* =========================================
+   LUXURY FORM INPUTS (ฟอร์มหรูหรา)
+   ========================================= */
+.lux-input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: 0.3s all ease;
+    background-color: #f9fafb;
+    font-family: 'Prompt', sans-serif;
+    color: #111;
+}
+.lux-input:focus {
+    border-color: #d4af37;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+}
+.lux-input::placeholder {
+    color: #9ca3af;
+}
+.lux-input-group {
+    position: relative;
+}
+.lux-input-group i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.3rem;
+    color: #9ca3af;
+    transition: 0.3s;
+}
+.lux-input-group .lux-input {
+    padding-left: 48px;
+}
+.lux-input-group .lux-input:focus + i, 
+.lux-input-group .lux-input:focus ~ i {
+    color: #d4af37;
+}

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการผู้เช่าและห้องพัก (Admin) - K. Dormitory</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background-color: #f8fafc; margin: 0; font-family: 'Prompt', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar Admin */
+        .sidebar { width: 260px; background: #0f172a; color: #fff; height: 100vh; padding: 20px 0; position: fixed; display: flex; flex-direction: column; z-index: 10; }
+        .sidebar .logo { font-size: 24px; font-weight: 600; text-align: center; color: #facc15; margin-bottom: 30px; letter-spacing: 1px; }
+        .sidebar a { display: flex; align-items: center; padding: 15px 25px; color: #cbd5e1; text-decoration: none; font-size: 15px; transition: 0.3s; }
+        .sidebar a i { font-size: 20px; margin-right: 15px; }
+        .sidebar a:hover, .sidebar a.active { background: #1e293b; color: #fff; border-left: 4px solid #facc15; }
+        .sidebar .logout { margin-top: auto; border-top: 1px solid #1e293b; color: #f87171; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; padding: 30px 40px; width: calc(100% - 260px); overflow-y: auto; box-sizing: border-box; }
+        
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header-actions h2 { margin: 0; color: #0f172a; font-size: 24px; }
+        
+        /* Table Card */
+        .card { background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow: hidden; padding: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 15px; background: #f8fafc; color: #64748b; font-size: 13px; font-weight: 500; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 15px; color: #334155; font-size: 14px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        
+        .room-badge { background: #1e293b; color: #facc15; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 14px; }
+        .no-room { background: #f1f5f9; color: #94a3b8; }
+        
+        .input-room { width: 60px; padding: 5px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: 'Prompt'; text-align: center; }
+        .btn-save { background: #10b981; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .btn-save:hover { background: #059669; }
+
+        .role-badge { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e0e7ff; color: #4f46e5; }
+        .role-admin { background: #fef08a; color: #854d0e; }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo">K. DORM ADMIN</div>
+        <a href="dashboard.html"><i class='bx bxs-dashboard'></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html"><i class='bx bx-receipt'></i> จัดการบิล / ตรวจสลิป</a>
+        <a href="users.html" class="active"><i class='bx bx-user-pin'></i> จัดการผู้เช่า / ห้องพัก</a>
+        <a href="maintenance.html"><i class='bx bx-wrench'></i> รายการแจ้งซ่อม</a>
+        <a href="chat.html"><i class='bx bxs-message-dots'></i> ข้อความ (Chat)</a>
+        
+        <a href="#" class="logout" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header-actions">
+            <h2>จัดการผู้เช่าและห้องพัก (Tenant Management)</h2>
+        </div>
+
+        <div class="card">
+            <p style="color: #64748b; margin-top: 0; font-size: 14px;">เมื่อมีผู้ใช้สมัครสมาชิกใหม่ ระบบจะยังไม่กำหนดห้องพักให้ (แสดงเป็น "ยังไม่ระบุ") แอดมินสามารถกำหนดเลขห้องพักได้ที่นี่ เพื่อให้ระบบคำนวณบิลได้อย่างถูกต้อง</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">อีเมลผู้ใช้ (Email)</th>
+                        <th>สิทธิ์การใช้งาน</th>
+                        <th>ข้อมูลที่อยู่เดิม</th>
+                        <th style="text-align: center;">หมายเลขห้องพัก (Room No.)</th>
+                        <th style="text-align: center;">บันทึก</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table-body">
+                    <tr><td colspan="5" style="text-align: center;">กำลังโหลดข้อมูล...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="../js/supabase-config.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                window.location.href = "../login.html";
+                return;
+            }
+            loadUsers();
+        });
+
+        async function loadUsers() {
+            // ดึงผู้ใช้ทั้งหมด
+            const { data: users, error } = await supabaseClient
+                .from('tenant_profiles')
+                .select('*')
+                .order('role', { ascending: true }) // เอา admin ขึ้นก่อน หรือเรียงตามสิทธิ์
+                .order('room_no', { ascending: true });
+
+            if (error) {
+                console.error("Error fetching users:", error);
+                return;
+            }
+
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const isAdmin = user.role === 'admin';
+                const roleBadge = isAdmin ? '<span class="role-badge role-admin">Admin</span>' : '<span class="role-badge">ผู้เช่า (Tenant)</span>';
+                
+                const roomVal = user.room_no || '';
+                const roomDisplay = roomVal 
+                    ? `<span class="room-badge">${roomVal}</span>` 
+                    : `<span class="room-badge no-room">ยังไม่ระบุ</span>`;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight: 500;">
+                            ${user.email} 
+                            <div style="font-size: 12px; color: #94a3b8; font-weight: 400;">เข้าร่วม: ${new Date(user.created_at).toLocaleDateString('th-TH')}</div>
+                        </td>
+                        <td>${roleBadge}</td>
+                        <td style="font-size: 13px;">${user.address || '-'}</td>
+                        <td style="text-align: center;">
+                            <input type="text" id="room_input_${user.id}" class="input-room" value="${roomVal}" placeholder="เช่น 101">
+                        </td>
+                        <td style="text-align: center;">
+                            <button class="btn-save" onclick="updateRoom(${user.id}, '${user.email}')" title="บันทึกเลขห้อง"><i class='bx bx-save'></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function updateRoom(id, email) {
+            const newRoom = document.getElementById(`room_input_${id}`).value.trim();
+            
+            const { error } = await supabaseClient
+                .from('tenant_profiles')
+                .update({ room_no: newRoom || null })
+                .eq('id', id);
+            
+            if (error) {
+                alert('อัปเดตข้อมูลล้มเหลว: ' + error.message);
+            } else {
+                alert(`อัปเดตห้องพักของ ${email} เป็น ${newRoom || 'ว่าง'} สำเร็จ!`);
+                loadUsers(); // รีโหลดตาราง
+            }
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = "../login.html";
+        }
+    </script>
+</body>
+</html>

@@ -19,12 +19,11 @@ header { background-color: var(--primary-color); color: #fff; padding: 15px 20px
 .nav-menu ul li a:hover { background-color: var(--secondary-color); }
 .btn-login { background-color: #e74c3c; font-weight: bold; }
 
-/* --- Hero Section รูปตึกวิวสวย (เต็มจอ) --- */
+/* --- Hero Section รูปตึกวิวสวย (กลับไปใช้ 70vh ตามเดิม) --- */
 .hero {
     position: relative;
     text-align: center;
-    /* 100vh คือความสูง 100% ของจอ ลบออก 65px (ความสูงของเมนูด้านบน) เพื่อให้พอดีเป๊ะๆ */
-    min-height: calc(100vh - 65px); 
+    min-height: 70vh; /* กลับมาใช้ความสูง 70% ของหน้าจอ */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -32,7 +31,7 @@ header { background-color: var(--primary-color); color: #fff; padding: 15px 20px
     padding: 20px;
     background: url('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=80') fixed no-repeat center center/cover;
     color: #fff;
-    /* เอา margin-bottom ออกเพื่อให้รอยต่อของ Section เนียนไปเลย */
+    margin-bottom: 20px; /* เพิ่ม margin-bottom กลับมา */
 }
 .hero::before {
     content: '';

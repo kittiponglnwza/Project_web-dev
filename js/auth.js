@@ -56,8 +56,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (error) throw error;
 
+                // เช็ค Role จากตารางโปรไฟล์
+                const { data: profile } = await supabaseClient.from('tenant_profiles').select('role').eq('id', data.user.id).single();
+                const isAdmin = profile && profile.role === 'admin';
+
                 alert("เข้าสู่ระบบสำเร็จ!");
-                window.location.href = "tenant/dashboard.html"; // เปลี่ยนให้เข้าหน้า Dashboard ในโฟลเดอร์ tenant
+                if(isAdmin) {
+                    window.location.href = "admin/dashboard.html";
+                } else {
+                    window.location.href = "tenant/dashboard.html";
+                }
 
             } catch (error) {
                 console.error("Login Error:", error);
@@ -191,19 +199,23 @@ async function checkLoginStatus() {
             displayName = user.user_metadata.full_name.split(' ')[0]; // เอาแค่ชื่อแรก
         }
         
+        // เช็ค Role จาก Database
+        const { data: profile } = await supabaseClient.from('tenant_profiles').select('role').eq('id', user.id).single();
+        const isAdmin = profile && profile.role === 'admin';
+
         if (loginBtn) {
             loginBtn.innerHTML = `<i class='bx bxs-dashboard'></i> แผงควบคุม`;
             loginBtn.style.backgroundColor = "#d4af37";
             loginBtn.style.color = "#111";
             
-            // ให้กดแล้วเด้งไปหน้า Dashboard ของ tenant
-            loginBtn.href = "tenant/dashboard.html";
+            // ให้กดแล้วเด้งไปหน้า Dashboard ตามสิทธิ์
+            loginBtn.href = isAdmin ? "admin/dashboard.html" : "tenant/dashboard.html";
             loginBtn.onclick = null; 
         }
         
         // ถ้าเผลอกลับมาหน้า login หรือ register ให้เด้งไปหน้าแผงควบคุมเลย
         if (window.location.pathname.includes("login.html") || window.location.pathname.includes("register.html")) {
-            window.location.href = "tenant/dashboard.html";
+            window.location.href = isAdmin ? "admin/dashboard.html" : "tenant/dashboard.html";
         }
     }
 }

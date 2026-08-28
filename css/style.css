@@ -171,26 +171,22 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
 }
 
 /* =========================================
-   LOGIN PAGE (สไตล์หน้าเข้าสู่ระบบพรีเมียม)
+   LOGIN & REGISTER PAGE (Full Page Split Layout)
    ========================================= */
 .login-wrapper {
     display: flex;
-    width: 1000px;
-    max-width: 90%;
+    width: 100%;
+    min-height: 100vh;
     background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.12);
-    overflow: hidden;
-    min-height: 600px;
 }
 .login-left {
     width: 50%;
-    background: url('https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+    background: url('https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 50px;
+    padding: 60px;
 }
 .login-left::before {
     content: '';
@@ -198,22 +194,27 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
 }
 .login-branding { position: relative; z-index: 1; color: #fff; }
-.login-branding h2 { font-size: 3rem; margin-bottom: 5px; font-weight: 600; letter-spacing: 2px; color: #d4af37; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-.login-branding p { font-size: 1.1rem; font-weight: 300; opacity: 0.9; }
+.login-branding h2 { font-size: 3.5rem; margin-bottom: 5px; font-weight: 600; letter-spacing: 2px; color: #d4af37; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+.login-branding p { font-size: 1.2rem; font-weight: 300; opacity: 0.9; }
 
 .login-right {
     width: 50%;
-    padding: 60px;
+    padding: 60px 80px;
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background: #fff;
 }
-.back-home { position: absolute; top: 30px; right: 40px; color: #9ca3af; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.3s; font-size: 0.95rem; }
+.back-home { position: absolute; top: 40px; right: 50px; color: #9ca3af; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.3s; font-size: 0.95rem; }
 .back-home:hover { color: #111; }
 
+@media (max-width: 900px) {
+    .login-right { padding: 40px; }
+}
+
 @media (max-width: 768px) {
-    .login-wrapper { flex-direction: column; min-height: auto; }
+    .login-wrapper { flex-direction: column; }
     .login-left { width: 100%; height: 250px; padding: 30px; }
     .login-right { width: 100%; padding: 40px 25px; }
 }

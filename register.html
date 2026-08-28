@@ -8,23 +8,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        /* จัดการ Layout เฉพาะหน้า Register ให้ยืดหยุ่น ไม่อึดอัด */
-        .register-page { padding: 40px 20px; }
-        .login-right { padding: 50px 60px; position: static; }
         .section-title { font-size: 1.05rem; color: #d4af37; margin-bottom: 20px; font-weight: 500; letter-spacing: 0.5px; }
-        
-        @media (max-width: 768px) {
-            .register-page { padding: 20px 10px; }
-            .login-right { padding: 30px 20px; }
-        }
+        /* ดันเนื้อหาให้อยู่ชิดบนเวลาเป็น Full screen และข้อมูลเยอะ */
+        .login-right { justify-content: flex-start; padding-top: 60px; padding-bottom: 60px; overflow-y: auto; }
     </style>
 </head>
-<body class="luxury-body register-page" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+<body class="luxury-body" style="margin: 0; padding: 0;">
 
-    <!-- นำความสูงแบบฟิกซ์ออก ปล่อยให้กล่องยืดตามเนื้อหา (height: auto) -->
-    <div class="login-wrapper" style="width: 1050px; max-width: 100%; height: auto;">
+    <div class="login-wrapper">
         
-        <div class="login-left" style="background: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;">
+        <div class="login-left" style="background: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat; position: sticky; top: 0; height: 100vh;">
             <div class="login-branding">
                 <h2>MyDorm</h2>
                 <p>ระบบจัดการลงทะเบียนผู้เช่า (Tenant Portal)</p>

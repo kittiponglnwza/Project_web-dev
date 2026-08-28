@@ -58,20 +58,9 @@
                         <th>จัดการ</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="billing-list">
                     <tr>
-                        <td>ตุลาคม 2567</td>
-                        <td>ค่าเช่าห้อง + ค่าน้ำค่าไฟ</td>
-                        <td>4,500</td>
-                        <td><span class="status-badge status-pending">ค้างชำระ</span></td>
-                        <td><button class="pay-btn" onclick="alert('ไปหน้าชำระเงิน...')">ชำระเงิน</button></td>
-                    </tr>
-                    <tr>
-                        <td>กันยายน 2567</td>
-                        <td>ค่าเช่าห้อง + ค่าน้ำค่าไฟ</td>
-                        <td>4,800</td>
-                        <td><span class="status-badge status-paid">ชำระแล้ว</span></td>
-                        <td>-</td>
+                        <td colspan="5" style="text-align:center;">กำลังตรวจสอบรอบบิล...</td>
                     </tr>
                 </tbody>
             </table>
@@ -81,5 +70,47 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
     <script src="../js/auth.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) { window.location.href = "../login.html"; return; }
+            
+            const { data: bills, error } = await supabaseClient
+                .from('bills')
+                .select('*')
+                .eq('email', session.user.email)
+                .order('created_at', { ascending: false });
+                
+            const list = document.getElementById("billing-list");
+            list.innerHTML = "";
+            
+            if (error || !bills || bills.length === 0) {
+                list.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#6b7280;">ไม่มียอดค้างชำระ</td></tr>`;
+                return;
+            }
+            
+            bills.forEach(bill => {
+                let statusHtml = "";
+                let actionHtml = "";
+                if (bill.status === "pending") {
+                    statusHtml = `<span class="status-badge status-pending">ค้างชำระ</span>`;
+                    actionHtml = `<button class="pay-btn" onclick="alert('ระบบชำระเงินจำลอง')">ชำระเงิน</button>`;
+                } else {
+                    statusHtml = `<span class="status-badge status-paid">ชำระแล้ว</span>`;
+                    actionHtml = `-`;
+                }
+                
+                list.innerHTML += `
+                    <tr>
+                        <td>${bill.month}</td>
+                        <td>ค่าเช่าห้อง + ค่าน้ำค่าไฟ</td>
+                        <td>${bill.amount.toLocaleString()}</td>
+                        <td>${statusHtml}</td>
+                        <td>${actionHtml}</td>
+                    </tr>
+                `;
+            });
+        });
+    </script>
 </body>
 </html>

@@ -60,9 +60,7 @@
                     </thead>
                     <tbody id="maintenance-list">
                         <tr>
-                            <td><strong>แอร์ไม่เย็น</strong><br><small style="color:#6b7280">เปิด 16 องศาก็ไม่เย็น</small></td>
-                            <td>10 ต.ค. 67</td>
-                            <td><span class="status-badge status-paid">เสร็จสิ้น</span></td>
+                            <td colspan="3" style="text-align:center;">กำลังโหลดข้อมูล...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -77,7 +75,7 @@
                 <form id="maintenanceForm">
                     <input type="text" id="m_title" class="lux-input" placeholder="เรื่องที่ต้องการแจ้ง (เช่น ก๊อกน้ำรั่ว)" required>
                     <textarea id="m_desc" class="lux-input" placeholder="รายละเอียดเพิ่มเติม" rows="4" required></textarea>
-                    <button type="submit" class="submit-btn">ส่งเรื่องแจ้งซ่อม <i class='bx bx-send'></i></button>
+                    <button type="submit" class="submit-btn" id="submitBtn">ส่งเรื่องแจ้งซ่อม <i class='bx bx-send'></i></button>
                 </form>
             </div>
         </div>
@@ -87,22 +85,78 @@
     <script src="../js/supabase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script>
-        document.getElementById("maintenanceForm").addEventListener("submit", function(e) {
+        let userEmail = "";
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) { window.location.href = "../login.html"; return; }
+            userEmail = session.user.email;
+            
+            fetchMaintenance();
+        });
+
+        async function fetchMaintenance() {
+            const { data: requests, error } = await supabaseClient
+                .from('maintenance_requests')
+                .select('*')
+                .eq('email', userEmail)
+                .order('created_at', { ascending: false });
+                
+            const list = document.getElementById("maintenance-list");
+            list.innerHTML = "";
+            
+            if (error || !requests || requests.length === 0) {
+                list.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#6b7280;">ยังไม่มีประวัติการแจ้งซ่อม</td></tr>`;
+                return;
+            }
+            
+            requests.forEach(req => {
+                let statusHtml = "";
+                if (req.status === "completed") {
+                    statusHtml = `<span class="status-badge status-paid">เสร็จสิ้น</span>`;
+                } else if (req.status === "in_progress") {
+                    statusHtml = `<span class="status-badge status-pending" style="background:#e0e7ff; color:#4f46e5;">กำลังซ่อม</span>`;
+                } else {
+                    statusHtml = `<span class="status-badge status-pending">รอดำเนินการ</span>`;
+                }
+                
+                // Format Date
+                let d = new Date(req.created_at);
+                let dateStr = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
+
+                list.innerHTML += `
+                    <tr>
+                        <td><strong>${req.title}</strong><br><small style="color:#6b7280">${req.description || '-'}</small></td>
+                        <td>${dateStr}</td>
+                        <td>${statusHtml}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById("maintenanceForm").addEventListener("submit", async function(e) {
             e.preventDefault();
+            const btn = document.getElementById("submitBtn");
+            btn.innerHTML = "กำลังส่ง...";
+            btn.disabled = true;
+
             const title = document.getElementById("m_title").value;
             const desc = document.getElementById("m_desc").value;
             
-            const list = document.getElementById("maintenance-list");
-            list.innerHTML = `
-                <tr>
-                    <td><strong>${title}</strong><br><small style="color:#6b7280">${desc}</small></td>
-                    <td>เพิ่งแจ้ง</td>
-                    <td><span class="status-badge status-pending">รอดำเนินการ</span></td>
-                </tr>
-            ` + list.innerHTML;
+            const { error } = await supabaseClient
+                .from('maintenance_requests')
+                .insert([{ email: userEmail, title: title, description: desc }]);
+                
+            if (error) {
+                alert("เกิดข้อผิดพลาดในการแจ้งซ่อม: " + error.message);
+            } else {
+                alert("ส่งเรื่องแจ้งซ่อมเรียบร้อยแล้ว แอดมินจะรีบตรวจสอบให้ครับ!");
+                this.reset();
+                fetchMaintenance(); // โหลดข้อมูลใหม่
+            }
             
-            this.reset();
-            alert("ส่งเรื่องแจ้งซ่อมเรียบร้อยแล้ว แอดมินจะรีบตรวจสอบให้ครับ!");
+            btn.innerHTML = "ส่งเรื่องแจ้งซ่อม <i class='bx bx-send'></i>";
+            btn.disabled = false;
         });
     </script>
 </body>

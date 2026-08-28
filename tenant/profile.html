@@ -60,7 +60,7 @@
                 </div>
                 <div class="info-group">
                     <label>เลขประจำตัวประชาชน (National ID)</label>
-                    <div class="info-val">1-2345-XXXXX-12-3</div>
+                    <div class="info-val" id="p_nid">กำลังโหลด...</div>
                 </div>
                 <div class="info-group">
                     <label>อีเมล (Email Address)</label>
@@ -78,19 +78,19 @@
             <div class="profile-grid">
                 <div class="info-group">
                     <label>หมายเลขห้อง (Room Number)</label>
-                    <div class="info-val">302 <span style="color:#6b7280; font-size:0.9rem; font-weight:400;">(Deluxe Room)</span></div>
+                    <div class="info-val" id="p_room">กำลังโหลด...</div>
                 </div>
                 <div class="info-group">
                     <label>สถานะสัญญา (Status)</label>
-                    <div class="info-val" style="color: #059669; font-weight: 600;">🟢 Active (กำลังเช่า)</div>
+                    <div class="info-val" id="p_status" style="font-weight: 600;">กำลังโหลด...</div>
                 </div>
                 <div class="info-group">
                     <label>วันเริ่มต้นสัญญา (Start Date)</label>
-                    <div class="info-val">01 ก.ค. 2567</div>
+                    <div class="info-val" id="p_start">กำลังโหลด...</div>
                 </div>
                 <div class="info-group">
                     <label>วันสิ้นสุดสัญญา (End Date)</label>
-                    <div class="info-val">30 มิ.ย. 2568</div>
+                    <div class="info-val" id="p_end">กำลังโหลด...</div>
                 </div>
             </div>
 
@@ -100,11 +100,11 @@
             <div class="profile-grid">
                 <div class="info-group">
                     <label>ชื่อผู้ติดต่อ (Contact Name)</label>
-                    <div class="info-val">สมศรี ผู้ปกครอง (มารดา)</div>
+                    <div class="info-val" id="p_em_name">กำลังโหลด...</div>
                 </div>
                 <div class="info-group">
                     <label>เบอร์โทรศัพท์ฉุกเฉิน (Emergency Phone)</label>
-                    <div class="info-val">081-999-XXXX</div>
+                    <div class="info-val" id="p_em_phone">กำลังโหลด...</div>
                 </div>
             </div>
 
@@ -126,16 +126,49 @@
                 if (user.user_metadata) {
                     let title = user.user_metadata.title || "";
                     let fName = user.user_metadata.full_name || "ไม่ระบุ";
-                    
-                    // แก้บั๊กพิมพ์คำนำหน้าชื่อซ้ำซ้อน (เช่น นายนาย)
                     if (fName.trim().startsWith(title)) {
                         document.getElementById("p_name").innerText = fName;
                     } else {
                         document.getElementById("p_name").innerText = title + " " + fName;
                     }
-                    
                     document.getElementById("p_phone").innerText = user.user_metadata.phone || "ไม่ระบุเบอร์โทรศัพท์";
                 }
+                
+                // ดึงข้อมูลสัญญาจาก Database 
+                const { data: profile, error } = await supabaseClient
+                    .from('tenant_profiles')
+                    .select('*')
+                    .eq('email', user.email)
+                    .single();
+                    
+                if (profile && !error) {
+                    document.getElementById("p_nid").innerText = profile.national_id || "ไม่ระบุ";
+                    document.getElementById("p_room").innerText = "ห้อง " + (profile.room_no || "-");
+                    document.getElementById("p_start").innerText = profile.start_date || "-";
+                    document.getElementById("p_end").innerText = profile.end_date || "-";
+                    document.getElementById("p_em_name").innerText = profile.emergency_contact || "-";
+                    document.getElementById("p_em_phone").innerText = profile.emergency_phone || "-";
+                    
+                    const statusEl = document.getElementById("p_status");
+                    if (profile.lease_status === "Active") {
+                        statusEl.innerHTML = "🟢 Active (กำลังเช่า)";
+                        statusEl.style.color = "#059669";
+                    } else {
+                        statusEl.innerHTML = "🔴 Inactive";
+                        statusEl.style.color = "#dc2626";
+                    }
+                } else {
+                    // ถ้ายังไม่มีข้อมูลแอดมินป้อนให้
+                    document.getElementById("p_nid").innerText = "ยังไม่มีข้อมูลในระบบ";
+                    document.getElementById("p_room").innerText = "รอการอนุมัติห้องพัก";
+                    document.getElementById("p_start").innerText = "-";
+                    document.getElementById("p_end").innerText = "-";
+                    document.getElementById("p_em_name").innerText = "-";
+                    document.getElementById("p_em_phone").innerText = "-";
+                    document.getElementById("p_status").innerText = "รอการทำสัญญา";
+                    document.getElementById("p_status").style.color = "#d97706";
+                }
+
             } else {
                 window.location.href = "../login.html";
             }

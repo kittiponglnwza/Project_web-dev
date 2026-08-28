@@ -283,11 +283,8 @@
         function downloadPDF() {
             const bill = globalBills.find(b => b.id === currentBillId);
             if(!bill) return;
-
-            // เอาหน้าแบบฟอร์มเต็มมาเตรียมไว้
-            const element = document.getElementById('pdf-invoice-template');
             
-            // ใส่ข้อมูลลงแบบฟอร์ม
+            // ใส่ข้อมูลลงแบบฟอร์ม (ยังไม่ต้องแสดงบนจอ)
             let d = new Date(bill.created_at);
             document.getElementById('pdf-inv-no').innerText = "INV-" + d.getFullYear() + (d.getMonth()+1).toString().padStart(2, '0') + "-" + bill.id;
             document.getElementById('pdf-date').innerText = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -306,21 +303,24 @@
             document.getElementById('pdf-other-fee').innerText = (bill.other_fee || 0).toLocaleString();
             document.getElementById('pdf-total').innerText = bill.amount.toLocaleString();
 
-            // แสดงก่อนให้ html2pdf มองเห็น
-            element.style.display = 'block';
+            // ดึง HTML ภายในมาครอบด้วย Div ที่กำหนดขนาดชัดเจน
+            const templateInner = document.getElementById('pdf-invoice-template').innerHTML;
+            const htmlContent = `
+                <div style="width: 800px; padding: 40px; background: #fff; color: #000; font-family: 'Prompt', sans-serif; box-sizing: border-box;">
+                    ${templateInner}
+                </div>
+            `;
 
             const opt = {
                 margin:       [0.4, 0.4],
                 filename:     `Invoice_${bill.month}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
+                html2canvas:  { scale: 2, useCORS: true },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                // ซ่อนกลับ
-                element.style.display = 'none';
-            });
+            // ใช้ html2pdf ส่ง string เข้าไปประมวลผล (ป้องกันหน้าขาวจาก display:none)
+            html2pdf().set(opt).from(htmlContent).save();
         }
 
         document.addEventListener("DOMContentLoaded", async () => {

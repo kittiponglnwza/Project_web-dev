@@ -203,7 +203,7 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
 }
 .login-left {
     width: 50%;
-    background: url('https://images.pexels.com/photos/1630039/pexels-photo-1630039.jpeg?auto=compress&cs=tinysrgb&w=1200') center/cover no-repeat;
+    background: url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200') center/cover no-repeat;
     position: relative;
     display: flex;
     flex-direction: column;

@@ -15,20 +15,80 @@ document.addEventListener("DOMContentLoaded", () => {
 // ดึงข้อมูลห้องพักจากฐานข้อมูลจริง (Supabase)
 async function fetchRooms() {
     try {
-        // ใช้ Supabase API ดึงข้อมูลจากตาราง rooms
-        const { data, error } = await supabaseClient
+        // 1. ดึงข้อมูลห้องพักทั้งหมดจากตาราง rooms
+        const { data: roomsData, error: roomsError } = await supabaseClient
             .from('rooms')
             .select('*')
             .order('id', { ascending: true });
 
-        if (error) throw error;
+        if (roomsError) throw roomsError;
+
+        // 2. ดึงข้อมูลผู้เช่าทั้งหมดที่มีเลขห้อง เพื่อคำนวณห้องที่ถูกจองแล้ว
+        const { data: tenantsData, error: tenantsError } = await supabaseClient
+            .from('tenant_profiles')
+            .select('room_no')
+            .neq('role', 'admin');
+
+        let totalOccupied = 0;
+        let occupiedS = 0;
+        let occupiedM = 0;
+        let occupiedXL = 0;
+
+        if (!tenantsError && tenantsData) {
+            // นับห้องที่ไม่ซ้ำกัน
+            const uniqueRooms = [...new Set(tenantsData.map(t => t.room_no ? t.room_no.trim() : '').filter(r => r !== ''))];
+            totalOccupied = uniqueRooms.length;
+
+            // คำนวณแยกตามประเภทห้อง (S: ลงท้าย 01-04, M: ลงท้าย 05-10, XL: ลงท้าย 11+)
+            uniqueRooms.forEach(room => {
+                const suffix = parseInt(room.slice(-2));
+                if (suffix >= 1 && suffix <= 4) occupiedS++;
+                else if (suffix >= 5 && suffix <= 10) occupiedM++;
+                else occupiedXL++;
+            });
+        }
+
+        // 3. อัปเดตป้ายบอกจำนวนห้องว่างรวมที่หน้า Index (สมมติว่าตึกนี้มีทั้งหมด 16 ห้อง ตามที่แอดมินแจ้ง)
+        const TOTAL_BUILDING_ROOMS = 16;
+        const heroBadge = document.getElementById('hero-availability');
+        if (heroBadge) {
+            const availableTotal = TOTAL_BUILDING_ROOMS - totalOccupied;
+            if (availableTotal > 0) {
+                heroBadge.innerHTML = `<i class='bx bx-check-circle'></i> มีห้องว่าง ${availableTotal} ห้อง พร้อมเข้าอยู่ทันที!`;
+                heroBadge.style.background = '#10b981';
+                heroBadge.style.color = '#fff';
+                heroBadge.style.border = 'none';
+                heroBadge.style.boxShadow = '0 4px 10px rgba(16, 185, 129, 0.3)';
+            } else {
+                heroBadge.innerHTML = `<i class='bx bx-x-circle'></i> ตอนนี้ห้องพักเต็มทั้งหมดแล้ว`;
+                heroBadge.style.background = '#ef4444';
+                heroBadge.style.color = '#fff';
+                heroBadge.style.border = 'none';
+            }
+        }
         
-        // แปลงข้อมูลให้ตรงกับตัวแปรที่หน้าเว็บใช้ (snake_case -> camelCase)
-        const formattedData = data.map(room => ({
-            ...room,
-            isAvailable: room.is_available,
-            availableCount: room.available_count
-        }));
+        // 4. แปลงข้อมูลและคำนวณจำนวนห้องว่างของแต่ละ Type (S, M, XL) แบบ Real-time
+        // จำนวนห้องทั้งหมดต่อ Type (สมมติว่า S มี 4, M มี 6, XL มี 6)
+        const typeCapacity = { 'S': 4, 'M': 6, 'XL': 6 };
+        
+        const formattedData = roomsData.map(room => {
+            let typeKey = room.type.split(' ')[1] || 'S'; // แกะเอาตัวอักษร S, M, XL ออกมาจากคำว่า "Type S"
+            let capacity = typeCapacity[typeKey] || 4;
+            let occupied = 0;
+            
+            if (typeKey === 'S') occupied = occupiedS;
+            else if (typeKey === 'M') occupied = occupiedM;
+            else if (typeKey === 'XL') occupied = occupiedXL;
+
+            let realAvailableCount = capacity - occupied;
+            if (realAvailableCount < 0) realAvailableCount = 0;
+
+            return {
+                ...room,
+                isAvailable: realAvailableCount > 0,
+                availableCount: realAvailableCount
+            };
+        });
         
         renderRooms(formattedData);
     } catch (error) {

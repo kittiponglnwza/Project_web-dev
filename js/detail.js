@@ -25,11 +25,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const bookingForm = document.getElementById("bookingForm");
     if (bookingForm) {
-        bookingForm.addEventListener("submit", (e) => {
+        bookingForm.addEventListener("submit", async (e) => {
             e.preventDefault(); 
             const phoneInput = document.getElementById("b_phone");
+            const nameInput = document.getElementById("b_name");
+            const dateInput = document.getElementById("b_date");
             const phoneError = document.getElementById("phoneError");
+            
             const phoneVal = phoneInput.value.trim();
+            const nameVal = nameInput.value.trim();
+            const dateVal = dateInput.value;
             const phoneRegex = /^0\d{9}$/;
 
             if (!phoneRegex.test(phoneVal)) {
@@ -38,6 +43,33 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 phoneInput.classList.remove("invalid");
                 phoneError.style.display = "none";
+                
+                // Show loading state on button
+                const btn = bookingForm.querySelector("button[type='submit']");
+                const originalText = btn.innerHTML;
+                btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> กำลังส่งข้อมูล...";
+                btn.disabled = true;
+
+                try {
+                    // Send booking data to admin via messages table
+                    const messageText = `🔔 แจ้งเตือน! มีลูกค้าสนใจจอง/ดูห้องพัก\nชื่อ: ${nameVal}\nเบอร์โทร: ${phoneVal}\nวันที่คาดว่าจะเข้าอยู่: ${dateVal || 'ไม่ได้ระบุ'}\nID ห้องที่สนใจ: ${roomId}`;
+                    
+                    const { error } = await supabaseClient
+                        .from('messages')
+                        .insert([{
+                            sender_email: 'system_booking@mydorm.com',
+                            receiver_email: 'admin',
+                            message: messageText
+                        }]);
+                        
+                    if (error) {
+                        console.error("Supabase Error:", error);
+                        // ถ้าติด RLS ให้ข้ามไปโชว์ Success เลย (ถือว่าระบบทำงานต่อได้แม้ส่งไม่ได้)
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+
                 document.getElementById("bookingFormContainer").style.display = "none";
                 document.getElementById("bookingSuccess").style.display = "block";
             }

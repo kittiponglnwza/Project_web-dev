@@ -24,10 +24,10 @@ async function fetchRooms() {
         if (roomsError) throw roomsError;
 
         // 2. ดึงข้อมูลผู้เช่าทั้งหมดที่มีเลขห้อง เพื่อคำนวณห้องที่ถูกจองแล้ว
+        // (เปลี่ยนไปคิวรีจาก View: occupied_rooms แทน เพื่อความปลอดภัย ไม่ให้ข้อมูลส่วนตัวผู้เช่าหลุด)
         const { data: tenantsData, error: tenantsError } = await supabaseClient
-            .from('tenant_profiles')
-            .select('room_no')
-            .neq('role', 'admin');
+            .from('occupied_rooms')
+            .select('room_no');
 
         let totalOccupied = 0;
         let occupiedS = 0;

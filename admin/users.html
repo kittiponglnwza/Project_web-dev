@@ -7,10 +7,10 @@
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background-color: #f8fafc; margin: 0; font-family: 'Prompt', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        body { background-color: #f8fafc; margin: 0; font-family: 'Prompt', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         /* Sidebar Admin */
-        .sidebar { width: 260px; background: #0f172a; color: #fff; height: 100vh; padding: 20px 0; position: fixed; display: flex; flex-direction: column; z-index: 10; }
+        .sidebar { width: 100%; display: flex; flex-direction: column;   background: #0f172a; color: #fff;  padding: 20px 0;    z-index: 10;  }
         .sidebar .logo { font-size: 24px; font-weight: 600; text-align: center; color: #facc15; margin-bottom: 30px; letter-spacing: 1px; }
         .sidebar a { display: flex; align-items: center; padding: 15px 25px; color: #cbd5e1; text-decoration: none; font-size: 15px; transition: 0.3s; }
         .sidebar a i { font-size: 20px; margin-right: 15px; }
@@ -18,7 +18,7 @@
         .sidebar .logout { margin-top: auto; border-top: 1px solid #1e293b; color: #f87171; }
 
         /* Main Content */
-        .main-content { margin-left: 260px; padding: 30px 40px; width: calc(100% - 260px); overflow-y: auto; box-sizing: border-box; }
+        .main-content { width: 100%; box-sizing: border-box;   padding: 30px 40px;  overflow-y: auto; box-sizing: border-box;  }
         
         .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header-actions h2 { margin: 0; color: #0f172a; font-size: 24px; }

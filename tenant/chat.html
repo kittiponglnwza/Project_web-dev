@@ -8,10 +8,10 @@
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background-color: #f3f4f6; margin: 0; font-family: 'Prompt', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        body { background-color: #f3f4f6; margin: 0; font-family: 'Prompt', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         /* Sidebar */
-        .sidebar { width: 260px; background: #fff; height: 100vh; padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar { width: 100%; display: flex; flex-direction: column;   background: #fff;  padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05);     }
 
         .sidebar-logo { text-align: center; font-size: 1.8rem; font-weight: 600; color: #111; margin-bottom: 30px; letter-spacing: 1px; }
         .nav-link { display: flex; align-items: center; gap: 12px; padding: 15px 25px; color: #6b7280; text-decoration: none; font-size: 1rem; transition: 0.3s; border-left: 4px solid transparent; }
@@ -29,7 +29,7 @@
         
 
         /* Main Content (Chat Area) */
-        .main-content { flex: 1; display: flex; flex-direction: column; padding: 20px 40px; background: #f8fafc; }
+        .main-content { width: 100%; box-sizing: border-box;  flex: 1; display: flex; flex-direction: column; padding: 20px 40px; background: #f8fafc;  }
         
         /* Chat Container */
         .chat-container { background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: calc(100vh - 80px); overflow: hidden; }

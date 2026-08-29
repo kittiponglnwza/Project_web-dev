@@ -37,11 +37,9 @@ header { background-color: var(--primary-color); color: #fff; padding: 15px 20px
 .info-content p { color: #475569; line-height: 1.6; font-size: 1rem; font-weight: 300; margin: 0; }
 .nearby-list { margin: 15px 0 0 0; padding-left: 20px; color: #475569; font-weight: 300; line-height: 1.8; font-size: 0.95rem; }
 
-.location-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 768px) {
-    .location-grid { grid-template-columns: 1fr; }
-    .info-tabs { overflow-x: auto; white-space: nowrap; padding-bottom: 5px; }
-}
+.location-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+.info-tabs { overflow-x: auto; white-space: nowrap; padding-bottom: 5px; }
+
 
 .room-section { padding: 40px 20px; text-align: center; background-color: var(--bg-color); }
 .room-section h2 { font-weight: 600; color: var(--primary-color); margin-bottom: 10px; }
@@ -197,18 +195,20 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
    ========================================= */
 .login-wrapper {
     display: flex;
+    flex-direction: column;
     width: 100%;
     min-height: 100vh;
     background: #fff;
 }
 .login-left {
-    width: 50%;
+    width: 100%;
+    height: 250px;
     background: url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200') center/cover no-repeat;
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 60px;
+    padding: 30px;
 }
 .login-left::before {
     content: '';
@@ -216,12 +216,12 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
 }
 .login-branding { position: relative; z-index: 1; color: #fff; }
-.login-branding h2 { font-size: 3.5rem; margin-bottom: 5px; font-weight: 600; letter-spacing: 2px; color: #d4af37; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+.login-branding h2 { font-size: clamp(2rem, 8vw, 3.5rem); margin-bottom: 5px; font-weight: 600; letter-spacing: 2px; color: #d4af37; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 .login-branding p { font-size: 1.2rem; font-weight: 300; opacity: 0.9; }
 
 .login-right {
-    width: 50%;
-    padding: 60px 80px;
+    width: 100%;
+    padding: 40px 25px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -231,15 +231,9 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
 .back-home { position: absolute; top: 40px; right: 50px; color: #9ca3af; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.3s; font-size: 0.95rem; }
 .back-home:hover { color: #111; }
 
-@media (max-width: 900px) {
-    .login-right { padding: 40px; }
-}
 
-@media (max-width: 768px) {
-    .login-wrapper { flex-direction: column; }
-    .login-left { width: 100%; height: 250px; padding: 30px; }
-    .login-right { width: 100%; padding: 40px 25px; }
-}
+
+
 
 /* =========================================
    LUXURY FORM INPUTS (เธเธญเธฃเนเธกเธซเธฃเธนเธซเธฃเธฒ)
@@ -302,53 +296,7 @@ input[type="email"]:focus {
 }
 
 /* Dashboard Responsive (Mobile First / Breakpoints) */
-@media (max-width: 992px) {
-    /* Hide sidebar and stretch main content on smaller screens */
-    .sidebar {
-        width: 80px;
-    }
-    .sidebar .logo, .sidebar-logo {
-        font-size: 14px;
-        word-break: break-all;
-    }
-    .sidebar a {
-        padding: 15px;
-        justify-content: center;
-    }
-    .sidebar a i {
-        margin-right: 0;
-        font-size: 24px;
-    }
-    .sidebar a span, .sidebar a, .nav-link {
-        font-size: 0; /* Hide text */
-    }
-    .nav-link i { font-size: 24px; margin-right: 0; }
-    
-    .main-content {
-        margin-left: 80px;
-        width: calc(100% - 80px);
-        padding: 20px;
-    }
-    
-    /* Stats grid */
-    .stats-grid, .dashboard-cards {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
-}
 
-@media (max-width: 576px) {
-    /* Full mobile */
-    .sidebar {
-        display: none; /* In a real app, we would have a hamburger menu */
-    }
-    .main-content {
-        margin-left: 0;
-        width: 100%;
-    }
-    .stats-grid, .dashboard-cards {
-        grid-template-columns: 1fr !important;
-    }
-}
 
 
 /* ========================================================= */
@@ -402,4 +350,46 @@ input[type="text"], input[type="email"], input[type="tel"], input[type="password
 /* 11. Specificity Weight (Big Bonus) */
 #registerForm .lux-input:focus {
     box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+@media (min-width: 768px) {
+    .location-grid { grid-template-columns: 1fr 1fr; }
+    .info-tabs { overflow-x: visible; white-space: normal; }
+}
+
+@media (min-width: 768px) {
+    .login-wrapper { flex-direction: row; }
+    .login-left { width: 50%; height: auto; padding: 60px; }
+    .login-right { width: 50%; padding: 40px; }
+}
+@media (min-width: 900px) {
+    .login-right { padding: 60px 80px; }
+}
+
+/* Responsive Table (No HTML Wrap needed) */
+table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
+@media (min-width: 992px) {
+    table { display: table; overflow-x: visible; white-space: normal; }
+}
+
+/* Dashboard Desktop Layout */
+@media (min-width: 992px) {
+    body { flex-direction: row !important; }
+    
+    /* Restore fixed sidebar */
+    .sidebar { width: 260px !important; height: 100vh !important; position: fixed !important; }
+    
+    /* Main content spacing */
+    .main-content { margin-left: 260px !important; width: calc(100% - 260px) !important; padding: 30px 40px !important; }
+    
+    .stats-grid, .dashboard-cards { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (min-width: 1200px) {
+    .stats-grid, .dashboard-cards { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* Responsive Forms */
+.form-row { display: flex; flex-direction: column; gap: 15px; }
+@media (min-width: 768px) {
+    .form-row { flex-direction: row; }
 }

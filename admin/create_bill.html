@@ -11,10 +11,10 @@
             --bg: #f8fafc;
             --text: #334155;
         }
-        body { margin: 0; padding: 0; font-family: 'Prompt', sans-serif; background: var(--bg); display: flex; color: var(--text); }
+        body { margin: 0; padding: 0; font-family: 'Prompt', sans-serif; background: var(--bg); display: flex; flex-direction: column; color: var(--text); }
         
         /* Sidebar Admin */
-        .sidebar { width: 260px; background: #0f172a; color: #fff; height: 100vh; padding: 20px 0; position: fixed; display: flex; flex-direction: column; z-index: 10; }
+        .sidebar { width: 100%; display: flex; flex-direction: column;   background: #0f172a; color: #fff;  padding: 20px 0;    z-index: 10;  }
         .sidebar .logo { font-size: 24px; font-weight: 600; text-align: center; color: #facc15; margin-bottom: 30px; letter-spacing: 1px; }
         .sidebar a { display: flex; align-items: center; padding: 15px 25px; color: #cbd5e1; text-decoration: none; font-size: 15px; transition: 0.3s; }
         .sidebar a i { font-size: 20px; margin-right: 15px; }
@@ -22,7 +22,7 @@
         .sidebar .logout { margin-top: auto; border-top: 1px solid #1e293b; color: #f87171; }
 
         /* Main Content */
-        .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); box-sizing: border-box; height: 100vh; overflow-y: auto; }
+        .main-content { width: 100%; box-sizing: border-box;   padding: 40px;  box-sizing: border-box; height: 100vh; overflow-y: auto;  }
         
         .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header-actions h2 { margin: 0; color: #0f172a; font-size: 24px; display: flex; align-items: center; gap: 10px; }

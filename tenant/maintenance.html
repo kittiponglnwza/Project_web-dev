@@ -6,8 +6,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f3f4f6; margin: 0; font-family: 'Prompt', sans-serif; display: flex; }
-        .sidebar { width: 260px; background: #fff; height: 100vh; padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05); position: fixed; display: flex; flex-direction: column; }
+        body { background-color: #f3f4f6; margin: 0; font-family: 'Prompt', sans-serif; display: flex; flex-direction: column; }
+        .sidebar { width: 100%; display: flex; flex-direction: column;   background: #fff;  padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05);     }
 
         .sidebar-logo { text-align: center; font-size: 1.8rem; font-weight: 600; color: #111; margin-bottom: 30px; letter-spacing: 1px; }
         .nav-link { display: flex; align-items: center; gap: 12px; padding: 15px 25px; color: #6b7280; text-decoration: none; font-size: 1rem; transition: 0.3s; border-left: 4px solid transparent; }
@@ -24,7 +24,7 @@
         
         
         
-        .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
+        .main-content { width: 100%; box-sizing: border-box;   padding: 40px;  display: grid; grid-template-columns: 2fr 1fr; gap: 25px;  }
         .recent-section { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .section-header { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; font-size: 1.2rem; font-weight: 600; }
         

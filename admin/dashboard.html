@@ -148,6 +148,44 @@
                     <div style="text-align: center; color: #94a3b8; padding: 20px;">กำลังโหลด...</div>
                 </div>
             </div>
+        <!-- Announcements Section -->
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <h3><i class='bx bxs-megaphone'></i> จัดการข่าวประชาสัมพันธ์ (Announcements)</h3>
+            </div>
+            
+            <div class="dash-layout">
+                <!-- Create Announcement Form -->
+                <div>
+                    <form id="announcement-form" style="display: flex; flex-direction: column; gap: 15px;">
+                        <div>
+                            <label style="font-size: 13px; color: #64748b; font-weight: 500;">หัวข้อประกาศ</label>
+                            <input type="text" id="announce-title" required style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px;" placeholder="เช่น แจ้งล้างแอร์ประจำปี 2567">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; color: #64748b; font-weight: 500;">รายละเอียด</label>
+                            <textarea id="announce-content" required rows="3" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px; resize: vertical;" placeholder="กรอกรายละเอียดข่าวสาร..."></textarea>
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; color: #64748b; font-weight: 500;">ประเภท (สีแถบด้านข้าง)</label>
+                            <select id="announce-type" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px;">
+                                <option value="info">สีน้ำเงิน (อัปเดตทั่วไป / ข่าวสาร)</option>
+                                <option value="warning">สีเหลือง (แจ้งเตือน / ซ่อมบำรุง)</option>
+                                <option value="urgent">สีแดง (เรื่องด่วน / สำคัญมาก)</option>
+                            </select>
+                        </div>
+                        <button type="submit" style="background: #0f172a; color: #fff; border: none; padding: 12px; border-radius: 8px; font-family: 'Prompt'; cursor: pointer; font-weight: 500;">ประกาศข้อความ</button>
+                    </form>
+                </div>
+                
+                <!-- Announcement Log -->
+                <div style="border-left: 1px solid #e2e8f0; padding-left: 20px;">
+                    <h4 style="margin-top: 0; color: #475569;">ประวัติการประกาศ</h4>
+                    <div id="admin-announcement-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto; padding-right: 10px;">
+                        <div style="text-align: center; color: #94a3b8; padding: 20px;">กำลังโหลด...</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -165,7 +203,70 @@
             document.getElementById('current-date').innerText = 'ข้อมูลอัปเดตล่าสุด: ' + now.toLocaleDateString('th-TH', dateOpts);
             
             await fetchDashboardData();
+            await loadAnnouncements();
+
+            document.getElementById('announcement-form').addEventListener('submit', createAnnouncement);
         });
+
+        async function loadAnnouncements() {
+            const { data, error } = await supabaseClient
+                .from('announcements')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            const list = document.getElementById('admin-announcement-list');
+            if (error) {
+                list.innerHTML = `<div style="color: #ef4444; padding: 10px;">เกิดข้อผิดพลาดในการโหลดประกาศ: ${error.message}</div>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                list.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">ยังไม่มีประกาศ</div>`;
+                return;
+            }
+
+            list.innerHTML = data.map(ann => {
+                let color = '#3b82f6';
+                if (ann.type === 'warning') color = '#eab308';
+                if (ann.type === 'urgent') color = '#ef4444';
+
+                const d = new Date(ann.created_at);
+                const dateStr = d.toLocaleDateString('th-TH', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+                return `
+                    <div style="background: #f8fafc; border-left: 4px solid ${color}; padding: 15px; border-radius: 8px; position: relative;">
+                        <button onclick="deleteAnnouncement('${ann.id}')" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ef4444; cursor: pointer; font-size: 16px;"><i class='bx bx-trash'></i></button>
+                        <h5 style="margin: 0 0 5px; color: #0f172a; font-size: 15px; padding-right: 20px;">${ann.title}</h5>
+                        <p style="margin: 0 0 8px; color: #64748b; font-size: 13px;">${ann.content}</p>
+                        <small style="color: #94a3b8; font-size: 11px;">ประกาศเมื่อ: ${dateStr}</small>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function createAnnouncement(e) {
+            e.preventDefault();
+            const title = document.getElementById('announce-title').value.trim();
+            const content = document.getElementById('announce-content').value.trim();
+            const type = document.getElementById('announce-type').value;
+
+            if (!title || !content) return;
+
+            const { error } = await supabaseClient.from('announcements').insert([{ title, content, type }]);
+            if (!error) {
+                document.getElementById('announcement-form').reset();
+                loadAnnouncements();
+            } else {
+                alert("เกิดข้อผิดพลาด: " + error.message);
+            }
+        }
+
+        async function deleteAnnouncement(id) {
+            if(confirm("แน่ใจหรือไม่ว่าต้องการลบประกาศนี้?")) {
+                const { error } = await supabaseClient.from('announcements').delete().eq('id', id);
+                if(!error) loadAnnouncements();
+            }
+        }
 
         async function fetchDashboardData() {
             // 1. Fetch Tenants

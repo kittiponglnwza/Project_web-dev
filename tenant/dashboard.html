@@ -86,13 +86,8 @@
 
         <div class="recent-section">
             <div class="section-header">ข่าวประชาสัมพันธ์ล่าสุด</div>
-            <div style="padding: 15px; border-left: 4px solid #d4af37; background: #f9fafb; margin-bottom: 10px; border-radius: 4px;">
-                <strong style="display: block; color: #111; margin-bottom: 5px;">แจ้งล้างแอร์ประจำปี 2567</strong>
-                <span style="color: #6b7280; font-size: 0.9rem;">ทางหอพักจะทำการล้างแอร์ในวันที่ 15-20 เดือนนี้ ขอให้ผู้เช่าเตรียมตัวและเก็บของมีค่าให้เรียบร้อยครับ</span>
-            </div>
-            <div style="padding: 15px; border-left: 4px solid #3b82f6; background: #f9fafb; border-radius: 4px;">
-                <strong style="display: block; color: #111; margin-bottom: 5px;">อัปเดตระบบสแกนนิ้วเข้าตึก</strong>
-                <span style="color: #6b7280; font-size: 0.9rem;">กรุณาติดต่อที่สำนักงานเพื่ออัปเดตลายนิ้วมือเข้าตึกใหม่ ภายในสัปดาห์นี้</span>
+            <div id="tenant-announcements">
+                <div style="text-align: center; color: #9ca3af; padding: 20px;">กำลังโหลดประกาศ...</div>
             </div>
         </div>
     </div>
@@ -124,7 +119,7 @@
                 let nameWithoutTitle = fName.replace(/^(นาย|นางสาว|นาง)\s*/, '');
                 shortName = nameWithoutTitle.split(' ')[0];
                 // โหลดข้อมูล Dashboard
-                loadDashboardData(user.email);
+                loadDashboardData(user.email); loadTenantAnnouncements();
             }
             
             document.getElementById("welcome-text").innerText = "สวัสดี, " + fullName;
@@ -186,6 +181,37 @@
                 roomEl.innerHTML = `รอการจัดห้อง`;
                 roomEl.style.fontSize = "1.2rem";
             }
+        }
+
+        async function loadTenantAnnouncements() {
+            const { data, error } = await supabaseClient
+                .from('announcements')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            const list = document.getElementById('tenant-announcements');
+            if (error) {
+                list.innerHTML = `<div style="color: #ef4444; padding: 10px;">เกิดข้อผิดพลาดในการโหลดข่าวสาร</div>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                list.innerHTML = `<div style="text-align: center; color: #9ca3af; padding: 20px;">ยังไม่มีข่าวประชาสัมพันธ์ในขณะนี้</div>`;
+                return;
+            }
+
+            list.innerHTML = data.map(ann => {
+                let color = '#3b82f6'; // default info
+                if (ann.type === 'warning') color = '#d4af37'; // yellow-ish theme
+                if (ann.type === 'urgent') color = '#ef4444'; // red
+
+                return `
+                    <div style="padding: 15px; border-left: 4px solid ${color}; background: #f9fafb; margin-bottom: 10px; border-radius: 4px;">
+                        <strong style="display: block; color: #111; margin-bottom: 5px;">${ann.title}</strong>
+                        <span style="color: #6b7280; font-size: 0.9rem; line-height: 1.5; display: block;">${ann.content}</span>
+                    </div>
+                `;
+            }).join('');
         }
     </script>
 </body>

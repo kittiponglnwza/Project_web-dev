@@ -122,7 +122,7 @@ function renderUltraPremiumDetail(room) {
                 <div class="lux-section">
                     <h2>แผนผังอาคาร (Floor Plan)</h2>
                     <div style="width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: center;">
-                        <img src="images/floorplan.png" alt="แผนผังอาคาร" style="max-width: 100%; height: auto; border-radius: 12px;">
+                        <img src="images/floorplan.jpg" alt="แผนผังอาคาร" style="max-width: 100%; height: auto; border-radius: 12px;">
                     </div>
                 </div>
                 
@@ -143,7 +143,7 @@ function renderUltraPremiumDetail(room) {
                     <h2>สถานที่ตั้ง (Location)</h2>
                     <div style="width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 15px;">
                         <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3874.33156272559!2d100.51139427508365!3d13.824510786575184!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29b7134371457%3A0xcbb98305342a7!2z4Lih4Lir4Liy4Lin4Li04LiX4Lii4Liy4Lil4Lix4Lii4LmA4LiX4LiE4LmC4LiZ4LmC4Lil4Lii4Li14Lie4Lij4Liw4LiI4Lit4Lih4LmA4LiB4Lil4LmJ4Liy4Lie4Lij4Liw4LiZ4LiE4Lij4LmA4Lir4LiZ4Li34Lit!5e0!3m2!1sth!2sth!4v1714500000000!5m2!1sth!2sth" 
+                            src="https://maps.google.com/maps?q=คณะวิทยาศาสตร์ประยุกต์%20มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ&t=&z=16&ie=UTF8&iwloc=&output=embed" 
                             width="100%" 
                             height="350" 
                             style="border:0;" 
@@ -154,7 +154,7 @@ function renderUltraPremiumDetail(room) {
                     </div>
                     <p style="color: #4b5563; font-size: 1rem; display: flex; gap: 8px; align-items: flex-start; line-height: 1.6;">
                         <i class='bx bxs-map' style="color: #ef4444; font-size: 1.3rem; margin-top: 3px;"></i> 
-                        <span>ทำเลทอง ใกล้มหาวิทยาลัยและแหล่งชุมชน เดินทางสะดวกสบายด้วยรถสาธารณะ มีร้านสะดวกซื้อ 7-11 ป้ายรถเมล์ และวินมอเตอร์ไซค์หน้าปากซอย</span>
+                        <span>ทำเลทอง ใกล้มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ (มจพ.) เดินทางสะดวกสบายด้วยรถสาธารณะ มีร้านสะดวกซื้อ 7-11 ป้ายรถเมล์ และวินมอเตอร์ไซค์หน้าปากซอย</span>
                     </p>
                 </div>
 

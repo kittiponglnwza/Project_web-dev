@@ -24,6 +24,21 @@
         
         .card { background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow: hidden; }
         
+        /* Dashboard Stats */
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .month-selector { display: flex; align-items: center; gap: 15px; }
+        .month-selector select { padding: 8px 15px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'Prompt'; font-size: 15px; outline: none; min-width: 150px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 15px; }
+        .stat-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 24px; }
+        .stat-info h3 { margin: 0; font-size: 20px; color: #0f172a; }
+        .stat-info p { margin: 5px 0 0; color: #64748b; font-size: 13px; }
+        
+        .bg-blue { background: #eff6ff; color: #3b82f6; }
+        .bg-green { background: #f0fdf4; color: #10b981; }
+        .bg-orange { background: #fff7ed; color: #f59e0b; }
+
         .filter-bar { padding: 15px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; gap: 10px; }
         .filter-btn { background: #fff; border: 1px solid #cbd5e1; padding: 6px 15px; border-radius: 20px; font-size: 13px; cursor: pointer; color: #64748b; transition: 0.2s; }
         .filter-btn.active { background: #0f172a; color: #fff; border-color: #0f172a; }
@@ -57,7 +72,43 @@
 
     <div class="main-content">
         <div class="header-actions">
-            <h2>รายการแจ้งซ่อม / ปัญหา (Maintenance Requests)</h2>
+            <h2>ระบบสรุปรายการแจ้งซ่อมรายเดือน</h2>
+        </div>
+
+        <div class="dashboard-header">
+            <div class="month-selector">
+                <label style="font-weight: 500; color: #334155;">สรุปข้อมูลประจำเดือน:</label>
+                <select id="monthSelect" onchange="changeMonth()">
+                    <option value="">-- โหลดข้อมูล --</option>
+                </select>
+            </div>
+            <div style="color: #64748b; font-size: 14px;">
+                อัปเดตล่าสุด: <span id="last-update" style="color: #0f172a; font-weight: 500;">-</span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon bg-blue"><i class='bx bx-wrench'></i></div>
+                <div class="stat-info">
+                    <h3 id="stat-total">0</h3>
+                    <p>รายการแจ้งซ่อมทั้งหมด</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-orange"><i class='bx bx-time'></i></div>
+                <div class="stat-info">
+                    <h3 id="stat-pending">0</h3>
+                    <p>รอดำเนินการ</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-green"><i class='bx bx-check-shield'></i></div>
+                <div class="stat-info">
+                    <h3 id="stat-completed">0</h3>
+                    <p>ซ่อมเสร็จแล้ว</p>
+                </div>
+            </div>
         </div>
 
         <div class="card">
@@ -79,7 +130,7 @@
                     </tr>
                 </thead>
                 <tbody id="maintenance-table-body">
-                    <tr><td colspan="6" style="text-align: center;">กำลังโหลดข้อมูล...</td></tr>
+                    <tr><td colspan="6" style="text-align: center; padding: 30px;">กำลังโหลดข้อมูล...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -88,7 +139,9 @@
     <script src="../js/supabase-config.js"></script>
     <script>
         let allRequests = [];
+        let currentMonthRequests = [];
         let tenantProfiles = {};
+        const thaiMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
 
         document.addEventListener("DOMContentLoaded", async () => {
             const { data: { session } } = await supabaseClient.auth.getSession();
@@ -96,6 +149,10 @@
                 window.location.href = "../login.html";
                 return;
             }
+            
+            const now = new Date();
+            document.getElementById('last-update').innerText = now.toLocaleString('th-TH');
+
             await loadProfiles();
             await loadRequests();
         });
@@ -116,17 +173,63 @@
                 .order('created_at', { ascending: false });
 
             if (!error && data) {
+                // สร้างฟิลด์ monthStr อัตโนมัติจาก created_at
+                data.forEach(req => {
+                    const d = new Date(req.created_at);
+                    req.monthStr = `${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
+                });
+                
                 allRequests = data;
-                renderTable(data);
+                
+                // ดึงเดือนที่ไม่ซ้ำกัน
+                const uniqueMonths = [...new Set(data.map(r => r.monthStr))];
+                const select = document.getElementById('monthSelect');
+                select.innerHTML = '';
+                
+                if (uniqueMonths.length === 0) {
+                    select.innerHTML = '<option value="">ไม่มีข้อมูลแจ้งซ่อม</option>';
+                    changeMonth();
+                    return;
+                }
+
+                uniqueMonths.forEach(m => {
+                    select.innerHTML += `<option value="${m}">${m}</option>`;
+                });
+                
+                changeMonth();
             }
+        }
+
+        function changeMonth() {
+            const selectedMonth = document.getElementById('monthSelect').value;
+            currentMonthRequests = allRequests.filter(r => r.monthStr === selectedMonth);
+            
+            let total = currentMonthRequests.length;
+            let pending = 0;
+            let completed = 0;
+
+            currentMonthRequests.forEach(r => {
+                if(r.status === 'completed') completed++;
+                else pending++;
+            });
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-pending').innerText = pending;
+            document.getElementById('stat-completed').innerText = completed;
+
+            // รีเซ็ตปุ่ม Filter
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.filter-btn').classList.add('active'); 
+            
+            renderTable(currentMonthRequests);
         }
 
         function filterData(status, btnElement) {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
 
-            if(status === 'all') renderTable(allRequests);
-            else renderTable(allRequests.filter(r => r.status === status));
+            if(status === 'all') renderTable(currentMonthRequests);
+            else renderTable(currentMonthRequests.filter(r => r.status === status));
         }
 
         function renderTable(requests) {
@@ -134,7 +237,7 @@
             tbody.innerHTML = '';
 
             if (requests.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">ไม่มีรายการแจ้งซ่อม</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px;">ไม่มีรายการแจ้งซ่อมในเดือนนี้</td></tr>';
                 return;
             }
 
@@ -157,7 +260,9 @@
                 tbody.innerHTML += `
                     <tr>
                         <td style="font-size: 12px; color: #64748b;">${dateStr}</td>
-                        <td style="font-weight: 600; color: #0f172a;">${roomNo}</td>
+                        <td style="font-weight: 600; color: #0f172a;">
+                            <div style="background: #f1f5f9; display: inline-block; padding: 4px 10px; border-radius: 6px; border-left: 3px solid #0f172a;">${roomNo}</div>
+                        </td>
                         <td style="font-weight: 500;">${req.title}</td>
                         <td style="font-size: 13px; color: #64748b;">${req.description || '-'}</td>
                         <td>${badge}</td>

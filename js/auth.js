@@ -1,4 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // --- Rubric 9: Cookie + Session (Initialize / Get) ---
+    const isRemembered = document.cookie.includes("rememberMe=true");
+    const savedEmail = sessionStorage.getItem("savedEmail");
+    const sessID = sessionStorage.getItem("sessionID");
+    
+    if (isRemembered && savedEmail) {
+        const emailInput = document.getElementById("l_email");
+        const rememberCheckbox = document.getElementById("rememberMe");
+        if (emailInput && rememberCheckbox) {
+            emailInput.value = savedEmail;
+            rememberCheckbox.checked = true;
+            console.log("Session Restored:", sessID);
+        }
+    }
+    // ---------------------------------------------------
     // ==========================================
     // ดักจับ Event เมื่อกดลิงก์ "กู้รหัสผ่าน" จากอีเมล
     // ==========================================

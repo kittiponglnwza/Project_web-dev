@@ -9,14 +9,7 @@ window.addEventListener('load', () => {
         console.log('First time visitor this session!');
         sessionStorage.setItem('has_visited_index', 'true');
     }
-    
-    // XHR / Fetch API (Ajax Requirement)
-    // Fetch static JSON file as a fallback or static data source
-    fetch('data/rooms.json')
-        .then(res => res.json())
-        .then(data => console.log('Successfully fetched static JSON data:', data))
-        .catch(err => console.error('Fetch error:', err));
-});
+    });
 // =================================
 
 document.addEventListener("DOMContentLoaded", () => {

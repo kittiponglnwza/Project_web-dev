@@ -80,8 +80,10 @@
 
         <div class="card">
             <div class="form-group" style="max-width: 300px;">
-                <label>ประจำเดือน (เช่น ตุลาคม 2567)</label>
-                <input type="text" id="b_month" required placeholder="ต.ค. 2567">
+                <label>ประจำเดือน</label>
+                <select id="b_month" required style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; font-size: 1rem;">
+                    <!-- JS จะใส่ options ให้ -->
+                </select>
             </div>
 
             <table>
@@ -120,9 +122,27 @@
         }
 
         document.addEventListener("DOMContentLoaded", async () => {
+            const monthSelect = document.getElementById('b_month');
             const thaiMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
             const d = new Date();
-            document.getElementById('b_month').value = `${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
+            let startMonth = d.getMonth() - 6; // ย้อนหลัง 6 เดือน
+            let currentYear = d.getFullYear();
+            
+            for (let i = 0; i < 15; i++) { // ล่วงหน้าถึง 8 เดือน
+                let targetDate = new Date(currentYear, startMonth + i, 1);
+                let mText = thaiMonths[targetDate.getMonth()];
+                let yText = targetDate.getFullYear() + 543;
+                let val = `${mText} ${yText}`;
+                
+                let option = document.createElement('option');
+                option.value = val;
+                option.text = val;
+                
+                if(targetDate.getMonth() === d.getMonth() && targetDate.getFullYear() === d.getFullYear()) {
+                    option.selected = true;
+                }
+                monthSelect.appendChild(option);
+            }
             
             await loadTenants();
             renderTable();

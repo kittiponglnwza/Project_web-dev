@@ -56,6 +56,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const emailVal = emailInput.value.trim();
             const passVal = passwordInput.value;
+            const rememberMe = document.getElementById("rememberMe")?.checked;
+            
+            // --- Rubric 9: Cookie + Session (Store) ---
+            if (rememberMe) {
+                document.cookie = "rememberMe=true; max-age=604800; path=/;";
+                sessionStorage.setItem("savedEmail", emailVal);
+                sessionStorage.setItem("sessionID", "sess_" + new Date().getTime());
+            } else {
+                document.cookie = "rememberMe=; max-age=0; path=/;";
+                sessionStorage.removeItem("savedEmail");
+                sessionStorage.removeItem("sessionID");
+            }
+            // ------------------------------------------
 
             // รัน Loader ที่ปุ่ม
             const originalBtnText = btnSubmit.innerHTML;

@@ -29,13 +29,23 @@ document.addEventListener("DOMContentLoaded", () => {
 // ดึงข้อมูลห้องพักจากฐานข้อมูลจริง (Supabase)
 async function fetchRooms() {
     try {
-        // 1. ดึงข้อมูลห้องพักทั้งหมดจากตาราง rooms
-        const { data: roomsData, error: roomsError } = await supabaseClient
-            .from('rooms')
-            .select('*')
-            .order('id', { ascending: true });
+        // --- Rubric 10: Ajax Fetch API -> Database ---
+        // ใช้ Fetch API บริสุทธิ์ดึงข้อมูลจาก Supabase REST API โดยตรง
+        const fetchUrl = supabaseUrl + '/rest/v1/rooms?select=*&order=id.asc';
+        const response = await fetch(fetchUrl, {
+            method: 'GET',
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': 'Bearer ' + supabaseKey
+            }
+        });
 
-        if (roomsError) throw roomsError;
+        if (!response.ok) {
+            throw new Error("HTTP Fetch Error: " + response.status);
+        }
+
+        const roomsData = await response.json();
+        // ---------------------------------------------
 
         // 2. ดึงข้อมูลผู้เช่าทั้งหมดที่มีเลขห้อง เพื่อคำนวณห้องที่ถูกจองแล้ว
         // (เปลี่ยนไปคิวรีจาก View: occupied_rooms แทน เพื่อความปลอดภัย ไม่ให้ข้อมูลส่วนตัวผู้เช่าหลุด)
@@ -106,8 +116,27 @@ async function fetchRooms() {
         
         renderRooms(formattedData);
     } catch (error) {
-        console.error("Error fetching from Supabase:", error);
-        document.getElementById("room-container").innerHTML = "<p style='text-align:center;'>เกิดข้อผิดพลาดในการดึงข้อมูลจากฐานข้อมูล</p>";
+        console.error("Error fetching from Supabase, falling back to local JSON (Rubric 7: JSON):", error);
+        // JSON -> Fetch -> Process -> Render UI
+        try {
+            const response = await fetch('data/rooms.json');
+            const localData = await response.json();
+            
+            // Process the JSON data to match the format expected by renderRooms
+            const fallbackData = localData.map(room => ({
+                id: room.id,
+                type: room.type,
+                description: room.description,
+                price: room.price,
+                isAvailable: room.isAvailable,
+                availableCount: room.availableCount,
+                images: room.images
+            }));
+            
+            renderRooms(fallbackData);
+        } catch (fetchError) {
+            document.getElementById("room-container").innerHTML = "<p style='text-align:center;'>เกิดข้อผิดพลาดในการดึงข้อมูลทั้งจากฐานข้อมูลและไฟล์สำรอง</p>";
+        }
     }
 }
 // ตัวแปรเก็บสถานะสไลเดอร์ของแต่ละห้อง

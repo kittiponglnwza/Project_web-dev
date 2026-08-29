@@ -49,9 +49,12 @@
         
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
         .st-pending { background: #fef08a; color: #854d0e; }
+        .st-inprogress { background: #dbeafe; color: #1e3a8a; }
         .st-completed { background: #d1fae5; color: #059669; }
 
         .btn-action { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-family: 'Prompt'; font-size: 13px; transition: 0.2s; }
+        .btn-inprogress { background: #3b82f6; color: #fff; }
+        .btn-inprogress:hover { background: #2563eb; }
         .btn-complete { background: #10b981; color: #fff; }
         .btn-complete:hover { background: #059669; }
 
@@ -99,7 +102,7 @@
                 <div class="stat-icon bg-orange"><i class='bx bx-time'></i></div>
                 <div class="stat-info">
                     <h3 id="stat-pending">0</h3>
-                    <p>รอดำเนินการ</p>
+                    <p>รอดำเนินการ / กำลังซ่อม</p>
                 </div>
             </div>
             <div class="stat-card">
@@ -115,6 +118,7 @@
             <div class="filter-bar">
                 <button class="filter-btn active" onclick="filterData('all', this)">ทั้งหมด</button>
                 <button class="filter-btn" onclick="filterData('pending', this)">รอดำเนินการ 🔴</button>
+                <button class="filter-btn" onclick="filterData('in_progress', this)">กำลังซ่อม 🔵</button>
                 <button class="filter-btn" onclick="filterData('completed', this)">ซ่อมเสร็จแล้ว 🟢</button>
             </div>
             
@@ -173,7 +177,6 @@
                 .order('created_at', { ascending: false });
 
             if (!error && data) {
-                // สร้างฟิลด์ monthStr อัตโนมัติจาก created_at
                 data.forEach(req => {
                     const d = new Date(req.created_at);
                     req.monthStr = `${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
@@ -181,7 +184,6 @@
                 
                 allRequests = data;
                 
-                // ดึงเดือนที่ไม่ซ้ำกัน
                 const uniqueMonths = [...new Set(data.map(r => r.monthStr))];
                 const select = document.getElementById('monthSelect');
                 select.innerHTML = '';
@@ -217,7 +219,6 @@
             document.getElementById('stat-pending').innerText = pending;
             document.getElementById('stat-completed').innerText = completed;
 
-            // รีเซ็ตปุ่ม Filter
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector('.filter-btn').classList.add('active'); 
             
@@ -252,9 +253,12 @@
                 if (req.status === 'completed') {
                     badge = '<span class="status-badge st-completed"><i class="bx bx-check"></i> ซ่อมเสร็จแล้ว</span>';
                     actionBtn = `<span style="color:#94a3b8; font-size:12px;">เรียบร้อย</span>`;
+                } else if (req.status === 'in_progress') {
+                    badge = '<span class="status-badge st-inprogress"><i class="bx bx-wrench"></i> กำลังดำเนินการ</span>';
+                    actionBtn = `<button class="btn-action btn-complete" onclick="updateStatus('${req.id}', 'completed')">กดเมื่อซ่อมเสร็จ</button>`;
                 } else {
                     badge = '<span class="status-badge st-pending"><i class="bx bx-time"></i> รอดำเนินการ</span>';
-                    actionBtn = `<button class="btn-action btn-complete" onclick="markCompleted('${req.id}')">กดเมื่อซ่อมเสร็จ</button>`;
+                    actionBtn = `<button class="btn-action btn-inprogress" onclick="updateStatus('${req.id}', 'in_progress')">รับเรื่อง / กำลังซ่อม</button>`;
                 }
 
                 tbody.innerHTML += `
@@ -272,15 +276,33 @@
             });
         }
 
-        async function markCompleted(id) {
-            if(confirm('ยืนยันว่าช่างได้เข้าซ่อมแซมปัญหานี้เสร็จสิ้นแล้วใช่หรือไม่?')) {
-                const { error } = await supabaseClient
+        async function updateStatus(id, newStatus) {
+            const req = allRequests.find(r => r.id === id);
+            let confirmMsg = newStatus === 'in_progress' ? 
+                'รับเรื่องและส่งสถานะ "กำลังดำเนินการ" ไปยังแชทของผู้เช่าใช่หรือไม่?' : 
+                'ยืนยันว่าช่างได้ "ซ่อมเสร็จสิ้น" และส่งแจ้งเตือนไปที่แชทผู้เช่า?';
+                
+            if(confirm(confirmMsg)) {
+                // อัปเดตสถานะการแจ้งซ่อม
+                const { error: err1 } = await supabaseClient
                     .from('maintenance_requests')
-                    .update({ status: 'completed' })
+                    .update({ status: newStatus })
                     .eq('id', id);
                 
-                if(!error) {
-                    alert('อัปเดตสถานะสำเร็จ!');
+                if(!err1) {
+                    // ส่งข้อความไปที่แชท
+                    const chatMessage = newStatus === 'in_progress' ? 
+                        `[ระบบแจ้งซ่อม] 👨‍🔧 แอดมินรับเรื่องแจ้งซ่อมของคุณแล้ว และกำลังเตรียมดำเนินการแก้ไขปัญหา "${req.title}" ครับ` : 
+                        `[ระบบแจ้งซ่อม] ✅ การซ่อมแซมปัญหา "${req.title}" ได้ดำเนินการเสร็จสิ้นเรียบร้อยแล้วครับ`;
+
+                    await supabaseClient.from('messages').insert([{
+                        sender_email: 'admin',
+                        receiver_email: req.email,
+                        message: chatMessage,
+                        is_read: false
+                    }]);
+
+                    alert('อัปเดตสถานะและส่งแจ้งเตือนเรียบร้อย!');
                     loadRequests(); // รีเฟรช
                 }
             }

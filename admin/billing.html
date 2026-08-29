@@ -242,11 +242,12 @@
 
             if (!error && data) {
                 data.forEach(bill => {
-                    if (!bill.room_no || bill.room_no === 'null') {
-                        const tenant = tenantProfiles.find(t => t.email === bill.email);
-                        if (tenant && tenant.room_no) {
-                            bill.room_no = tenant.room_no;
-                        }
+                    // ดึงเลขห้องปัจจุบันจาก tenantProfiles เสมอ เพื่อไม่ให้ข้อมูลขัดแย้งกันกรณีเปลี่ยนห้อง
+                    const tenant = tenantProfiles.find(t => t.email === bill.email);
+                    if (tenant && tenant.room_no) {
+                        bill.room_no = tenant.room_no;
+                    } else if (!bill.room_no || bill.room_no === 'null') {
+                        bill.room_no = 'ไม่ระบุ';
                     }
                 });
                 

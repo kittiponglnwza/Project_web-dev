@@ -121,7 +121,22 @@
             return { type: '-', price: 0 };
         }
 
-        document.addEventListener("DOMContentLoaded", async () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+
+            // ================= ADMIN GUARD =================
+            const { data: { session: adminSession } } = await supabaseClient.auth.getSession();
+            if (!adminSession) {
+                window.location.href = "../login.html";
+                return;
+            }
+            const { data: adminProfile } = await supabaseClient.from('tenant_profiles').select('role').eq('email', adminSession.user.email).single();
+            if (!adminProfile || adminProfile.role !== 'admin') {
+                alert("⛔ ไม่อนุญาตให้เข้าถึง! คุณไม่มีสิทธิ์ผู้ดูแลระบบ");
+                window.location.href = "../index.html";
+                return;
+            }
+            // ===============================================
+
             const monthSelect = document.getElementById('b_month');
             const thaiMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
             const d = new Date();

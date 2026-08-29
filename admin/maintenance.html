@@ -148,11 +148,21 @@
         const thaiMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
 
         document.addEventListener("DOMContentLoaded", async () => {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
+            
+            // ================= ADMIN GUARD =================
+            const { data: { session: adminSession } } = await supabaseClient.auth.getSession();
+            if (!adminSession) {
                 window.location.href = "../login.html";
                 return;
             }
+            const { data: adminProfile } = await supabaseClient.from('tenant_profiles').select('role').eq('email', adminSession.user.email).single();
+            if (!adminProfile || adminProfile.role !== 'admin') {
+                alert("⛔ ไม่อนุญาตให้เข้าถึง! คุณไม่มีสิทธิ์ผู้ดูแลระบบ");
+                window.location.href = "../index.html";
+                return;
+            }
+            // ===============================================
+
             
             const now = new Date();
             document.getElementById('last-update').innerText = now.toLocaleString('th-TH');

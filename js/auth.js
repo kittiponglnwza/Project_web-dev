@@ -166,10 +166,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (error) throw error;
 
-                // นำอีเมลของผู้ใช้ใหม่ไปบันทึกในตารางโปรไฟล์ทันที เพื่อให้แอดมินเห็นในระบบ
+                // นำอีเมลของผู้ใช้ใหม่ไปบันทึกในตารางโปรไฟล์
+                // (Role จะถูกเซ็ตเป็น 'tenant' อัตโนมัติจาก Default ของ Database เพื่อความปลอดภัย)
                 await supabaseClient.from('tenant_profiles').insert([{ 
-                    email: email,
-                    role: 'tenant'
+                    email: email
                 }]);
 
                 alert("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบด้วยอีเมลและรหัสผ่านที่คุณตั้งไว้");

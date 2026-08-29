@@ -108,15 +108,28 @@ function renderUltraPremiumDetail(room) {
     const formattedPrice = new Intl.NumberFormat('th-TH').format(room.price);
     const statusText = room.isAvailable ? `Available (${room.availableCount} Rooms)` : "Fully Booked (เต็มแล้ว)";
     const statusColor = room.isAvailable ? "#10b981" : "#ef4444"; 
-    const mainImage = room.images[0];
+    // ดึงรูปแรกมาขยายขนาดความละเอียดสำหรับแบนเนอร์ใหญ่
+    let mainImage = room.images[0];
+    if (mainImage.includes('images.pexels.com')) {
+        mainImage = mainImage.replace(/w=\d+/g, 'w=1920'); // ขยายเป็น 1920px เพื่อความคมชัด
+    }
+
     let galleryHTML = '';
     
     if (room.images.length > 1) {
         room.images.forEach((imgUrl, index) => {
-            if (index > 0) galleryHTML += `<img src="${imgUrl}" alt="Gallery ${index}" class="lux-gallery-img">`;
+            if (index > 0) {
+                // ขยายรูปใน Gallery ให้ชัดขึ้นด้วย (เช่น 1200px)
+                let highResImg = imgUrl;
+                if (highResImg.includes('images.pexels.com')) {
+                    highResImg = highResImg.replace(/w=\d+/g, 'w=1200'); 
+                }
+                galleryHTML += `<img src="${highResImg}" alt="Gallery ${index}" class="lux-gallery-img" style="cursor: pointer;" onclick="window.open('${highResImg}', '_blank')">`;
+            }
         });
     } else {
-        galleryHTML = `<img src="${mainImage}" alt="Gallery 1" class="lux-gallery-img">`;
+        let highResImg = mainImage.replace(/w=\d+/g, 'w=1200');
+        galleryHTML = `<img src="${highResImg}" alt="Gallery 1" class="lux-gallery-img">`;
     }
 
     container.innerHTML = `

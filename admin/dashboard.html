@@ -129,16 +129,43 @@
         </div>
 
         <div class="dash-layout">
-            <!-- Left Column: Chart -->
+            <!-- Left Column: Announcements Section -->
             <div class="card">
-                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 style="margin: 0;"><i class='bx bx-line-chart'></i> สรุปรายรับ</h3>
-                    <select id="chart-year-filter" onchange="filterChart()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'Prompt'; font-size: 13px; outline: none; cursor: pointer;">
-                        <option value="all">รวมทุกปี</option>
-                    </select>
+                <div class="card-header">
+                    <h3><i class='bx bxs-megaphone'></i> จัดการข่าวประชาสัมพันธ์ (Announcements)</h3>
                 </div>
-                <div style="position: relative; height: 300px; width: 100%;">
-                    <canvas id="revenueChart"></canvas>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- Create Announcement Form -->
+                    <div>
+                        <form id="announcement-form" style="display: flex; flex-direction: column; gap: 15px;">
+                            <div>
+                                <label style="font-size: 13px; color: #64748b; font-weight: 500;">หัวข้อประกาศ</label>
+                                <input type="text" id="announce-title" required style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px;" placeholder="เช่น แจ้งล้างแอร์ประจำปี 2567">
+                            </div>
+                            <div>
+                                <label style="font-size: 13px; color: #64748b; font-weight: 500;">รายละเอียด</label>
+                                <textarea id="announce-content" required rows="4" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px; resize: vertical;" placeholder="กรอกรายละเอียดข่าวสาร..."></textarea>
+                            </div>
+                            <div>
+                                <label style="font-size: 13px; color: #64748b; font-weight: 500;">ประเภท (สีแถบด้านข้าง)</label>
+                                <select id="announce-type" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px;">
+                                    <option value="info">สีน้ำเงิน (อัปเดตทั่วไป / ข่าวสาร)</option>
+                                    <option value="warning">สีเหลือง (แจ้งเตือน / ซ่อมบำรุง)</option>
+                                    <option value="urgent">สีแดง (เรื่องด่วน / สำคัญมาก)</option>
+                                </select>
+                            </div>
+                            <button type="submit" style="background: #0f172a; color: #fff; border: none; padding: 12px; border-radius: 8px; font-family: 'Prompt'; cursor: pointer; font-weight: 500;">ประกาศข้อความ</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Announcement Log -->
+                    <div style="border-left: 1px solid #e2e8f0; padding-left: 20px;">
+                        <h4 style="margin-top: 0; color: #475569;">ประวัติการประกาศ</h4>
+                        <div id="admin-announcement-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto; padding-right: 10px;">
+                            <div style="text-align: center; color: #94a3b8; padding: 20px;">กำลังโหลด...</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -151,43 +178,18 @@
                     <div style="text-align: center; color: #94a3b8; padding: 20px;">กำลังโหลด...</div>
                 </div>
             </div>
-        <!-- Announcements Section -->
+        </div>
+
+        <!-- Full Width Chart -->
         <div class="card" style="margin-top: 20px;">
-            <div class="card-header">
-                <h3><i class='bx bxs-megaphone'></i> จัดการข่าวประชาสัมพันธ์ (Announcements)</h3>
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0;"><i class='bx bx-line-chart'></i> สรุปรายรับ (Revenue Trend)</h3>
+                <select id="chart-year-filter" onchange="filterChart()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'Prompt'; font-size: 13px; outline: none; cursor: pointer;">
+                    <option value="all">รวมทุกปี</option>
+                </select>
             </div>
-            
-            <div class="dash-layout">
-                <!-- Create Announcement Form -->
-                <div>
-                    <form id="announcement-form" style="display: flex; flex-direction: column; gap: 15px;">
-                        <div>
-                            <label style="font-size: 13px; color: #64748b; font-weight: 500;">หัวข้อประกาศ</label>
-                            <input type="text" id="announce-title" required style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px;" placeholder="เช่น แจ้งล้างแอร์ประจำปี 2567">
-                        </div>
-                        <div>
-                            <label style="font-size: 13px; color: #64748b; font-weight: 500;">รายละเอียด</label>
-                            <textarea id="announce-content" required rows="3" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px; resize: vertical;" placeholder="กรอกรายละเอียดข่าวสาร..."></textarea>
-                        </div>
-                        <div>
-                            <label style="font-size: 13px; color: #64748b; font-weight: 500;">ประเภท (สีแถบด้านข้าง)</label>
-                            <select id="announce-type" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px;">
-                                <option value="info">สีน้ำเงิน (อัปเดตทั่วไป / ข่าวสาร)</option>
-                                <option value="warning">สีเหลือง (แจ้งเตือน / ซ่อมบำรุง)</option>
-                                <option value="urgent">สีแดง (เรื่องด่วน / สำคัญมาก)</option>
-                            </select>
-                        </div>
-                        <button type="submit" style="background: #0f172a; color: #fff; border: none; padding: 12px; border-radius: 8px; font-family: 'Prompt'; cursor: pointer; font-weight: 500;">ประกาศข้อความ</button>
-                    </form>
-                </div>
-                
-                <!-- Announcement Log -->
-                <div style="border-left: 1px solid #e2e8f0; padding-left: 20px;">
-                    <h4 style="margin-top: 0; color: #475569;">ประวัติการประกาศ</h4>
-                    <div id="admin-announcement-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto; padding-right: 10px;">
-                        <div style="text-align: center; color: #94a3b8; padding: 20px;">กำลังโหลด...</div>
-                    </div>
-                </div>
+            <div style="position: relative; height: 350px; width: 100%;">
+                <canvas id="revenueChart"></canvas>
             </div>
         </div>
     </div>
@@ -422,12 +424,12 @@
                 data.push(0);
             }
 
-            let gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.8)');
-            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.1)');
+            let gradient = ctx.createLinearGradient(0, 0, 0, 350);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
             revenueChartInstance = new Chart(ctx, {
-                type: 'bar',
+                type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
@@ -435,10 +437,14 @@
                         data: data,
                         backgroundColor: gradient,
                         borderColor: '#3b82f6',
-                        borderWidth: 2,
-                        borderRadius: 6,
-                        maxBarThickness: 60,
-                        hoverBackgroundColor: '#2563eb'
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#3b82f6',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: true,
+                        tension: 0.4 // Makes the line smooth/curved
                     }]
                 },
                 options: {

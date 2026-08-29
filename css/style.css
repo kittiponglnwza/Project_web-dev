@@ -21,6 +21,22 @@ header { background-color: var(--primary-color); color: #fff; padding: 15px 20px
 .hero-content h1 { font-size: 3.5rem; margin-bottom: 15px; font-weight: 600; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
 .hero-content p { font-size: 1.2rem; font-weight: 300; text-shadow: 1px 1px 5px rgba(0,0,0,0.8); }
 
+/* Project Info Section */
+.info-section { padding: 40px 20px; background-color: #fff; margin-bottom: 20px; }
+.info-container { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 15px rgba(0,0,0,0.03); padding: 30px; }
+.info-header { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 25px; }
+.info-logo { width: 70px; height: 70px; background: #f8fafc; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 35px; color: #3b82f6; flex-shrink: 0; }
+.info-title-group h2 { margin: 0 0 5px 0; font-size: 1.8rem; color: #111; font-weight: 600; }
+.info-title-group .sub-title { margin: 0 0 10px 0; color: #64748b; font-size: 1rem; font-weight: 300; }
+.rating { display: flex; align-items: center; gap: 5px; color: #facc15; font-size: 1.1rem; }
+.review-count { color: #64748b; font-size: 0.9rem; margin-left: 10px; font-weight: 300; }
+.info-tabs { display: flex; gap: 30px; border-bottom: 2px solid #f1f5f9; margin-bottom: 25px; }
+.tab-btn { background: none; border: none; padding: 10px 0; font-family: 'Prompt'; font-size: 1rem; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; font-weight: 500; transition: 0.3s; }
+.tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+.tab-btn:hover:not(.active) { color: #111; }
+.info-content p { color: #475569; line-height: 1.6; font-size: 1rem; font-weight: 300; margin: 0; }
+.nearby-list { margin: 15px 0 0 0; padding-left: 20px; color: #475569; font-weight: 300; line-height: 1.8; font-size: 0.95rem; }
+
 .room-section { padding: 40px 20px; text-align: center; background-color: var(--bg-color); }
 .room-section h2 { font-weight: 600; color: var(--primary-color); margin-bottom: 10px; }
 .list-container { display: flex; flex-direction: column; gap: 20px; max-width: 900px; margin: 20px auto; } 

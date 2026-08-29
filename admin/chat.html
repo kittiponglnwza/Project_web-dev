@@ -233,7 +233,22 @@
 
             let html = '';
             contactArray.forEach(c => {
-                const roomNo = tenantProfiles[c.email] || 'ไม่ระบุห้อง';
+                let displayName = c.email.split('@')[0];
+                let roleBadge = '';
+                let isOutsider = !tenantProfiles[c.email];
+                
+                if (!isOutsider) {
+                    const roomNo = tenantProfiles[c.email];
+                    roleBadge = `<span class="contact-room" style="background:#3b82f6;">ห้อง ${roomNo}</span>`;
+                } else {
+                    if (c.email === 'system_booking@mydorm.com') {
+                        displayName = "ระบบแจ้งเตือน";
+                        roleBadge = `<span class="contact-room" style="background:#f59e0b;">ลูกค้านัดดูห้อง</span>`;
+                    } else {
+                        roleBadge = `<span class="contact-room" style="background:#8b5cf6;">ผู้ติดต่อภายนอก</span>`;
+                    }
+                }
+
                 const isActive = activeChatEmail === c.email ? 'active' : '';
                 const unreadBadge = c.unreadCount > 0 ? `<span class="unread-badge">${c.unreadCount}</span>` : '';
                 
@@ -242,10 +257,10 @@
 
                 html += `
                     <div class="contact-item ${isActive}" onclick="openChat('${c.email}')">
-                        <div class="contact-avatar"><i class='bx bx-user'></i></div>
+                        <div class="contact-avatar" style="${isOutsider ? 'background:#f59e0b;' : ''}"><i class='bx ${isOutsider ? 'bxs-bell-ring' : 'bx-user'}'></i></div>
                         <div class="contact-info">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <h4 class="contact-name">${c.email.split('@')[0]} <span class="contact-room">ห้อง ${roomNo}</span></h4>
+                                <h4 class="contact-name">${displayName} ${roleBadge}</h4>
                                 <span style="font-size:10px; color:#94a3b8;">${timeStr}</span>
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -265,15 +280,30 @@
 
         async function openChat(tenantEmail) {
             activeChatEmail = tenantEmail;
-            const roomNo = tenantProfiles[tenantEmail] || 'ไม่ระบุห้อง';
+            
+            let chatTitle = "";
+            let isOutsider = !tenantProfiles[tenantEmail];
+            
+            if (!isOutsider) {
+                chatTitle = `ผู้เช่าห้อง ${tenantProfiles[tenantEmail]}`;
+                document.getElementById('chat-form').style.display = 'flex';
+            } else {
+                if (tenantEmail === 'system_booking@mydorm.com') {
+                    chatTitle = `ลูกค้านัดดูห้อง (ระบบอัตโนมัติ)`;
+                    // ซ่อนช่องพิมพ์แชท เพราะเป็นข้อความจากระบบลูกค้าทั่วไป (พิมพ์ตอบไปเขาก็ไม่เห็น)
+                    document.getElementById('chat-form').style.display = 'none';
+                } else {
+                    chatTitle = `ผู้ติดต่อภายนอก`;
+                    document.getElementById('chat-form').style.display = 'flex';
+                }
+            }
 
             // สลับ UI
             document.getElementById('empty-state').style.display = 'none';
             document.getElementById('chat-header').style.display = 'flex';
             document.getElementById('chat-box').style.display = 'flex';
-            document.getElementById('chat-form').style.display = 'flex';
 
-            document.getElementById('active-chat-name').innerText = `ผู้เช่าห้อง ${roomNo}`;
+            document.getElementById('active-chat-name').innerText = chatTitle;
             document.getElementById('active-chat-email').innerText = tenantEmail;
 
             // เน้นสีคนที่ถูกเลือก

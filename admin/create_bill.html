@@ -125,10 +125,10 @@
             const monthSelect = document.getElementById('b_month');
             const thaiMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
             const d = new Date();
-            let startMonth = d.getMonth() - 6; // ย้อนหลัง 6 เดือน
+            let startMonth = d.getMonth() - 1; // ย้อนหลังแค่ 1 เดือน (เผื่อทำบิลตกหล่นตอนต้นเดือน)
             let currentYear = d.getFullYear();
             
-            for (let i = 0; i < 15; i++) { // ล่วงหน้าถึง 8 เดือน
+            for (let i = 0; i < 6; i++) { // สร้างตัวเลือกแค่ 6 เดือน (เดือนที่แล้ว + ปัจจุบัน + ล่วงหน้า 4 เดือน)
                 let targetDate = new Date(currentYear, startMonth + i, 1);
                 let mText = thaiMonths[targetDate.getMonth()];
                 let yText = targetDate.getFullYear() + 543;

@@ -71,7 +71,8 @@ const translations = {
     }
 };
 
-function setLanguage(lang) {
+// setLanguage ต้องเรียกได้จากทั้ง HTML onclick และ JS
+window.setLanguage = function(lang) {
     localStorage.setItem('lang', lang);
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
@@ -83,10 +84,10 @@ function setLanguage(lang) {
     // Toggle button active state
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById('lang-' + lang);
-    if(activeBtn) activeBtn.classList.add('active');
-}
+    if (activeBtn) activeBtn.classList.add('active');
+};
 
-// Initialize Language on Page Load
+// Initialize Language on Page Load - รอ DOM พร้อมก่อน
 document.addEventListener('DOMContentLoaded', () => {
     const savedLang = localStorage.getItem('lang') || 'th';
     setLanguage(savedLang);

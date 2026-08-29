@@ -30,8 +30,8 @@
                 <li><a href="login.html" class="btn-login" data-i18n="nav_login">เข้าสู่ระบบ</a></li>
                 <li>
                     <div class="lang-switcher">
-                        <button class="lang-btn active" id="lang-th" onclick="setLanguage('th')">TH</button>
-                        <button class="lang-btn" id="lang-en" onclick="setLanguage('en')">EN</button>
+                        <button type="button" class="lang-btn active" id="lang-th" onclick="event.stopPropagation(); setLanguage('th')">TH</button>
+                        <button type="button" class="lang-btn" id="lang-en" onclick="event.stopPropagation(); setLanguage('en')">EN</button>
                     </div>
                 </li>
             </ul>

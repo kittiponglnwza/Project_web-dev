@@ -215,15 +215,15 @@
                         
                         if (diffDays <= 30) {
                             expiryCount++;
-                            let statusText = diffDays < 0 ? \`หมดสัญญาแล้ว \${Math.abs(diffDays)} วัน\` : \`เหลือ \${diffDays} วัน\`;
+                            let statusText = diffDays < 0 ? `หมดสัญญาแล้ว ${Math.abs(diffDays)} วัน` : `เหลือ ${diffDays} วัน`;
                             let color = diffDays < 0 ? 'color: #dc2626;' : 'color: #ea580c;';
                             
-                            expiryList.innerHTML += \`
+                            expiryList.innerHTML += `
                                 <li>
-                                    <span>ห้อง \${t.room_no || 'ไม่ระบุ'}</span> 
-                                    \${t.email} - <b style="\${color}">\${statusText}</b> (สิ้นสุด \${endDate.toLocaleDateString('th-TH')})
+                                    <span>ห้อง ${t.room_no || 'ไม่ระบุ'}</span> 
+                                    ${t.email} - <b style="${color}">${statusText}</b> (สิ้นสุด ${endDate.toLocaleDateString('th-TH')})
                                 </li>
-                            \`;
+                            `;
                         }
                     }
                 });
@@ -265,7 +265,7 @@
 
                 // Populate dropdown
                 uniqueMonths.forEach(m => {
-                    select.innerHTML += \`<option value="\${m}">\${m}</option>\`;
+                    select.innerHTML += `<option value="${m}">${m}</option>`;
                 });
                 
                 // Trigger change to load the first month
@@ -346,34 +346,34 @@
 
                 if (bill.status === 'paid') {
                     badge = '<span class="status-badge st-paid">ชำระแล้ว</span>';
-                    actionBtn = \`<button class="action-btn" title="เรียบร้อย" onclick="alert('บิลนี้เคลียร์แล้ว')"><i class='bx bx-check-double'></i></button>\`;
+                    actionBtn = `<button class="action-btn" title="เรียบร้อย" onclick="alert('บิลนี้เคลียร์แล้ว')"><i class='bx bx-check-double'></i></button>`;
                 } else if (bill.status === 'checking') {
                     badge = '<span class="status-badge st-checking">รอตรวจสลิป</span>';
-                    actionBtn = \`
-                        <button class="action-btn" title="ดูสลิป" onclick="viewSlipNewTab('\${bill.id}')" style="color:#3b82f6;"><i class='bx bx-image'></i></button>
-                        <button class="action-btn btn-approve" title="อนุมัติสลิป" onclick="approveSlip('\${bill.id}')" style="color:#10b981;"><i class='bx bx-check'></i></button>
-                        <button class="action-btn" title="ให้ส่งใหม่" onclick="rejectSlip('\${bill.id}')" style="color:#ef4444;"><i class='bx bx-x'></i></button>
-                    \`;
+                    actionBtn = `
+                        <button class="action-btn" title="ดูสลิป" onclick="viewSlipNewTab('${bill.id}')" style="color:#3b82f6;"><i class='bx bx-image'></i></button>
+                        <button class="action-btn btn-approve" title="อนุมัติสลิป" onclick="approveSlip('${bill.id}')" style="color:#10b981;"><i class='bx bx-check'></i></button>
+                        <button class="action-btn" title="ให้ส่งใหม่" onclick="rejectSlip('${bill.id}')" style="color:#ef4444;"><i class='bx bx-x'></i></button>
+                    `;
                 } else {
                     badge = '<span class="status-badge st-unpaid">ค้างชำระ</span>';
-                    actionBtn = \`<button class="action-btn" title="ลบบิลทิ้ง" onclick="deleteBill('\${bill.id}')" style="color:#ef4444;"><i class='bx bx-trash'></i></button>\`;
+                    actionBtn = `<button class="action-btn" title="ลบบิลทิ้ง" onclick="deleteBill('${bill.id}')" style="color:#ef4444;"><i class='bx bx-trash'></i></button>`;
                 }
 
-                tbody.innerHTML += \`
+                tbody.innerHTML += `
                     <tr>
                         <td style="font-weight: 500;">
                             <div style="background: #f1f5f9; display: inline-block; padding: 4px 10px; border-radius: 6px; border-left: 3px solid #0f172a;">
-                                \${bill.room_no || 'ไม่ระบุ'}
+                                ${bill.room_no || 'ไม่ระบุ'}
                             </div>
                         </td>
-                        <td>\${bill.month}</td>
-                        <td>\${(bill.rent_fee || 0).toLocaleString()}</td>
-                        <td style="color: #64748b;">\${utilTotal.toLocaleString()}</td>
-                        <td style="font-weight: 600; color: #dc2626; font-size: 15px;">\${bill.amount.toLocaleString()}</td>
-                        <td>\${badge}</td>
-                        <td style="text-align: center;">\${actionBtn}</td>
+                        <td>${bill.month}</td>
+                        <td>${(bill.rent_fee || 0).toLocaleString()}</td>
+                        <td style="color: #64748b;">${utilTotal.toLocaleString()}</td>
+                        <td style="font-weight: 600; color: #dc2626; font-size: 15px;">${bill.amount.toLocaleString()}</td>
+                        <td>${badge}</td>
+                        <td style="text-align: center;">${actionBtn}</td>
                     </tr>
-                \`;
+                `;
             });
         }
 
@@ -383,14 +383,14 @@
             
             if (slipImage && slipImage !== 'undefined') {
                 const w = window.open("");
-                w.document.write(\`
+                w.document.write(`
                     <html>
-                    <head><title>สลิปโอนเงิน (บิล \${bill.month})</title></head>
+                    <head><title>สลิปโอนเงิน (บิล ${bill.month})</title></head>
                     <body style="margin:0; display:flex; justify-content:center; align-items:center; background:#0f172a; min-height:100vh;">
-                        <img src="\${slipImage}" style="max-width:100%; max-height:100vh; object-fit:contain; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
+                        <img src="${slipImage}" style="max-width:100%; max-height:100vh; object-fit:contain; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
                     </body>
                     </html>
-                \`);
+                `);
             } else {
                 alert("บิลนี้ไม่มีรูปสลิปในระบบครับ");
             }

@@ -173,6 +173,12 @@
         </div>
     </div>
 
+    <!-- Slip Modal -->
+    <div id="slipModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.9); z-index:9999; justify-content:center; align-items:center; flex-direction:column;">
+        <span onclick="closeSlipModal()" style="position:absolute; top:30px; right:40px; color:#fff; font-size:40px; cursor:pointer;">&times;</span>
+        <img id="slipImagePreview" src="" style="max-width:90%; max-height:85vh; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
+    </div>
+
     <script src="../js/supabase-config.js"></script>
     <script>
         let tenantProfiles = [];
@@ -348,13 +354,13 @@
                 if (bill.status === 'paid') {
                     badge = '<span class="status-badge st-paid">ชำระแล้ว</span>';
                     actionBtn = `
-                        <button class="action-btn" title="ดูสลิป" onclick="viewSlipNewTab('${bill.id}')" style="color:#3b82f6;"><i class='bx bx-image'></i></button>
+                        <button class="action-btn" title="ดูสลิป" onclick="openSlipModal('${bill.id}')" style="color:#3b82f6;"><i class='bx bx-image'></i></button>
                         <button class="action-btn" title="เรียบร้อย" onclick="alert('บิลนี้เคลียร์แล้ว')" style="color:#10b981;"><i class='bx bx-check-double'></i></button>
                     `;
                 } else if (bill.status === 'checking') {
                     badge = '<span class="status-badge st-checking">รอตรวจสลิป</span>';
                     actionBtn = `
-                        <button class="action-btn" title="ดูสลิป" onclick="viewSlipNewTab('${bill.id}')" style="color:#3b82f6;"><i class='bx bx-image'></i></button>
+                        <button class="action-btn" title="ดูสลิป" onclick="openSlipModal('${bill.id}')" style="color:#3b82f6;"><i class='bx bx-image'></i></button>
                         <button class="action-btn btn-approve" title="อนุมัติสลิป" onclick="approveSlip('${bill.id}')" style="color:#10b981;"><i class='bx bx-check'></i></button>
                         <button class="action-btn" title="ให้ส่งใหม่" onclick="rejectSlip('${bill.id}')" style="color:#ef4444;"><i class='bx bx-x'></i></button>
                     `;
@@ -381,23 +387,21 @@
             });
         }
 
-        function viewSlipNewTab(billId) {
+        function openSlipModal(billId) {
             const bill = allBills.find(b => b.id == billId);
             const slipImage = bill ? bill.slip_image : null;
             
             if (slipImage && slipImage !== 'undefined') {
-                const w = window.open("");
-                w.document.write(`
-                    <html>
-                    <head><title>สลิปโอนเงิน (บิล ${bill.month})</title></head>
-                    <body style="margin:0; display:flex; justify-content:center; align-items:center; background:#0f172a; min-height:100vh;">
-                        <img src="${slipImage}" style="max-width:100%; max-height:100vh; object-fit:contain; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
-                    </body>
-                    </html>
-                `);
+                document.getElementById('slipImagePreview').src = slipImage;
+                document.getElementById('slipModal').style.display = 'flex';
             } else {
                 alert("บิลนี้ไม่มีรูปสลิปในระบบครับ");
             }
+        }
+
+        function closeSlipModal() {
+            document.getElementById('slipModal').style.display = 'none';
+            document.getElementById('slipImagePreview').src = '';
         }
 
         async function rejectSlip(billId) {

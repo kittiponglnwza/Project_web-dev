@@ -108,30 +108,18 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
     <script>
-        let tenantProfiles = [];
+        let activeTenants = [];
         
-        // กำหนดข้อมูลโครงสร้างห้องชั้น 1 (16 ห้อง)
-        const dormRooms = [
-            { no: '101', type: 'S', price: 5500 },
-            { no: '102', type: 'S', price: 5500 },
-            { no: '103', type: 'S', price: 5500 },
-            { no: '104', type: 'S', price: 5500 },
-            { no: '105', type: 'M', price: 7500 },
-            { no: '106', type: 'M', price: 7500 },
-            { no: '107', type: 'M', price: 7500 },
-            { no: '108', type: 'M', price: 7500 },
-            { no: '109', type: 'M', price: 7500 },
-            { no: '110', type: 'M', price: 7500 },
-            { no: '111', type: 'XL', price: 9000 },
-            { no: '112', type: 'XL', price: 9000 },
-            { no: '113', type: 'XL', price: 9000 },
-            { no: '114', type: 'XL', price: 9000 },
-            { no: '115', type: 'XL', price: 9000 },
-            { no: '116', type: 'XL', price: 9000 }
-        ];
+        function getRoomDetails(roomNo) {
+            if (!roomNo) return { type: '-', price: 0 };
+            const num = parseInt(roomNo.toString().slice(-2));
+            if (num >= 1 && num <= 4) return { type: 'S', price: 5500 };
+            if (num >= 5 && num <= 10) return { type: 'M', price: 7500 };
+            if (num >= 11 && num <= 99) return { type: 'XL', price: 9000 };
+            return { type: '-', price: 0 };
+        }
 
         document.addEventListener("DOMContentLoaded", async () => {
-            // เซ็ตเดือนปัจจุบันอัตโนมัติ
             const thaiMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
             const d = new Date();
             document.getElementById('b_month').value = `${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
@@ -141,9 +129,13 @@
         });
 
         async function loadTenants() {
-            const { data } = await supabaseClient.from('tenant_profiles').select('*').neq('role', 'admin');
+            // ดึงเฉพาะผู้ใช้งานที่ไม่ใช่ admin และมีเลขห้องแล้ว
+            const { data } = await supabaseClient.from('tenant_profiles').select('*').neq('role', 'admin').not('room_no', 'is', null);
             if(data) {
-                tenantProfiles = data;
+                // กรองเอาเฉพาะที่เลขห้องไม่ใช่ค่าว่าง
+                activeTenants = data.filter(t => t.room_no.trim() !== '');
+                // อัปเดตปุ่มบันทึกให้แสดงจำนวนผู้เช่าจริง
+                document.getElementById('save-all-btn').innerHTML = `<i class='bx bx-save'></i> บันทึกบิลทั้งหมด (${activeTenants.length} ห้อง)`;
             }
         }
 
@@ -151,32 +143,39 @@
             const tbody = document.getElementById('rooms-table-body');
             tbody.innerHTML = '';
 
-            dormRooms.forEach((r, index) => {
-                // ค้นหาผู้เช่าที่อยู่ห้องนี้
-                const tenant = tenantProfiles.find(t => t.room_no === r.no);
-                const tenantName = tenant ? tenant.email : '<span style="color:#94a3b8; font-size:12px;">ว่าง</span>';
-                
-                // กำหนดสีป้าย Type
-                const badgeClass = `type-${r.type}`;
+            if (activeTenants.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px;">ไม่มีผู้เช่าที่มีห้องในระบบ</td></tr>';
+                return;
+            }
+
+            // เรียงตามเลขห้อง
+            activeTenants.sort((a, b) => parseInt(a.room_no) - parseInt(b.room_no));
+
+            activeTenants.forEach((tenant) => {
+                const r = getRoomDetails(tenant.room_no);
+                const badgeClass = r.type !== '-' ? `type-${r.type}` : '';
 
                 tbody.innerHTML += `
-                    <tr id="row-${r.no}" data-room="${r.no}" data-email="${tenant ? tenant.email : ''}">
+                    <tr id="row-${tenant.room_no}" data-room="${tenant.room_no}" data-email="${tenant.email}" data-price="${r.price}">
                         <td>
-                            <span class="room-badge ${badgeClass}">${r.type}</span> 
-                            <strong style="margin-left:8px; color:#0f172a;">${r.no}</strong>
+                            ${r.type !== '-' ? `<span class="room-badge ${badgeClass}">${r.type}</span>` : ''} 
+                            <strong style="margin-left:8px; color:#0f172a;">${tenant.room_no}</strong>
                         </td>
-                        <td style="font-size:13px; max-width:150px; overflow:hidden; text-overflow:ellipsis;">${tenantName}</td>
+                        <td style="font-size:13px; max-width:150px; overflow:hidden; text-overflow:ellipsis;">${tenant.email}</td>
                         <td>${r.price.toLocaleString()}</td>
-                        <td><input type="number" class="input-sm calc-input" id="elec-${r.no}" value="0" min="0" oninput="calculateRow('${r.no}', ${r.price})"></td>
-                        <td><input type="number" class="input-sm calc-input" id="water-${r.no}" value="0" min="0" oninput="calculateRow('${r.no}', ${r.price})"></td>
-                        <td><input type="number" class="input-sm calc-input" id="other-${r.no}" value="0" min="0" oninput="calculateRow('${r.no}', ${r.price})"></td>
-                        <td class="total-col" id="total-${r.no}">${r.price.toLocaleString()}</td>
+                        <td><input type="number" class="input-sm calc-input" id="elec-${tenant.room_no}" value="0" min="0" oninput="calculateRow('${tenant.room_no}')"></td>
+                        <td><input type="number" class="input-sm calc-input" id="water-${tenant.room_no}" value="0" min="0" oninput="calculateRow('${tenant.room_no}')"></td>
+                        <td><input type="number" class="input-sm calc-input" id="other-${tenant.room_no}" value="0" min="0" oninput="calculateRow('${tenant.room_no}')"></td>
+                        <td class="total-col" id="total-${tenant.room_no}">${r.price.toLocaleString()}</td>
                     </tr>
                 `;
             });
         }
 
-        function calculateRow(roomNo, basePrice) {
+        function calculateRow(roomNo) {
+            const row = document.getElementById(`row-${roomNo}`);
+            const basePrice = parseInt(row.getAttribute('data-price')) || 0;
+            
             const elecUnit = parseInt(document.getElementById(`elec-${roomNo}`).value) || 0;
             const waterUnit = parseInt(document.getElementById(`water-${roomNo}`).value) || 0;
             const otherFee = parseInt(document.getElementById(`other-${roomNo}`).value) || 0;
@@ -186,13 +185,18 @@
         }
 
         async function saveAllBills() {
+            if (activeTenants.length === 0) {
+                alert("ไม่มีผู้เช่าให้สร้างบิล");
+                return;
+            }
+
             const month = document.getElementById('b_month').value;
             if(!month) {
                 alert("กรุณาระบุประจำเดือน");
                 return;
             }
 
-            if(!confirm(`ยืนยันการสร้างบิลสำหรับเดือน "${month}" จำนวน 16 ห้อง?`)) return;
+            if(!confirm(`ยืนยันการสร้างบิลสำหรับเดือน "${month}" จำนวน ${activeTenants.length} ห้อง?`)) return;
 
             const btn = document.getElementById('save-all-btn');
             btn.disabled = true;
@@ -200,26 +204,21 @@
 
             const billsToInsert = [];
 
-            dormRooms.forEach(r => {
-                const row = document.getElementById(`row-${r.no}`);
-                const email = row.getAttribute('data-email');
+            activeTenants.forEach(tenant => {
+                const roomNo = tenant.room_no;
+                const r = getRoomDetails(roomNo);
                 
-                // ถ้าไม่มีผู้เช่า เราอาจจะบันทึกอีเมลเป็น null หรือ '-' แต่ใน Supabase อาจจะเกิดปัญหา foreign key 
-                // หรือเราจะบันทึกแค่ห้องที่มีคนอยู่ก็ได้ แต่โจทย์คือ "บันทึกรายเดือน 16 ห้อง"
-                // จะลองกำหนดเป็น empty string ไปก่อนถ้าไม่มี
-                const finalEmail = email || '-'; 
-
-                const elecUnit = parseInt(document.getElementById(`elec-${r.no}`).value) || 0;
-                const waterUnit = parseInt(document.getElementById(`water-${r.no}`).value) || 0;
-                const otherFee = parseInt(document.getElementById(`other-${r.no}`).value) || 0;
+                const elecUnit = parseInt(document.getElementById(`elec-${roomNo}`).value) || 0;
+                const waterUnit = parseInt(document.getElementById(`water-${roomNo}`).value) || 0;
+                const otherFee = parseInt(document.getElementById(`other-${roomNo}`).value) || 0;
                 
                 const elecFee = elecUnit * 8;
                 const waterFee = waterUnit * 18;
                 const totalAmount = r.price + elecFee + waterFee + otherFee;
 
                 billsToInsert.push({
-                    email: finalEmail,
-                    room_no: r.no,
+                    email: tenant.email,
+                    room_no: roomNo,
                     month: month,
                     rent_fee: r.price,
                     other_fee: otherFee,
@@ -228,20 +227,20 @@
                     water_unit: waterUnit,
                     water_fee: waterFee,
                     amount: totalAmount,
-                    status: 'pending' // รอลูกบ้านชำระ
+                    status: 'pending' 
                 });
             });
 
-            // บันทึกเข้า Supabase ทีเดียวทั้งหมด (Bulk Insert)
+            // Bulk Insert
             const { data, error } = await supabaseClient.from('bills').insert(billsToInsert);
 
             if (error) {
                 alert('เกิดข้อผิดพลาดในการสร้างบิล: ' + error.message);
                 console.error(error);
                 btn.disabled = false;
-                btn.innerHTML = `<i class='bx bx-save'></i> บันทึกบิลทั้งหมด (16 ห้อง)`;
+                btn.innerHTML = `<i class='bx bx-save'></i> บันทึกบิลทั้งหมด (${activeTenants.length} ห้อง)`;
             } else {
-                alert('สร้างบิลรายเดือนสำเร็จ 16 ห้องรวด!');
+                alert(`สร้างบิลรายเดือนสำเร็จ ${activeTenants.length} ห้องรวด!`);
                 window.location.href = 'billing.html';
             }
         }

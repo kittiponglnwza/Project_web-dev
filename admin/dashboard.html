@@ -131,8 +131,11 @@
         <div class="dash-layout">
             <!-- Left Column: Chart -->
             <div class="card">
-                <div class="card-header">
-                    <h3><i class='bx bx-line-chart'></i> แนวโน้มรายรับรายเดือน (6 เดือนล่าสุด)</h3>
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0;"><i class='bx bx-line-chart'></i> สรุปรายรับ</h3>
+                    <select id="chart-year-filter" onchange="filterChart()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'Prompt'; font-size: 13px; outline: none; cursor: pointer;">
+                        <option value="all">รวมทุกปี</option>
+                    </select>
                 </div>
                 <div style="position: relative; height: 300px; width: 100%;">
                     <canvas id="revenueChart"></canvas>
@@ -268,6 +271,9 @@
             }
         }
 
+        let globalBills = [];
+        let revenueChartInstance = null;
+
         async function fetchDashboardData() {
             // 1. Fetch Tenants
             const { data: tenants } = await supabaseClient.from('tenant_profiles').select('*').neq('role', 'admin');
@@ -286,24 +292,25 @@
             const { data: bills } = await supabaseClient.from('bills').select('*');
             let currentRevenue = 0;
             let pendingSlips = 0;
-            let revenueByMonth = {};
 
             if (bills) {
-                // หาเดือนล่าสุดที่มีการเปิดบิล
+                globalBills = bills;
                 const allMonths = [...new Set(bills.map(b => b.month))];
-                // เรียงเดือน
                 bills.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-                
                 const latestMonth = allMonths.length > 0 ? bills[bills.length-1].month : '';
+
+                // Populate Year Filter Dropdown
+                const allYears = [...new Set(bills.map(b => (b.month.split(' ')[1] || '')))].filter(y => y);
+                const select = document.getElementById('chart-year-filter');
+                select.innerHTML = '<option value="all">รวมทุกปี</option>';
+                allYears.sort().reverse().forEach(y => {
+                    select.innerHTML += `<option value="${y}">ปี ${y}</option>`;
+                });
 
                 bills.forEach(b => {
                     if (b.status === 'checking') pendingSlips++;
-                    
-                    if (b.status === 'paid') {
-                        if (b.month === latestMonth) {
-                            currentRevenue += b.amount;
-                        }
-                        revenueByMonth[b.month] = (revenueByMonth[b.month] || 0) + b.amount;
+                    if (b.status === 'paid' && b.month === latestMonth) {
+                        currentRevenue += b.amount;
                     }
                 });
             }
@@ -323,11 +330,9 @@
                 });
             }
 
-            // Render Alerts
+            // Render Alerts & Initial Chart
             renderAlerts(pendingMaintenance.length, pendingSlips, expiringContracts, (chats ? chats.length : 0));
-
-            // Render Chart
-            renderChart(revenueByMonth);
+            filterChart();
         }
 
         function renderAlerts(maintenanceCount, slipsCount, expiryCount, chatCount) {
@@ -386,11 +391,30 @@
             }
         }
 
+        function filterChart() {
+            const selectedYear = document.getElementById('chart-year-filter').value;
+            let revenueByMonth = {};
+            
+            globalBills.forEach(b => {
+                if (b.status === 'paid') {
+                    const year = b.month.split(' ')[1] || '';
+                    if (selectedYear === 'all' || year === selectedYear) {
+                        revenueByMonth[b.month] = (revenueByMonth[b.month] || 0) + b.amount;
+                    }
+                }
+            });
+            
+            renderChart(revenueByMonth);
+        }
+
         function renderChart(revenueByMonth) {
             const ctx = document.getElementById('revenueChart').getContext('2d');
             
-            // Extract last 6 months (or whatever is available)
-            const labels = Object.keys(revenueByMonth).slice(-6);
+            if (revenueChartInstance) {
+                revenueChartInstance.destroy();
+            }
+
+            const labels = Object.keys(revenueByMonth);
             const data = labels.map(l => revenueByMonth[l]);
 
             if (labels.length === 0) {
@@ -398,25 +422,53 @@
                 data.push(0);
             }
 
-            new Chart(ctx, {
+            let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.8)');
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.1)');
+
+            revenueChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'รายรับ (บาท)',
                         data: data,
-                        backgroundColor: '#3b82f6',
+                        backgroundColor: gradient,
+                        borderColor: '#3b82f6',
+                        borderWidth: 2,
                         borderRadius: 6,
+                        maxBarThickness: 60,
+                        hoverBackgroundColor: '#2563eb'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            titleFont: { family: 'Prompt', size: 14 },
+                            bodyFont: { family: 'Prompt', size: 14 },
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString() + ' บาท';
+                                }
+                            }
+                        }
                     },
                     scales: {
-                        y: { beginAtZero: true }
+                        y: { 
+                            beginAtZero: true,
+                            grid: { borderDash: [5, 5] },
+                            ticks: { font: { family: 'Prompt' } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Prompt' } }
+                        }
                     }
                 }
             });

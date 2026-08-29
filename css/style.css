@@ -37,6 +37,12 @@ header { background-color: var(--primary-color); color: #fff; padding: 15px 20px
 .info-content p { color: #475569; line-height: 1.6; font-size: 1rem; font-weight: 300; margin: 0; }
 .nearby-list { margin: 15px 0 0 0; padding-left: 20px; color: #475569; font-weight: 300; line-height: 1.8; font-size: 0.95rem; }
 
+.location-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 768px) {
+    .location-grid { grid-template-columns: 1fr; }
+    .info-tabs { overflow-x: auto; white-space: nowrap; padding-bottom: 5px; }
+}
+
 .room-section { padding: 40px 20px; text-align: center; background-color: var(--bg-color); }
 .room-section h2 { font-weight: 600; color: var(--primary-color); margin-bottom: 10px; }
 .list-container { display: flex; flex-direction: column; gap: 20px; max-width: 900px; margin: 20px auto; } 

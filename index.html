@@ -55,25 +55,58 @@
                 </div>
 
                 <div class="info-tabs">
-                    <button class="tab-btn active">Highlight</button>
-                    <button class="tab-btn">สถานที่ใกล้เคียง</button>
-                    <button class="tab-btn">สิ่งอำนวยความสะดวก</button>
+                    <button class="tab-btn active" onclick="switchTab(event, 'highlight')">Highlight</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'location')">แผนที่และสถานที่ใกล้เคียง</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'amenities')">สิ่งอำนวยความสะดวก</button>
                 </div>
 
-                <div class="info-content">
-                    <p><strong>MyDorm Apartment</strong> โครงการตั้งอยู่ทำเลทอง ใกล้คณะวิทยาศาสตร์ประยุกต์ มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ (มจพ.) เพียงระยะเดิน 5 นาที หน้าโครงการมีร้านสะดวกซื้อ 7-11, ร้านอาหาร, และคาเฟ่มากมาย ตอบโจทย์ไลฟ์สไตล์นักศึกษาและวัยทำงานที่ต้องการความสะดวกสบายและความปลอดภัยขั้นสูงสุด</p>
-                    
-                    <h4 style="margin-top: 25px; color: #111; font-weight: 600;">📍 สถานที่สำคัญใกล้เคียง</h4>
-                    <ul class="nearby-list">
-                        <li>ม.เทคโนโลยีพระจอมเกล้าพระนครเหนือ (มจพ.) : 300 ม.</li>
-                        <li>คณะวิทยาศาสตร์ประยุกต์ มจพ. : 350 ม.</li>
-                        <li>ร้านสะดวกซื้อ 7-11 / ร้านอาหาร : 50 ม.</li>
-                        <li>ตลาดนัด / ศูนย์อาหาร : 150 ม.</li>
-                        <li>MRT สายสีม่วง (สถานีวงศ์สว่าง) : 2.5 กม.</li>
-                        <li>โรงพยาบาลเกษมราษฎร์ ประชาชื่น : 3.2 กม.</li>
-                        <li>Gateway บางซื่อ : 4.5 กม.</li>
-                    </ul>
+                <div class="info-content-area" id="tab-highlight">
+                    <p style="margin: 0; line-height: 1.8; color: #475569;"><strong>MyDorm Apartment</strong> โครงการตั้งอยู่ทำเลทอง ใกล้คณะวิทยาศาสตร์ประยุกต์ มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ (มจพ.) เพียงระยะเดิน 5 นาที หน้าโครงการมีร้านสะดวกซื้อ 7-11, ร้านอาหาร, และคาเฟ่มากมาย ตอบโจทย์ไลฟ์สไตล์นักศึกษาและวัยทำงานที่ต้องการความสะดวกสบายและความปลอดภัยขั้นสูงสุด พร้อมส่วนกลางระดับพรีเมียมที่ทำให้คุณพักผ่อนได้อย่างเต็มที่ในทุกๆ วัน</p>
                 </div>
+
+                <div class="info-content-area" id="tab-location" style="display: none;">
+                    <div class="location-grid">
+                        <div>
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3874.195325852924!2d100.51179781527787!3d13.821257490299888!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29b794025a1e7%3A0x6b7782b75fba1419!2sFaculty%20of%20Applied%20Science%2C%20KMUTNB!5e0!3m2!1sen!2sth!4v1714578161578!5m2!1sen!2sth" width="100%" height="250" style="border:0; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+                        <div>
+                            <h4 style="margin-top: 0; color: #111; font-weight: 600;">📍 สถานที่สำคัญใกล้เคียง</h4>
+                            <ul class="nearby-list">
+                                <li>ม.เทคโนโลยีพระจอมเกล้าพระนครเหนือ (มจพ.) : 300 ม.</li>
+                                <li>คณะวิทยาศาสตร์ประยุกต์ มจพ. : 350 ม.</li>
+                                <li>ร้านสะดวกซื้อ 7-11 / ร้านอาหาร : 50 ม.</li>
+                                <li>ตลาดนัด / ศูนย์อาหาร : 150 ม.</li>
+                                <li>MRT สายสีม่วง (สถานีวงศ์สว่าง) : 2.5 กม.</li>
+                                <li>โรงพยาบาลเกษมราษฎร์ ประชาชื่น : 3.2 กม.</li>
+                                <li>Gateway บางซื่อ : 4.5 กม.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-content-area" id="tab-amenities" style="display: none;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 10px;">
+                        <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-wifi' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> ฟรี Wi-Fi ความเร็วสูง</div>
+                        <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bxs-car-garage' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> ที่จอดรถกว้างขวาง</div>
+                        <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-cctv' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> กล้องวงจรปิด CCTV 24 ชม.</div>
+                        <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-key' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> ระบบ Keycard เข้า-ออก</div>
+                        <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-wind' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> เครื่องปรับอากาศทุกห้อง</div>
+                        <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bxs-washer' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> เครื่องซักผ้าหยอดเหรียญ</div>
+                        <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-water' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> ตู้กดน้ำดื่มหยอดเหรียญ</div>
+                        <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-support' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> เจ้าหน้าที่ รปภ. ดูแล 24 ชม.</div>
+                        <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-dumbbell' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> ฟิตเนสส่วนกลาง</div>
+                    </div>
+                </div>
+
+                <script>
+                    function switchTab(evt, tabId) {
+                        document.querySelectorAll('.info-content-area').forEach(el => el.style.display = 'none');
+                        document.getElementById('tab-' + tabId).style.display = 'block';
+                        
+                        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                        evt.currentTarget.classList.add('active');
+                    }
+                </script>
             </div>
         </section>
 

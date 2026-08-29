@@ -277,7 +277,7 @@
         }
 
         async function updateStatus(id, newStatus) {
-            const req = allRequests.find(r => r.id === id);
+            const req = allRequests.find(r => r.id == id);
             let confirmMsg = newStatus === 'in_progress' ? 
                 'รับเรื่องและส่งสถานะ "กำลังดำเนินการ" ไปยังแชทของผู้เช่าใช่หรือไม่?' : 
                 'ยืนยันว่าช่างได้ "ซ่อมเสร็จสิ้น" และส่งแจ้งเตือนไปที่แชทผู้เช่า?';

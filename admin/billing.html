@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
+<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการบิลค่าเช่า (Admin) - Dorminator</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background-color: #f8fafc; margin: 0; font-family: 'Prompt', sans-serif; display: flex; height: 100vh; overflow: hidden; }
@@ -75,26 +73,26 @@
 </head>
 <body>
 
-    <div class="sidebar">
+    <nav class="sidebar">
         <div class="logo">Dorminator Admin</div>
-        <a href="dashboard.html"><i class='bx bxs-dashboard'></i> ภาพรวม (Dashboard)</a>
-        <a href="billing.html" class="active"><i class='bx bx-receipt'></i> จัดการบิล / ตรวจสลิป</a>
-        <a href="users.html"><i class='bx bx-user-pin'></i> จัดการผู้เช่า / ห้องพัก</a>
-        <a href="maintenance.html"><i class='bx bx-wrench'></i> รายการแจ้งซ่อม</a>
-        <a href="chat.html"><i class='bx bxs-message-dots'></i> ข้อความ (Chat)</a>
+        <a href="dashboard.html"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html" class="active"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
+        <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
+        <a href="maintenance.html"><i class="bx bx-wrench"></i> รายการแจ้งซ่อม</a>
+        <a href="chat.html"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
         
-        <a href="#" class="logout" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
-    </div>
+        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </nav>
 
-    <div class="main-content">
-        <div class="header-actions">
+    <main class="main-content">
+        <header class="header-actions">
             <h2>ระบบสรุปรายเดือน (Monthly Record)</h2>
-            <a href="create_bill.html" class="btn-primary"><i class='bx bx-plus'></i> สร้างบิลใหม่</a>
-        </div>
+            <a href="create_bill.html" class="btn-primary"><i class="bx bx-plus"></i> สร้างบิลใหม่</a>
+        </header>
 
         <!-- Alert Section -->
         <div class="alert-box" id="expiry-alert">
-            <h4><i class='bx bxs-bell-ring bx-tada'></i> แจ้งเตือน: ผู้เช่าใกล้หมดอายุสัญญา (ภายใน 30 วัน)</h4>
+            <h4><i class="bx bxs-bell-ring bx-tada"></i> แจ้งเตือน: ผู้เช่าใกล้หมดอายุสัญญา (ภายใน 30 วัน)</h4>
             <ul class="alert-list" id="expiry-list">
                 <!-- Data injected here -->
             </ul>
@@ -114,36 +112,36 @@
         </div>
 
         <!-- Stats Grid -->
-        <div class="stats-grid">
+        <section class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon bg-blue"><i class='bx bx-money'></i></div>
+                <div class="stat-icon bg-blue"><i class="bx bx-money"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-total">0 ฿</h3>
                     <p>ยอดเรียกเก็บรวม</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon bg-green"><i class='bx bx-check-shield'></i></div>
+                <div class="stat-icon bg-green"><i class="bx bx-check-shield"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-paid">0 ฿</h3>
                     <p>รับชำระแล้ว (<span id="count-paid">0</span> บิล)</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon bg-orange"><i class='bx bx-time'></i></div>
+                <div class="stat-icon bg-orange"><i class="bx bx-time"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-checking">0</h3>
                     <p>รอตรวจสลิป (บิล)</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon bg-red"><i class='bx bx-x-circle'></i></div>
+                <div class="stat-icon bg-red"><i class="bx bx-x-circle"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-unpaid">0 ฿</h3>
                     <p>ค้างชำระ (<span id="count-unpaid">0</span> บิล)</p>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Table Card -->
         <div class="card">
@@ -171,11 +169,11 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </main>
 
     <!-- Slip Modal -->
     <div id="slipModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.9); z-index:9999; justify-content:center; align-items:center; flex-direction:column;">
-        <span onclick="closeSlipModal()" style="position:absolute; top:30px; right:40px; color:#fff; font-size:40px; cursor:pointer;">&times;</span>
+        <span onclick="closeSlipModal()" style="position:absolute; top:30px; right:40px; color:#fff; font-size:40px; cursor:pointer;">×</span>
         <img id="slipImagePreview" src="" style="max-width:90%; max-height:85vh; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
     </div>
 
@@ -462,5 +460,6 @@
             window.location.href = "../login.html";
         }
     </script>
-</body>
-</html>
+
+
+</body></html>

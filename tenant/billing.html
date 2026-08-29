@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
+<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>รายการค้างชำระ - Dorminator</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <style>
@@ -67,17 +65,17 @@
 </head>
 <body>
 
-    <div class="sidebar">
+    <nav class="sidebar">
         <div class="sidebar-logo">Dorminator</div>
-        <a href="dashboard.html" class="nav-link"><i class='bx bx-grid-alt'></i> ภาพรวม (Dashboard)</a>
-        <a href="billing.html" class="nav-link active"><i class='bx bx-receipt'></i> รายการค้างชำระ</a>
-        <a href="maintenance.html" class="nav-link"><i class='bx bx-wrench'></i> แจ้งซ่อม/ปัญหา</a>
-        <a href="profile.html" class="nav-link"><i class='bx bx-user'></i> ข้อมูลผู้เช่า</a>
-        <a href="chat.html" class="nav-link"><i class='bx bx-message-square-dots'></i> ติดต่อนิติบุคคล</a>
-        <a href="#" class="nav-link logout-btn" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
-    </div>
+        <a href="dashboard.html" class="nav-link"><i class="bx bx-grid-alt"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html" class="nav-link active"><i class="bx bx-receipt"></i> รายการค้างชำระ</a>
+        <a href="maintenance.html" class="nav-link"><i class="bx bx-wrench"></i> แจ้งซ่อม/ปัญหา</a>
+        <a href="profile.html" class="nav-link"><i class="bx bx-user"></i> ข้อมูลผู้เช่า</a>
+        <a href="chat.html" class="nav-link"><i class="bx bx-message-square-dots"></i> ติดต่อนิติบุคคล</a>
+        <a href="#" class="nav-link logout-btn" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </nav>
 
-    <div class="main-content">
+    <main class="main-content">
         <h1 class="page-title">รายการค้างชำระและประวัติ</h1>
         
         <div class="recent-section">
@@ -99,12 +97,12 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </main>
 
     <!-- Payment Modal -->
     <div id="paymentModal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <span class="close-btn" onclick="closeModal()">×</span>
             <h2 style="margin-top: 0;">ชำระเงินผ่านสแกน QR</h2>
             <p id="modal-bill-details" style="color: #6b7280; margin-bottom: 20px;">รอบบิล: - | ยอดชำระ: - บาท</p>
             
@@ -115,7 +113,7 @@
             
             <div style="margin: 20px 0; text-align: left;">
                 <label style="font-size: 0.9rem; color: #6b7280;">แนบสลิปโอนเงิน (สลิปการโอน):</label>
-                <input type="file" id="slipUpload" class="lux-input" accept="image/*" required>
+                <input type="file" id="slipUpload" class="lux-input" accept="image/*" required="">
             </div>
             
             <button class="pay-btn" style="width: 100%; padding: 12px; font-size: 1.05rem;" id="confirmPayBtn" onclick="confirmPayment()">ยืนยันการโอนเงิน</button>
@@ -127,7 +125,7 @@
         <div class="invoice-modal">
             <div class="invoice-header">
                 <h2 class="invoice-title" id="detail-month">เดือน</h2>
-                <span class="close-btn" style="position: static; font-size: 1.8rem; color: #9ca3af;" onclick="closeDetailModal()">&times;</span>
+                <span class="close-btn" style="position: static; font-size: 1.8rem; color: #9ca3af;" onclick="closeDetailModal()">×</span>
             </div>
             <div class="invoice-body">
                 <h3 class="invoice-section-title">รายละเอียด</h3>
@@ -178,7 +176,7 @@
 
                 <div class="invoice-row" style="align-items: center; margin-top: 15px;">
                     <span>- ใบเสร็จรับเงินอิเล็กทรอนิกส์ :</span>
-                    <i class='bx bxs-file-pdf' style="color: #ef4444; font-size: 2.2rem; cursor: pointer; transition: 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="ดาวน์โหลด PDF" onclick="downloadPDF()"></i>
+                    <i class="bx bxs-file-pdf" style="color: #ef4444; font-size: 2.2rem; cursor: pointer; transition: 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="ดาวน์โหลด PDF" onclick="downloadPDF()"></i>
                 </div>
             </div>
         </div>
@@ -545,6 +543,7 @@
             reader.readAsDataURL(file);
         }
     </script>
-</body>
-</html>
 
+
+
+</body></html>

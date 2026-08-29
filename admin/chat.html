@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
+<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบตอบแชทลูกค้า (Admin) - Dorminator</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -79,16 +77,16 @@
 <body>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <nav class="sidebar">
         <div class="logo">Dorminator Admin</div>
-        <a href="dashboard.html"><i class='bx bxs-dashboard'></i> ภาพรวม (Dashboard)</a>
-        <a href="billing.html"><i class='bx bx-receipt'></i> จัดการบิล / ตรวจสลิป</a>
-        <a href="users.html"><i class='bx bx-user-pin'></i> จัดการผู้เช่า / ห้องพัก</a>
-        <a href="maintenance.html"><i class='bx bx-wrench'></i> รายการแจ้งซ่อม</a>
-        <a href="chat.html" class="active"><i class='bx bxs-message-dots'></i> ข้อความ (Chat)</a>
+        <a href="dashboard.html"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
+        <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
+        <a href="maintenance.html"><i class="bx bx-wrench"></i> รายการแจ้งซ่อม</a>
+        <a href="chat.html" class="active"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
         
-        <a href="#" class="logout" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
-    </div>
+        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </nav>
 
     <!-- Main Content -->
     <div class="main-wrapper">
@@ -98,7 +96,7 @@
             <div class="chat-list-header">
                 <h2>กล่องข้อความ</h2>
                 <div class="search-box">
-                    <i class='bx bx-search'></i>
+                    <i class="bx bx-search"></i>
                     <input type="text" id="search-input" placeholder="ค้นหาห้องพัก หรือ อีเมล...">
                 </div>
             </div>
@@ -112,14 +110,14 @@
             
             <!-- Default State (No chat selected) -->
             <div class="empty-chat-state" id="empty-state">
-                <i class='bx bx-message-square-dots'></i>
+                <i class="bx bx-message-square-dots"></i>
                 <h2>ระบบจัดการแชท</h2>
                 <p>เลือกผู้เช่าจากแถบด้านซ้ายเพื่อเริ่มสนทนา</p>
             </div>
 
             <!-- Active Chat Header -->
             <div class="chat-window-header" id="chat-header" style="display: none;">
-                <div class="contact-avatar"><i class='bx bx-user'></i></div>
+                <div class="contact-avatar"><i class="bx bx-user"></i></div>
                 <div>
                     <h3 id="active-chat-name">ผู้เช่า</h3>
                     <p id="active-chat-email">email@example.com</p>
@@ -133,8 +131,8 @@
 
             <!-- Input Form -->
             <form class="chat-input-area" id="chat-form" style="display: none;">
-                <input type="text" id="msg-input" placeholder="พิมพ์ข้อความตอบกลับ..." autocomplete="off" required>
-                <button type="submit" class="btn-send"><i class='bx bxs-send'></i></button>
+                <input type="text" id="msg-input" placeholder="พิมพ์ข้อความตอบกลับ..." autocomplete="off" required="">
+                <button type="submit" class="btn-send"><i class="bx bxs-send"></i></button>
             </form>
 
         </div>
@@ -434,5 +432,6 @@
             window.location.href = "../login.html";
         }
     </script>
-</body>
-</html>
+
+
+</body></html>

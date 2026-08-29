@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
+<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการแจ้งซ่อม (Admin) - Dorminator</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background-color: #f8fafc; margin: 0; font-family: 'Prompt', sans-serif; display: flex; height: 100vh; overflow: hidden; }
@@ -62,21 +60,21 @@
 </head>
 <body>
 
-    <div class="sidebar">
+    <nav class="sidebar">
         <div class="logo">Dorminator Admin</div>
-        <a href="dashboard.html"><i class='bx bxs-dashboard'></i> ภาพรวม (Dashboard)</a>
-        <a href="billing.html"><i class='bx bx-receipt'></i> จัดการบิล / ตรวจสลิป</a>
-        <a href="users.html"><i class='bx bx-user-pin'></i> จัดการผู้เช่า / ห้องพัก</a>
-        <a href="maintenance.html" class="active"><i class='bx bx-wrench'></i> รายการแจ้งซ่อม</a>
-        <a href="chat.html"><i class='bx bxs-message-dots'></i> ข้อความ (Chat)</a>
+        <a href="dashboard.html"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
+        <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
+        <a href="maintenance.html" class="active"><i class="bx bx-wrench"></i> รายการแจ้งซ่อม</a>
+        <a href="chat.html"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
         
-        <a href="#" class="logout" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
-    </div>
+        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </nav>
 
-    <div class="main-content">
-        <div class="header-actions">
+    <main class="main-content">
+        <header class="header-actions">
             <h2>ระบบสรุปรายการแจ้งซ่อมรายเดือน</h2>
-        </div>
+        </header>
 
         <div class="dashboard-header">
             <div class="month-selector">
@@ -90,29 +88,29 @@
             </div>
         </div>
 
-        <div class="stats-grid">
+        <section class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon bg-blue"><i class='bx bx-wrench'></i></div>
+                <div class="stat-icon bg-blue"><i class="bx bx-wrench"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-total">0</h3>
                     <p>รายการแจ้งซ่อมทั้งหมด</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon bg-orange"><i class='bx bx-time'></i></div>
+                <div class="stat-icon bg-orange"><i class="bx bx-time"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-pending">0</h3>
                     <p>รอดำเนินการ / กำลังซ่อม</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon bg-green"><i class='bx bx-check-shield'></i></div>
+                <div class="stat-icon bg-green"><i class="bx bx-check-shield"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-completed">0</h3>
                     <p>ซ่อมเสร็จแล้ว</p>
                 </div>
             </div>
-        </div>
+        </section>
 
         <div class="card">
             <div class="filter-bar">
@@ -138,7 +136,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </main>
 
     <script src="../js/supabase-config.js"></script>
     <script>
@@ -323,5 +321,6 @@
             window.location.href = "../login.html";
         }
     </script>
-</body>
-</html>
+
+
+</body></html>

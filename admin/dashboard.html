@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
+<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Dorminator</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -72,67 +70,67 @@
 <body>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <nav class="sidebar">
         <div class="logo">Dorminator Admin</div>
-        <a href="dashboard.html" class="active"><i class='bx bxs-dashboard'></i> ภาพรวม (Dashboard)</a>
-        <a href="billing.html"><i class='bx bx-receipt'></i> จัดการบิล / ตรวจสลิป</a>
-        <a href="users.html"><i class='bx bx-user-pin'></i> จัดการผู้เช่า / ห้องพัก</a>
-        <a href="maintenance.html"><i class='bx bx-wrench'></i> รายการแจ้งซ่อม</a>
-        <a href="chat.html"><i class='bx bxs-message-dots'></i> ข้อความ (Chat)</a>
+        <a href="dashboard.html" class="active"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
+        <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
+        <a href="maintenance.html"><i class="bx bx-wrench"></i> รายการแจ้งซ่อม</a>
+        <a href="chat.html"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
         
-        <a href="#" class="logout" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
-    </div>
+        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </nav>
 
     <!-- Main Content -->
-    <div class="main-content">
-        <div class="header-actions">
+    <main class="main-content">
+        <header class="header-actions">
             <div>
                 <h2>ศูนย์ควบคุมระบบ (Command Center)</h2>
                 <p style="margin: 5px 0 0; color: #64748b; font-size: 14px;" id="current-date">กำลังโหลดข้อมูล...</p>
             </div>
             <div style="background: #e2e8f0; padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 8px;">
-                <i class='bx bxs-user-circle'></i>
+                <i class="bx bxs-user-circle"></i>
                 <span style="font-weight: 500; color: #334155;">ผู้ดูแลระบบ (Admin)</span>
             </div>
-        </div>
+        </header>
 
         <!-- Statistics Cards -->
-        <div class="stats-grid">
+        <section class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon bg-green"><i class='bx bx-money'></i></div>
+                <div class="stat-icon bg-green"><i class="bx bx-money"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-revenue">0 ฿</h3>
                     <p>รายรับรวมเดือนนี้</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon bg-blue"><i class='bx bx-group'></i></div>
+                <div class="stat-icon bg-blue"><i class="bx bx-group"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-tenants">0</h3>
                     <p>ผู้เช่าทั้งหมดในระบบ</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon bg-orange"><i class='bx bx-wrench'></i></div>
+                <div class="stat-icon bg-orange"><i class="bx bx-wrench"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-maintenance">0</h3>
                     <p>แจ้งซ่อมรอดำเนินการ</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon bg-red"><i class='bx bxs-message-rounded-error'></i></div>
+                <div class="stat-icon bg-red"><i class="bx bxs-message-rounded-error"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-chat">0</h3>
                     <p>ข้อความใหม่ยังไม่ได้อ่าน</p>
                 </div>
             </div>
-        </div>
+        </section>
 
         <div class="dash-layout">
             <!-- Left Column: Announcements Section -->
             <div class="card">
                 <div class="card-header">
-                    <h3><i class='bx bxs-megaphone'></i> จัดการข่าวประชาสัมพันธ์ (Announcements)</h3>
+                    <h3><i class="bx bxs-megaphone"></i> จัดการข่าวประชาสัมพันธ์ (Announcements)</h3>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -141,11 +139,11 @@
                         <form id="announcement-form" style="display: flex; flex-direction: column; gap: 15px;">
                             <div>
                                 <label style="font-size: 13px; color: #64748b; font-weight: 500;">หัวข้อประกาศ</label>
-                                <input type="text" id="announce-title" required style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px;" placeholder="เช่น แจ้งล้างแอร์ประจำปี 2567">
+                                <input type="text" id="announce-title" required="" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px;" placeholder="เช่น แจ้งล้างแอร์ประจำปี 2567">
                             </div>
                             <div>
                                 <label style="font-size: 13px; color: #64748b; font-weight: 500;">รายละเอียด</label>
-                                <textarea id="announce-content" required rows="4" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px; resize: vertical;" placeholder="กรอกรายละเอียดข่าวสาร..."></textarea>
+                                <textarea id="announce-content" required="" rows="4" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px; resize: vertical;" placeholder="กรอกรายละเอียดข่าวสาร..."></textarea>
                             </div>
                             <div>
                                 <label style="font-size: 13px; color: #64748b; font-weight: 500;">ประเภท (สีแถบด้านข้าง)</label>
@@ -172,7 +170,7 @@
             <!-- Right Column: Action Alerts -->
             <div class="card">
                 <div class="card-header">
-                    <h3><i class='bx bxs-bell-ring'></i> สิ่งที่ต้องจัดการด่วน</h3>
+                    <h3><i class="bx bxs-bell-ring"></i> สิ่งที่ต้องจัดการด่วน</h3>
                 </div>
                 <div class="alert-list" id="alert-list">
                     <div style="text-align: center; color: #94a3b8; padding: 20px;">กำลังโหลด...</div>
@@ -183,7 +181,7 @@
         <!-- Full Width Chart -->
         <div class="card" style="margin-top: 20px;">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin: 0;"><i class='bx bx-line-chart'></i> สรุปรายรับ (Revenue Trend)</h3>
+                <h3 style="margin: 0;"><i class="bx bx-line-chart"></i> สรุปรายรับ (Revenue Trend)</h3>
                 <select id="chart-year-filter" onchange="filterChart()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'Prompt'; font-size: 13px; outline: none; cursor: pointer;">
                     <option value="all">รวมทุกปี</option>
                 </select>
@@ -192,7 +190,7 @@
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
-    </div>
+    </main>
 
     <script src="../js/supabase-config.js"></script>
     <script>
@@ -495,5 +493,6 @@
             window.location.href = "../login.html";
         }
     </script>
-</body>
-</html>
+
+
+</body></html>

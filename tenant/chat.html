@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
+<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ติดต่อแอดมิน - Dorminator</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -70,22 +68,22 @@
 <body>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <nav class="sidebar">
         <div class="sidebar-logo">Dorminator</div>
-        <a href="dashboard.html" class="nav-link"><i class='bx bx-grid-alt'></i> ภาพรวม (Dashboard)</a>
-        <a href="billing.html" class="nav-link"><i class='bx bx-receipt'></i> รายการบิล / ชำระเงิน</a>
-        <a href="maintenance.html" class="nav-link"><i class='bx bx-wrench'></i> แจ้งซ่อม/ปัญหา</a>
-        <a href="profile.html" class="nav-link"><i class='bx bx-user'></i> ข้อมูลส่วนตัว</a>
-        <a href="chat.html" class="nav-link active"><i class='bx bx-message-square-dots'></i> ติดต่อนิติบุคคล</a>
-        <a href="#" class="nav-link logout-btn" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
-    </div>
+        <a href="dashboard.html" class="nav-link"><i class="bx bx-grid-alt"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html" class="nav-link"><i class="bx bx-receipt"></i> รายการบิล / ชำระเงิน</a>
+        <a href="maintenance.html" class="nav-link"><i class="bx bx-wrench"></i> แจ้งซ่อม/ปัญหา</a>
+        <a href="profile.html" class="nav-link"><i class="bx bx-user"></i> ข้อมูลส่วนตัว</a>
+        <a href="chat.html" class="nav-link active"><i class="bx bx-message-square-dots"></i> ติดต่อนิติบุคคล</a>
+        <a href="#" class="nav-link logout-btn" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </nav>
 
     <!-- Main Content -->
-    <div class="main-content">
-        <div class="chat-container">
+    <main class="main-content">
+        <section class="chat-container">
             <!-- Header -->
             <div class="chat-header">
-                <i class='bx bxs-chat'></i>
+                <i class="bx bxs-chat"></i>
                 <div>
                     <h2>ติดต่อนิติบุคคล (Admin)</h2>
                     <p>เจ้าหน้าที่จะตอบกลับในเวลาทำการ 09:00 - 18:00 น.</p>
@@ -106,11 +104,11 @@
 
             <!-- Input Area -->
             <form class="chat-input-area" id="chat-form">
-                <input type="text" id="msg-input" placeholder="พิมพ์ข้อความของคุณที่นี่..." autocomplete="off" required>
-                <button type="submit" class="btn-send"><i class='bx bxs-send'></i></button>
+                <input type="text" id="msg-input" placeholder="พิมพ์ข้อความของคุณที่นี่..." autocomplete="off" required="">
+                <button type="submit" class="btn-send"><i class="bx bxs-send"></i></button>
             </form>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script src="../js/supabase-config.js"></script>
     <script>
@@ -230,5 +228,6 @@
             window.location.href = "../login.html";
         }
     </script>
-</body>
-</html>
+
+
+</body></html>

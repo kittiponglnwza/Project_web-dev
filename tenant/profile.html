@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
+<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ข้อมูลผู้เช่า - Dorminator</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
         body { background-color: #f3f4f6; margin: 0; font-family: 'Prompt', sans-serif; display: flex; }
         .sidebar { width: 260px; background: #fff; height: 100vh; padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05); position: fixed; display: flex; flex-direction: column; z-index: 100; }
@@ -47,22 +45,22 @@
 </head>
 <body>
 
-    <div class="sidebar">
+    <nav class="sidebar">
         <div class="sidebar-logo">Dorminator</div>
-        <a href="dashboard.html" class="nav-link"><i class='bx bx-grid-alt'></i> ภาพรวม (Dashboard)</a>
-        <a href="billing.html" class="nav-link"><i class='bx bx-receipt'></i> รายการค้างชำระ</a>
-        <a href="maintenance.html" class="nav-link"><i class='bx bx-wrench'></i> แจ้งซ่อม/ปัญหา</a>
-        <a href="profile.html" class="nav-link active"><i class='bx bx-user'></i> ข้อมูลส่วนตัว</a>
-        <a href="chat.html" class="nav-link"><i class='bx bx-message-square-dots'></i> ติดต่อนิติบุคคล</a>
-        <a href="#" class="nav-link logout-btn" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
-    </div>
+        <a href="dashboard.html" class="nav-link"><i class="bx bx-grid-alt"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html" class="nav-link"><i class="bx bx-receipt"></i> รายการค้างชำระ</a>
+        <a href="maintenance.html" class="nav-link"><i class="bx bx-wrench"></i> แจ้งซ่อม/ปัญหา</a>
+        <a href="profile.html" class="nav-link active"><i class="bx bx-user"></i> ข้อมูลส่วนตัว</a>
+        <a href="chat.html" class="nav-link"><i class="bx bx-message-square-dots"></i> ติดต่อนิติบุคคล</a>
+        <a href="#" class="nav-link logout-btn" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </nav>
 
-    <div class="main-content">
+    <main class="main-content">
         <h1 class="page-title">แฟ้มประวัติผู้เช่า (Tenant Profile)</h1>
         
         <div class="recent-section">
             
-            <div class="sub-header"><i class='bx bx-user-pin'></i> ข้อมูลส่วนบุคคล (Personal Info)</div>
+            <div class="sub-header"><i class="bx bx-user-pin"></i> ข้อมูลส่วนบุคคล (Personal Info)</div>
             <div class="profile-grid">
                 <div class="info-group">
                     <label>ชื่อ-นามสกุล (Full Name)</label>
@@ -88,7 +86,7 @@
 
             <div class="divider"></div>
 
-            <div class="sub-header"><i class='bx bx-file'></i> ข้อมูลสัญญาเช่า (Lease Agreement)</div>
+            <div class="sub-header"><i class="bx bx-file"></i> ข้อมูลสัญญาเช่า (Lease Agreement)</div>
             <div class="profile-grid">
                 <div class="info-group">
                     <label>หมายเลขห้อง (Room Number)</label>
@@ -110,7 +108,7 @@
 
             <div class="divider"></div>
 
-            <div class="sub-header"><i class='bx bx-phone-call'></i> ผู้ติดต่อฉุกเฉิน (Emergency Contact)</div>
+            <div class="sub-header"><i class="bx bx-phone-call"></i> ผู้ติดต่อฉุกเฉิน (Emergency Contact)</div>
             <div class="profile-grid">
                 <div class="info-group">
                     <label>ชื่อผู้ติดต่อ (Contact Name)</label>
@@ -124,7 +122,7 @@
 
 
         </div>
-    </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
@@ -188,6 +186,7 @@
             }
         });
     </script>
-</body>
-</html>
 
+
+
+</body></html>

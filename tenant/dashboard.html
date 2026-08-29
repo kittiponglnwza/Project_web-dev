@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
+<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แผงควบคุมผู้เช่า - Dorminator</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
         /* Dashboard V1 Styles */
         body { background-color: #f3f4f6; margin: 0; font-family: 'Prompt', sans-serif; display: flex; }
@@ -46,19 +44,19 @@
 <body>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <nav class="sidebar">
         <div class="sidebar-logo">Dorminator</div>
-        <a href="dashboard.html" class="nav-link active"><i class='bx bx-grid-alt'></i> ภาพรวม (Dashboard)</a>
-        <a href="billing.html" class="nav-link"><i class='bx bx-receipt'></i> รายการค้างชำระ</a>
-        <a href="maintenance.html" class="nav-link"><i class='bx bx-wrench'></i> แจ้งซ่อม/ปัญหา</a>
-        <a href="profile.html" class="nav-link"><i class='bx bx-user'></i> ข้อมูลส่วนตัว</a>
-        <a href="chat.html" class="nav-link"><i class='bx bx-message-square-dots'></i> ติดต่อนิติบุคคล</a>
-        <a href="#" class="nav-link logout-btn" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
-    </div>
+        <a href="dashboard.html" class="nav-link active"><i class="bx bx-grid-alt"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html" class="nav-link"><i class="bx bx-receipt"></i> รายการค้างชำระ</a>
+        <a href="maintenance.html" class="nav-link"><i class="bx bx-wrench"></i> แจ้งซ่อม/ปัญหา</a>
+        <a href="profile.html" class="nav-link"><i class="bx bx-user"></i> ข้อมูลส่วนตัว</a>
+        <a href="chat.html" class="nav-link"><i class="bx bx-message-square-dots"></i> ติดต่อนิติบุคคล</a>
+        <a href="#" class="nav-link logout-btn" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </nav>
 
     <!-- Main Content -->
-    <div class="main-content">
-        <div class="top-header">
+    <main class="main-content">
+        <header class="top-header">
             <div>
                 <h1 style="font-size: 1.8rem; margin: 0; color: #111;">ยินดีต้อนรับสู่ระบบจัดการผู้เช่า</h1>
                 <p style="color: #6b7280; margin-top: 5px;" id="welcome-text">กำลังโหลดข้อมูล...</p>
@@ -67,31 +65,31 @@
 
                 <div class="user-profile">
                     <div style="width: 40px; height: 40px; background: #d4af37; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
-                        <i class='bx bx-user'></i>
+                        <i class="bx bx-user"></i>
                     </div>
                     <span id="profile-name">ผู้เช่า</span>
                 </div>
             </div>
-        </div>
+        </header>
 
         <!-- Dashboard Cards -->
-        <div class="dashboard-cards">
+        <section class="dashboard-cards">
             <div class="card">
-                <div class="card-icon" style="background: #fef3c7; color: #d97706;"><i class='bx bx-wallet'></i></div>
+                <div class="card-icon" style="background: #fef3c7; color: #d97706;"><i class="bx bx-wallet"></i></div>
                 <div class="card-title">ยอดค้างชำระเดือนนี้</div>
                 <div class="card-value">4,500 <span style="font-size: 1rem; color: #6b7280; font-weight: 400;">บาท</span></div>
             </div>
             <div class="card">
-                <div class="card-icon" style="background: #d1fae5; color: #059669;"><i class='bx bx-wrench'></i></div>
+                <div class="card-icon" style="background: #d1fae5; color: #059669;"><i class="bx bx-wrench"></i></div>
                 <div class="card-title">สถานะแจ้งซ่อมล่าสุด</div>
                 <div class="card-value" style="font-size: 1.4rem; color: #059669;">เสร็จสิ้น (แอร์ไม่เย็น)</div>
             </div>
             <div class="card">
-                <div class="card-icon" style="background: #e0e7ff; color: #4f46e5;"><i class='bx bx-building-house'></i></div>
+                <div class="card-icon" style="background: #e0e7ff; color: #4f46e5;"><i class="bx bx-building-house"></i></div>
                 <div class="card-title">ห้องพักของคุณ</div>
                 <div class="card-value" style="font-size: 1.4rem;">ห้อง 302 (Standard)</div>
             </div>
-        </div>
+        </section>
 
         <div class="recent-section">
             <div class="section-header">ข่าวประชาสัมพันธ์ล่าสุด</div>
@@ -99,7 +97,7 @@
                 <div style="text-align: center; color: #9ca3af; padding: 20px;">กำลังโหลดประกาศ...</div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
@@ -223,6 +221,7 @@
             }).join('');
         }
     </script>
-</body>
-</html>
 
+
+
+</body></html>

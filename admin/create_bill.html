@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
+<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>สร้างบิลค่าเช่ารายเดือน - Admin Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
         :root {
@@ -61,27 +59,27 @@
 </head>
 <body>
 
-    <div class="sidebar">
+    <nav class="sidebar">
         <div class="logo">Dorminator Admin</div>
-        <a href="dashboard.html"><i class='bx bxs-dashboard'></i> ภาพรวม (Dashboard)</a>
-        <a href="billing.html" class="active"><i class='bx bx-receipt'></i> จัดการบิล / ตรวจสลิป</a>
-        <a href="users.html"><i class='bx bx-user-pin'></i> จัดการผู้เช่า / ห้องพัก</a>
-        <a href="maintenance.html"><i class='bx bx-wrench'></i> รายการแจ้งซ่อม</a>
-        <a href="chat.html"><i class='bx bxs-message-dots'></i> ข้อความ (Chat)</a>
+        <a href="dashboard.html"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html" class="active"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
+        <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
+        <a href="maintenance.html"><i class="bx bx-wrench"></i> รายการแจ้งซ่อม</a>
+        <a href="chat.html"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
         
-        <a href="#" class="logout" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
-    </div>
+        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </nav>
 
-    <div class="main-content">
-        <div class="header-actions">
-            <h2><i class='bx bx-plus-circle'></i> บันทึกบิลค่าเช่ารายเดือน</h2>
-            <a href="billing.html" class="btn-secondary"><i class='bx bx-arrow-back'></i> กลับไปหน้ารวมบิล</a>
-        </div>
+    <main class="main-content">
+        <header class="header-actions">
+            <h2><i class="bx bx-plus-circle"></i> บันทึกบิลค่าเช่ารายเดือน</h2>
+            <a href="billing.html" class="btn-secondary"><i class="bx bx-arrow-back"></i> กลับไปหน้ารวมบิล</a>
+        </header>
 
         <div class="card">
             <div class="form-group" style="max-width: 300px;">
                 <label>ประจำเดือน</label>
-                <select id="b_month" required style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; font-size: 1rem;">
+                <select id="b_month" required="" style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; font-size: 1rem;">
                     <!-- JS จะใส่ options ให้ -->
                 </select>
             </div>
@@ -103,9 +101,9 @@
                 </tbody>
             </table>
 
-            <button type="button" class="btn-submit" id="save-all-btn" onclick="saveAllBills()"><i class='bx bx-save'></i> บันทึกบิลทั้งหมด (16 ห้อง)</button>
+            <button type="button" class="btn-submit" id="save-all-btn" onclick="saveAllBills()"><i class="bx bx-save"></i> บันทึกบิลทั้งหมด (16 ห้อง)</button>
         </div>
-    </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
@@ -285,5 +283,6 @@
             window.location.href = "../login.html";
         }
     </script>
-</body>
-</html>
+
+
+</body></html>

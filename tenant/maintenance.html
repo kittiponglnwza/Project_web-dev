@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
+<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แจ้งซ่อม - Dorminator</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
         body { background-color: #f3f4f6; margin: 0; font-family: 'Prompt', sans-serif; display: flex; }
         .sidebar { width: 260px; background: #fff; height: 100vh; padding: 20px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05); position: fixed; display: flex; flex-direction: column; }
@@ -44,17 +42,17 @@
 </head>
 <body>
 
-    <div class="sidebar">
+    <nav class="sidebar">
         <div class="sidebar-logo">Dorminator</div>
-        <a href="dashboard.html" class="nav-link"><i class='bx bx-grid-alt'></i> ภาพรวม (Dashboard)</a>
-        <a href="billing.html" class="nav-link"><i class='bx bx-receipt'></i> รายการค้างชำระ</a>
-        <a href="maintenance.html" class="nav-link active"><i class='bx bx-wrench'></i> แจ้งซ่อม/ปัญหา</a>
-        <a href="profile.html" class="nav-link"><i class='bx bx-user'></i> ข้อมูลส่วนตัว</a>
-        <a href="chat.html" class="nav-link"><i class='bx bx-message-square-dots'></i> ติดต่อนิติบุคคล</a>
-        <a href="#" class="nav-link logout-btn" onclick="logout()"><i class='bx bx-log-out'></i> ออกจากระบบ</a>
-    </div>
+        <a href="dashboard.html" class="nav-link"><i class="bx bx-grid-alt"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html" class="nav-link"><i class="bx bx-receipt"></i> รายการค้างชำระ</a>
+        <a href="maintenance.html" class="nav-link active"><i class="bx bx-wrench"></i> แจ้งซ่อม/ปัญหา</a>
+        <a href="profile.html" class="nav-link"><i class="bx bx-user"></i> ข้อมูลส่วนตัว</a>
+        <a href="chat.html" class="nav-link"><i class="bx bx-message-square-dots"></i> ติดต่อนิติบุคคล</a>
+        <a href="#" class="nav-link logout-btn" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </nav>
 
-    <div class="main-content">
+    <main class="main-content">
         <!-- ฝั่งซ้าย ประวัติ -->
         <div>
             <h1 style="font-size: 1.8rem; margin: 0 0 30px 0; color: #111;">แจ้งซ่อมและปัญหาต่างๆ</h1>
@@ -83,13 +81,13 @@
             <div class="recent-section">
                 <div class="section-header">แบบฟอร์มแจ้งซ่อมใหม่</div>
                 <form id="maintenanceForm">
-                    <input type="text" id="m_title" class="lux-input" placeholder="เรื่องที่ต้องการแจ้ง (เช่น ก๊อกน้ำรั่ว)" required>
-                    <textarea id="m_desc" class="lux-input" placeholder="รายละเอียดเพิ่มเติม" rows="4" required></textarea>
-                    <button type="submit" class="submit-btn" id="submitBtn">ส่งเรื่องแจ้งซ่อม <i class='bx bx-send'></i></button>
+                    <input type="text" id="m_title" class="lux-input" placeholder="เรื่องที่ต้องการแจ้ง (เช่น ก๊อกน้ำรั่ว)" required="">
+                    <textarea id="m_desc" class="lux-input" placeholder="รายละเอียดเพิ่มเติม" rows="4" required=""></textarea>
+                    <button type="submit" class="submit-btn" id="submitBtn">ส่งเรื่องแจ้งซ่อม <i class="bx bx-send"></i></button>
                 </form>
             </div>
         </div>
-    </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
@@ -169,6 +167,7 @@
             btn.disabled = false;
         });
     </script>
-</body>
-</html>
 
+
+
+</body></html>

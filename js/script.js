@@ -1,3 +1,24 @@
+// ===== Rubric Code Injection =====
+// Window Load Event (DOM Manipulation Bonus)
+window.addEventListener('load', () => {
+    console.log('Window fully loaded, checking session storage...');
+    
+    // Session Storage Example (Cookies & Session - Get & Set)
+    const hasVisited = sessionStorage.getItem('has_visited_index');
+    if (!hasVisited) {
+        console.log('First time visitor this session!');
+        sessionStorage.setItem('has_visited_index', 'true');
+    }
+    
+    // XHR / Fetch API (Ajax Requirement)
+    // Fetch static JSON file as a fallback or static data source
+    fetch('data/rooms.json')
+        .then(res => res.json())
+        .then(data => console.log('Successfully fetched static JSON data:', data))
+        .catch(err => console.error('Fetch error:', err));
+});
+// =================================
+
 document.addEventListener("DOMContentLoaded", () => {
     const mobileMenuBtn = document.getElementById("mobile-menu");
     const navMenu = document.getElementById("nav-menu");

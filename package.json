@@ -19,6 +19,7 @@
   "homepage": "https://github.com/kittiponglnwza/Project_web-dev#readme",
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
+    "cheerio": "^1.2.0",
     "puppeteer": "^25.9.0"
   }
 }

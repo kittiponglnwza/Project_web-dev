@@ -322,19 +322,33 @@
                 const timeStr = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
 
                 html += `
-                    <div class="msg-row ${isAdmin ? 'admin' : 'tenant'}">
+                    <div class="msg-row ${isAdmin ? 'admin' : 'tenant'}" style="position: relative;">
+                        ${!isAdmin ? `<button onclick="deleteMessage('${msg.id}')" title="ลบข้อความนี้" style="background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer; align-self:center; margin-right:8px;"><i class='bx bx-trash'></i></button>` : ''}
+                        
                         <div class="msg-bubble">
                             ${escapeHTML(msg.message)}
                             <span class="msg-time">${timeStr}</span>
                         </div>
+                        
+                        ${isAdmin ? `<button onclick="deleteMessage('${msg.id}')" title="ลบข้อความนี้" style="background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer; align-self:center; margin-left:8px;"><i class='bx bx-trash'></i></button>` : ''}
                     </div>
                 `;
             });
 
             chatBox.innerHTML = html;
 
-            // เลื่อนลงไปล่างสุด
-            chatBox.scrollTop = chatBox.scrollHeight;
+            if (forceScroll) {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        async function deleteMessage(msgId) {
+            if(confirm("แน่ใจหรือไม่ว่าต้องการลบข้อความนี้? (ผู้เช่าก็จะมองไม่เห็นเช่นกัน)")) {
+                const { error } = await supabaseClient.from('messages').delete().eq('id', msgId);
+                if(!error) {
+                    loadActiveChatMessages(true);
+                }
+            }
         }
 
         // ฟังก์ชันส่งข้อความ

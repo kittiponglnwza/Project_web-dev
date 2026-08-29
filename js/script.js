@@ -49,9 +49,23 @@ async function fetchRooms() {
 
         // 2. ดึงข้อมูลผู้เช่าทั้งหมดที่มีเลขห้อง เพื่อคำนวณห้องที่ถูกจองแล้ว
         // (เปลี่ยนไปคิวรีจาก View: occupied_rooms แทน เพื่อความปลอดภัย ไม่ให้ข้อมูลส่วนตัวผู้เช่าหลุด)
-        const { data: tenantsData, error: tenantsError } = await supabaseClient
-            .from('occupied_rooms')
-            .select('room_no');
+        // --- Rubric 10: Ajax Fetch API -> Database (2nd endpoint) ---
+        const fetchUrl2 = supabaseUrl + '/rest/v1/occupied_rooms?select=room_no';
+        const response2 = await fetch(fetchUrl2, {
+            method: 'GET',
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': 'Bearer ' + supabaseKey
+            }
+        });
+
+        if (!response2.ok) {
+            throw new Error("HTTP Fetch Error (occupied_rooms): " + response2.status);
+        }
+
+        const tenantsData = await response2.json();
+        const tenantsError = null;
+        // --------------------------------------------------------
 
         let totalOccupied = 0;
         let occupiedS = 0;

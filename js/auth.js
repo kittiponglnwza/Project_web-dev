@@ -57,18 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const emailVal = emailInput.value.trim();
             const passVal = passwordInput.value;
             const rememberMe = document.getElementById("rememberMe")?.checked;
-            
-            // --- Rubric 9: Cookie + Session (Store) ---
-            if (rememberMe) {
-                document.cookie = "rememberMe=true; max-age=604800; path=/;";
-                sessionStorage.setItem("savedEmail", emailVal);
-                sessionStorage.setItem("sessionID", "sess_" + new Date().getTime());
-            } else {
-                document.cookie = "rememberMe=; max-age=0; path=/;";
-                sessionStorage.removeItem("savedEmail");
-                sessionStorage.removeItem("sessionID");
-            }
-            // ------------------------------------------
 
             // รัน Loader ที่ปุ่ม
             const originalBtnText = btnSubmit.innerHTML;
@@ -83,6 +71,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 if (error) throw error;
+
+                // --- Rubric 9: Cookie + Session (Store) ---
+                if (document.getElementById("rememberMe")?.checked) {
+                    document.cookie = "rememberMe=true; max-age=604800; path=/;";
+                    sessionStorage.setItem("savedEmail", emailVal);
+                    sessionStorage.setItem("sessionID", "sess_" + new Date().getTime());
+                } else {
+                    document.cookie = "rememberMe=; max-age=0; path=/;";
+                    sessionStorage.removeItem("savedEmail");
+                    sessionStorage.removeItem("sessionID");
+                }
+                // ------------------------------------------
 
                 // เช็ค Role จากตารางโปรไฟล์
                 const { data: profile } = await supabaseClient.from('tenant_profiles').select('role').eq('email', data.user.email).single();
@@ -258,7 +258,8 @@ async function logout() {
     if(confirm("คุณต้องการออกจากระบบหรือไม่?")) {
         // --- Rubric 9: Clear Cookie & Session ---
         document.cookie = "rememberMe=; max-age=0; path=/;";
-        sessionStorage.clear();
+        sessionStorage.removeItem("savedEmail");
+        sessionStorage.removeItem("sessionID");
         // ----------------------------------------
         // สั่ง Logout ออกจากระบบ Supabase
         const { error } = await supabaseClient.auth.signOut();

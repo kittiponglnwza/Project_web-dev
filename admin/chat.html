@@ -78,7 +78,13 @@
 
     <!-- Sidebar -->
     <nav class="sidebar">
-        <div class="logo">Dorminator Admin</div>
+        <div class="sidebar-header">
+            <div class="logo" style="margin-bottom: 0;">Dorminator Admin</div>
+            <div class="sidebar-toggle">
+                <i class="bx bx-menu"></i>
+            </div>
+        </div>
+        <div class="sidebar-links">
         <a href="dashboard.html"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
         <a href="billing.html"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
         <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
@@ -86,6 +92,7 @@
         <a href="chat.html" class="active"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
         
         <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </div>
     </nav>
 
     <!-- Main Content -->

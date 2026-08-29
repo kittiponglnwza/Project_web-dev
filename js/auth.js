@@ -42,6 +42,18 @@ document.addEventListener("DOMContentLoaded", () => {
     checkLoginStatus();
 
     // ==========================================
+    // Sidebar Mobile Toggle
+    // ==========================================
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const sidebarLinks = document.querySelector('.sidebar-links');
+    if (sidebarToggle && sidebarLinks) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebarLinks.classList.toggle('active');
+        });
+    }
+
+
+    // ==========================================
     // ระบบเข้าสู่ระบบ (หน้า login.html)
     // ==========================================
     const loginForm = document.getElementById("loginForm");

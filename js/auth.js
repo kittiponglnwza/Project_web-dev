@@ -243,10 +243,19 @@ async function checkLoginStatus() {
 
 async function logout() {
     if(confirm("คุณต้องการออกจากระบบหรือไม่?")) {
+        // --- Rubric 9: Clear Cookie & Session ---
+        document.cookie = "rememberMe=; max-age=0; path=/;";
+        sessionStorage.clear();
+        // ----------------------------------------
         // สั่ง Logout ออกจากระบบ Supabase
         const { error } = await supabaseClient.auth.signOut();
         if (!error) {
-            window.location.reload(); 
+            // Check if we are in admin or tenant, reload or redirect to login
+            if (window.location.pathname.includes('tenant') || window.location.pathname.includes('admin')) {
+                window.location.href = "../login.html";
+            } else {
+                window.location.reload(); 
+            }
         }
     }
 }

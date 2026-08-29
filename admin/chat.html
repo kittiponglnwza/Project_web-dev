@@ -428,6 +428,10 @@
         }
 
         async function logout() {
+            // --- Rubric 9: Clear Cookie & Session ---
+            document.cookie = "rememberMe=; max-age=0; path=/;";
+            sessionStorage.clear();
+            // ----------------------------------------
             await supabaseClient.auth.signOut();
             window.location.href = "../login.html";
         }

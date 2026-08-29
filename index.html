@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dorminator - ระบบจัดการหอพัก</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        .lang-switcher { display: flex; gap: 10px; margin-left: 20px; }
-        .lang-btn { background: none; border: 1px solid #e5e7eb; padding: 4px 10px; border-radius: 6px; cursor: pointer; color: #64748b; font-family: 'Prompt'; transition: 0.3s; }
-        .lang-btn:hover { background: #f8fafc; color: #111; }
+        .lang-switcher { display: flex; gap: 8px; align-items: center; }
+        .lang-btn { background: none; border: 1px solid rgba(255,255,255,0.5); padding: 4px 12px; border-radius: 6px; cursor: pointer; color: #fff; font-family: 'Prompt', sans-serif; font-size: 0.85rem; transition: 0.3s; }
+        .lang-btn:hover { background: rgba(255,255,255,0.2); }
         .lang-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
     </style>
 </head>
@@ -29,7 +30,7 @@
                 <li><a href="login.html" class="btn-login" data-i18n="nav_login">เข้าสู่ระบบ</a></li>
                 <li>
                     <div class="lang-switcher">
-                        <button class="lang-btn" id="lang-th" onclick="setLanguage('th')">TH</button>
+                        <button class="lang-btn active" id="lang-th" onclick="setLanguage('th')">TH</button>
                         <button class="lang-btn" id="lang-en" onclick="setLanguage('en')">EN</button>
                     </div>
                 </li>
@@ -72,10 +73,12 @@
                     <button class="tab-btn" onclick="switchTab(event, 'amenities')" data-i18n="tab_amenities">สิ่งอำนวยความสะดวก</button>
                 </div>
 
+                <!-- Tab: Highlight -->
                 <div class="info-content-area" id="tab-highlight">
                     <p style="margin: 0; line-height: 1.8; color: #475569;" data-i18n="desc_text"><strong>Dorminator Apartment</strong> โครงการตั้งอยู่ทำเลทอง ใกล้คณะวิทยาศาสตร์ประยุกต์ มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ (มจพ.) เพียงระยะเดิน 5 นาที หน้าโครงการมีร้านสะดวกซื้อ 7-11, ร้านอาหาร, และคาเฟ่มากมาย ตอบโจทย์ไลฟ์สไตล์นักศึกษาและวัยทำงานที่ต้องการความสะดวกสบายและความปลอดภัยขั้นสูงสุด พร้อมส่วนกลางระดับพรีเมียมที่ทำให้คุณพักผ่อนได้อย่างเต็มที่ในทุกๆ วัน</p>
                 </div>
 
+                <!-- Tab: Location -->
                 <div class="info-content-area" id="tab-location" style="display: none;">
                     <div class="location-grid">
                         <div>
@@ -96,8 +99,9 @@
                     </div>
                 </div>
 
+                <!-- Tab: Amenities -->
                 <div class="info-content-area" id="tab-amenities" style="display: none;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 10px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; padding: 10px;">
                         <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-wifi' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> <span data-i18n="amenity_wifi">ฟรี Wi-Fi ความเร็วสูง</span></div>
                         <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bxs-car-garage' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> <span data-i18n="amenity_parking">ที่จอดรถกว้างขวาง</span></div>
                         <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-cctv' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> <span data-i18n="amenity_cctv">กล้องวงจรปิด CCTV 24 ชม.</span></div>
@@ -105,11 +109,44 @@
                         <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-wind' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> <span data-i18n="amenity_ac">เครื่องปรับอากาศทุกห้อง</span></div>
                         <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bxs-washer' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> <span data-i18n="amenity_washer">เครื่องซักผ้าหยอดเหรียญ</span></div>
                         <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-water' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> <span data-i18n="amenity_water">ตู้กดน้ำดื่มหยอดเหรียญ</span></div>
-                        <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx b    <!-- นำเข้า Supabase SDK -->
+                        <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-support' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> <span data-i18n="amenity_guard">เจ้าหน้าที่ รปภ. ดูแล 24 ชม.</span></div>
+                        <div style="display: flex; align-items: center; gap: 15px; color: #475569; font-weight: 300;"><i class='bx bx-dumbbell' style="font-size: 28px; color: #3b82f6; background: #eff6ff; padding: 10px; border-radius: 10px;"></i> <span data-i18n="amenity_fitness">ฟิตเนสส่วนกลาง</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Room List Section -->
+        <section id="rooms" class="room-section">
+            <h2 data-i18n="rooms_title">อัปเดตสถานะห้องพักล่าสุด</h2>
+            <p data-i18n="rooms_subtitle">ข้อมูลอัปเดตแบบเรียลไทม์ เลื่อนดูรูปภาพภายในห้องได้เลย</p>
+            <div id="room-container" class="list-container">
+                <p class="loading-text">กำลังโหลดข้อมูลห้องพัก...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p data-i18n="footer_text">&copy; 2024 Dorminator System. โปรเจกต์วิชา Web Development.</p>
+    </footer>
+
+    <!-- นำเข้า Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
 
+    <!-- Translation Script (load before other scripts) -->
+    <script src="js/lang.js"></script>
+
+    <script>
+        function switchTab(evt, tabId) {
+            document.querySelectorAll('.info-content-area').forEach(el => el.style.display = 'none');
+            document.getElementById('tab-' + tabId).style.display = 'block';
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            evt.currentTarget.classList.add('active');
+        }
+    </script>
+
     <script src="js/script.js"></script>
-    <script src="js/auth.js"></script> <!-- เพิ่มสคริปต์จัดการ Session/Login -->
+    <script src="js/auth.js"></script>
 </body>
 </html>

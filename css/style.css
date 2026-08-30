@@ -434,7 +434,7 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
 /* Tablet */
 @media (min-width: 768px) {
     .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-    .grid-2 { grid-template-columns: repeat(2, 1fr) !important; }
+    .grid-2, .profile-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 /* Desktop */
@@ -446,4 +446,22 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
     .stats-grid { grid-template-columns: repeat(4, 1fr) !important; }
     .dash-layout { grid-template-columns: 2fr 1fr !important; }
     /* Override for specific pages if needed, but 4 is fine for stats */
+}
+
+/* =========================================
+   Custom Scrollbar (For responsive tables & containers)
+   ========================================= */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }

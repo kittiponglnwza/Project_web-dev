@@ -403,26 +403,27 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
     align-items: center;
     padding: 0 20px;
 }
-
+.sidebar-toggle {
     font-size: 28px;
     cursor: pointer;
-    color: #111;
+    color: inherit;
+    display: block; /* Mobile Base */
 }
-.sidebar-links { flex-direction: column; }
-
-
-/* Mobile First Base */
-.sidebar-toggle { display: block; }
-.sidebar-links { display: none; width: 100%; }
-.sidebar-links.active { display: flex; }
+.sidebar-links {
+    display: none; /* Mobile Base */
+    width: 100%;
+    flex-direction: column;
+}
+.sidebar-links.active {
+    display: flex;
+}
 
 /* Desktop Enhancement */
 @media (min-width: 992px) {
-     }
-    .sidebar-links { display: flex !important; }
-}
-
-    .sidebar-links { display: none; width: 100%; }
-    .sidebar-links.active { display: flex; }
-    .sidebar { padding: 15px 0 !important; }
+    .sidebar-toggle {
+        display: none;
+    }
+    .sidebar-links {
+        display: flex !important;
+    }
 }

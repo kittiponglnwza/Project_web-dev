@@ -67,8 +67,7 @@
             position: relative; 
             word-break: break-word; 
             text-align: left; 
-            display: flex; 
-            flex-direction: column;
+            display: inline-block;
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
         
@@ -83,7 +82,7 @@
             border-bottom-right-radius: 4px; 
         }
         
-        .msg-time { font-size: 0.75rem; margin-top: 4px; align-self: flex-end; opacity: 0.8; }
+        .msg-time { display: block; font-size: 0.75rem; margin-top: 6px; text-align: right; opacity: 0.8; }
         .msg-row.tenant .msg-time { color: #94a3b8; }
         .msg-row.admin .msg-time { color: #d1d5db; }
 

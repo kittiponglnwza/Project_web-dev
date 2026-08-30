@@ -29,7 +29,7 @@
         
 
         /* Main Content (Chat Area) */
-        .main-content { width: 100%; box-sizing: border-box;  flex: 1; display: flex; flex-direction: column; padding: 20px 40px; background: #f8fafc;  }
+        .main-content { width: 100%; box-sizing: border-box;  flex: 1; display: flex; flex-direction: column; padding: 10px; background: #f8fafc;  }
         
         /* Chat Container */
         .chat-container { background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: calc(100vh - 80px); overflow: hidden; }
@@ -58,8 +58,7 @@
             position: relative; 
             word-break: break-word; 
             text-align: left; 
-            display: flex; 
-            flex-direction: column;
+            display: inline-block;
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
         
@@ -74,7 +73,7 @@
             border-bottom-right-radius: 4px; 
         }
         
-        .msg-time { font-size: 0.75rem; margin-top: 4px; align-self: flex-end; opacity: 0.8; }
+        .msg-time { display: block; font-size: 0.75rem; margin-top: 6px; text-align: right; opacity: 0.8; }
         .msg-row.admin .msg-time { color: #94a3b8; }
         .msg-row.tenant .msg-time { color: #d1d5db; }
 

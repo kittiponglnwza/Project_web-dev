@@ -18,11 +18,40 @@
         .sidebar a:hover, .sidebar a.active { background: #1e293b; color: #fff; border-left: 4px solid #facc15; }
         .sidebar .logout { margin-top: auto; border-top: 1px solid #1e293b; color: #f87171; }
 
-        /* Main Layout */
-        .main-wrapper { margin-left: 260px; width: calc(100% - 260px); display: flex; height: 100vh; }
+        /* Main Layout (Mobile First) */
+        .main-wrapper { 
+            width: 100%; 
+            display: flex; 
+            flex: 1; 
+            overflow: hidden; 
+        }
         
         /* Chat List Sidebar (Left) */
-        .chat-list-container { width: 350px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
+        .chat-list-container { width: 100%; background: #fff; display: flex; flex-direction: column; }
+        
+        /* Chat Window (Right) */
+        .chat-window { display: none; width: 100%; flex-direction: column; background: #f1f5f9; position: relative; }
+        
+        /* Active State on Mobile */
+        .main-wrapper.chat-active .chat-list-container { display: none; }
+        .main-wrapper.chat-active .chat-window { display: flex; }
+        
+        .mobile-back-btn { font-size: 24px; cursor: pointer; color: #0f172a; margin-right: 5px; }
+
+        @media (min-width: 992px) {
+            .main-wrapper { margin-left: 260px !important; width: calc(100% - 260px) !important; height: 100vh !important; flex-direction: row !important; }
+            .chat-list-container { width: 350px !important; display: flex !important; border-right: 1px solid #e2e8f0; }
+            .chat-window { display: flex !important; }
+            .chat-messages { padding: 30px !important; }
+            .mobile-back-btn { display: none !important; }
+        }
+
+        /* End Layout */
+        
+        
+        
+        /* Chat List Sidebar (Left) */
+        
         .chat-list-header { padding: 20px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
         .chat-list-header h2 { margin: 0 0 15px 0; font-size: 20px; color: #0f172a; }
         .search-box { position: relative; }
@@ -41,14 +70,14 @@
         .unread-badge { background: #ef4444; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 10px; font-weight: bold; }
 
         /* Chat Window (Right) */
-        .chat-window { flex: 1; display: flex; flex-direction: column; background: #f1f5f9; position: relative; }
+        
         
         .chat-window-header { padding: 20px 30px; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px; }
         .chat-window-header .contact-avatar { background: #d4af37; }
         .chat-window-header h3 { margin: 0; font-size: 18px; color: #0f172a; }
         .chat-window-header p { margin: 2px 0 0; font-size: 13px; color: #64748b; }
 
-        .chat-messages { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .chat-messages { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         .empty-chat-state { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; z-index: 5; }
         .empty-chat-state i { font-size: 80px; margin-bottom: 20px; color: #cbd5e1; }
 
@@ -117,7 +146,7 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="main-wrapper">
+    <div class="main-wrapper" id="main-wrapper">
         
         <!-- Left: Contact List -->
         <div class="chat-list-container">
@@ -145,6 +174,7 @@
 
             <!-- Active Chat Header -->
             <div class="chat-window-header" id="chat-header" style="display: none;">
+                <i class="bx bx-arrow-back mobile-back-btn" id="back-to-list"></i>
                 <div class="contact-avatar"><i class="bx bx-user"></i></div>
                 <div>
                     <h3 id="active-chat-name">ผู้เช่า</h3>
@@ -198,6 +228,15 @@
             }
 
             await loadContacts();
+
+            // Back Button Logic for Mobile
+            const backBtn = document.getElementById("back-to-list");
+            if (backBtn) {
+                backBtn.addEventListener("click", () => {
+                    document.getElementById("main-wrapper").classList.remove("chat-active");
+                });
+            }
+
 
             // Polling อัปเดตข้อมูลทุกๆ 3 วินาที
             setInterval(() => {
@@ -315,6 +354,7 @@
         }
 
         async function openChat(tenantEmail) {
+            document.getElementById("main-wrapper").classList.add("chat-active");
             activeChatEmail = tenantEmail;
             
             let chatTitle = "";

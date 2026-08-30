@@ -409,8 +409,7 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
     color: inherit;
     display: block; /* Mobile Base */
 }
-.sidebar-links {
-    display: none; /* Mobile Base */
+.sidebar-links {\n    display: none; /* Mobile Base */\n    flex: 1;
     width: 100%;
     flex-direction: column;
 }

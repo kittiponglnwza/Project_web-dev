@@ -410,14 +410,14 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
     display: block; /* Mobile Base */
 }
 .sidebar-links {
-    flex: 1;
-    justify-content: flex-start;
     display: none; /* Mobile Base */
     width: 100%;
     flex-direction: column;
 }
 .sidebar-links.active {
     display: flex;
+    height: calc(100vh - 70px);
+    overflow-y: auto;
 }
 
 /* Desktop Enhancement */
@@ -427,6 +427,7 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
     }
     .sidebar-links {
         display: flex !important;
+        height: calc(100vh - 100px); /* Account for logo */
     }
 }
 

@@ -427,3 +427,23 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
         display: flex !important;
     }
 }
+
+/* =========================================
+   Responsive Grids for Admin & Tenant
+   ========================================= */
+/* Tablet */
+@media (min-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* Desktop */
+@media (min-width: 992px) {
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr) !important; }
+}
+/* Tablet */
+@media (min-width: 992px) {
+    .stats-grid { grid-template-columns: repeat(4, 1fr) !important; }
+    .dash-layout { grid-template-columns: 2fr 1fr !important; }
+    /* Override for specific pages if needed, but 4 is fine for stats */
+}

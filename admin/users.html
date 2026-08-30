@@ -264,7 +264,7 @@
                         </td>
                         <td>${user.national_id || '-'}</td>
                         <td style="text-align: right;">
-                            <button class="action-btn btn-edit" title="ดู/แก้ไขโปรไฟล์" onclick="openProfileModal('${user.id}')"><i class='bx bx-edit'></i></button>
+                            <button class="action-btn btn-edit" title="ดู/แก้ไขโปรไฟล์" onclick="openEditModal('${user.id}')"><i class='bx bx-edit'></i></button>
                             ${isAdmin ? '' : `<button class="action-btn btn-delete" title="ลบผู้ใช้นี้ถาวร" onclick="deleteUser('${user.id}', '${user.email}')"><i class='bx bx-trash'></i></button>`}
                         </td>
                     </tr>

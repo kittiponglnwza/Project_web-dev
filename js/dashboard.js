@@ -59,10 +59,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             alert("ส่งเรื่องแจ้งซ่อมเรียบร้อยแล้ว: " + title);
             
+            // Escape HTML เพื่อป้องกัน XSS
+            function escapeHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+            
             const list = document.getElementById("maintenance-list");
             const newRow = `
                 <tr>
-                    <td><strong>${title}</strong><br><small style="color:#6b7280">${desc}</small></td>
+                    <td><strong>${escapeHTML(title)}</strong><br><small style="color:#6b7280">${escapeHTML(desc)}</small></td>
                     <td>เพิ่งแจ้ง</td>
                     <td><span class="status-badge status-pending">กำลังรอดำเนินการ</span></td>
                 </tr>

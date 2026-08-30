@@ -132,9 +132,11 @@
                 // สกัดเอาเฉพาะชื่อคำแรกไปแสดงมุมขวาบน (ตัดคำนำหน้าออก)
                 let nameWithoutTitle = fName.replace(/^(นาย|นางสาว|นาง)\s*/, '');
                 shortName = nameWithoutTitle.split(' ')[0];
-                // โหลดข้อมูล Dashboard
-                loadDashboardData(user.email); loadTenantAnnouncements();
             }
+
+            // โหลดข้อมูล Dashboard (ต้องอยู่นอก if เพื่อให้ทำงานเสมอ)
+            loadDashboardData(user.email);
+            loadTenantAnnouncements();
             
             document.getElementById("welcome-text").innerText = "สวัสดี, " + fullName;
             document.getElementById("profile-name").innerText = shortName;

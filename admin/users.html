@@ -221,7 +221,7 @@
 
             // Calculate Room Stats
             if (users) {
-                let rooms = users.filter(u => u.role !== 'admin' && u.room_no && u.room_no.trim() !== '').map(u => u.room_no.trim());
+                let rooms = users.filter(u => u.role == 'admin' || u.role =="tenant" && u.room_no && u.room_no.trim() !== '').map(u => u.room_no.trim());
                 let occupiedRooms = [...new Set(rooms)].length;
                 document.getElementById('stat-occupied').innerText = occupiedRooms;
                 document.getElementById('stat-available').innerText = (16 - occupiedRooms);

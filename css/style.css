@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap');
 
 :root { --primary-color: #1a202c; --secondary-color: #d4af37; --bg-color: #f9fafb; --text-color: #374151; }
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Prompt', sans-serif; }
@@ -417,8 +417,15 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
 }
 .sidebar-links.active {
     display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: inherit; /* Use parent's background (#fff or #0f172a) */
     height: calc(100vh - 70px);
     overflow-y: auto;
+    z-index: 9999;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
 }
 
 /* Desktop Enhancement */
@@ -517,7 +524,7 @@ body.tenant-layout { background-color: #f3f4f6; }
 .tenant-layout .sidebar-links a.logout-btn:hover { background: #fef2f2; color: #ef4444; border-left-color: #ef4444; }
 
 /* General Sidebar Fixes */
-.sidebar { width: 100%; display: flex; flex-direction: column; padding: 20px 0; z-index: 100; transition: 0.3s; }
+.sidebar { width: 100%; display: flex; flex-direction: column; padding: 15px 0; z-index: 9999; position: sticky; top: 0; transition: 0.3s; }
 .sidebar-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-bottom: 20px; }
 .sidebar-toggle { font-size: 28px; cursor: pointer; display: block; }
 .sidebar-links { display: none; flex: 1; flex-direction: column; width: 100%; }

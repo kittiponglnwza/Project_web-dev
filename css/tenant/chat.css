@@ -1,7 +1,7 @@
 /* Main Content (Chat Area) - Tenant Side */
 
 /* Chat Container */
-.chat-container { background: #fff; border-radius: 12px; border: 1px solid #efefef; box-shadow: 0 4px 20px rgba(0,0,0,0.03); display: flex; flex-direction: column; height: calc(100vh - 80px); overflow: hidden; }
+.chat-container { background: #fff; border-radius: 12px; border: 1px solid #efefef; box-shadow: 0 4px 20px rgba(0,0,0,0.03); display: flex; flex-direction: column; height: calc(100vh - 110px); overflow: hidden; }
 
 /* Chat Header */
 .chat-header { padding: 15px 25px; background: #fff; color: #000; border-bottom: 1px solid #efefef; display: flex; align-items: center; gap: 15px; }

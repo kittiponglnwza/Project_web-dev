@@ -149,14 +149,8 @@ input[type="text"], input[type="email"], input[type="tel"], input[type="password
 }
 
 /* 8. Descendant Selector */
-.nav-menu ul {
-    list-style: none;
-}
 
 /* 9. Child Selector */
-.nav-menu > ul > li {
-    display: inline-block;
-}
 
 /* 10. Adjacent-Sibling Selector */
 .lux-input:focus + i {
@@ -190,13 +184,10 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
 
 /* Dashboard Desktop Layout */
 @media (min-width: 992px) {
-    body { flex-direction: row !important; }
     
     /* Restore fixed sidebar */
-    .sidebar { width: 260px !important; height: 100vh !important; position: fixed !important; }
     
     /* Main content spacing */
-    .main-content { margin-left: 260px !important; width: calc(100% - 260px) !important; padding: 30px 40px !important; }
     
     .stats-grid, .dashboard-cards { grid-template-columns: repeat(2, 1fr) !important; }
 }
@@ -213,40 +204,8 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
 /* =========================================
    Sidebar Mobile Menu (Hamburger)
    ========================================= */
-.sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-}
-.sidebar-toggle {
-    font-size: 28px;
-    cursor: pointer;
-    color: inherit;
-    display: block; /* Mobile Base */
-}
-.sidebar-links {
-    display: none; /* Mobile Base */
-    flex: 1;
-    width: 100%;
-    flex-direction: column;
-}
-.sidebar-links.active {
-    display: flex;
-    height: calc(100vh - 70px);
-    overflow-y: auto;
-}
 
 /* Desktop Enhancement */
-@media (min-width: 992px) {
-    .sidebar-toggle {
-        display: none;
-    }
-    .sidebar-links {
-        display: flex !important;
-        height: calc(100vh - 100px); /* Account for logo */
-    }
-}
 
 /* =========================================
    Responsive Grids for Admin & Tenant

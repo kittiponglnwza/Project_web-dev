@@ -1,14 +1,4 @@
-body { background-color: #f8fafc; margin: 0; font-family: 'Prompt', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        .sidebar { width: 100%; display: flex; flex-direction: column;   background: #0f172a; color: #fff;  padding: 20px 0;    z-index: 10;  }
-        .sidebar .logo { font-size: 24px; font-weight: 600; text-align: center; color: #facc15; margin-bottom: 30px; letter-spacing: 1px; }
-        .sidebar a { display: flex; align-items: center; padding: 15px 25px; color: #cbd5e1; text-decoration: none; font-size: 15px; transition: 0.3s; }
-        .sidebar a i { font-size: 20px; margin-right: 15px; }
-        .sidebar a:hover, .sidebar a.active { background: #1e293b; color: #fff; border-left: 4px solid #facc15; }
-        .sidebar .logout { margin-top: auto; border-top: 1px solid #1e293b; color: #f87171; padding-top: 15px; }
-
-        .main-content { width: 100%; box-sizing: border-box;   padding: 30px 40px;  overflow-y: auto; box-sizing: border-box;  }
-        .header-actions { margin-bottom: 30px; }
+.header-actions { margin-bottom: 30px; }
         .header-actions h2 { margin: 0; color: #0f172a; font-size: 24px; }
         
         .card { background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow: hidden; }

@@ -525,12 +525,15 @@ body.tenant-layout { background-color: #f3f4f6; }
 
 /* General Sidebar Fixes */
 .sidebar { width: 100%; display: flex; flex-direction: column; padding: 15px 0; z-index: 9999; position: sticky; top: 0; transition: 0.3s; }
-.sidebar-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-bottom: 20px; }
-.sidebar-toggle { font-size: 28px; cursor: pointer; display: block; }
+.sidebar-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-bottom: 0; position: relative; z-index: 10000; }
+.sidebar-toggle { font-size: 28px; cursor: pointer; display: block; padding: 10px; margin: -10px; /* bigger touch target */ }
 .sidebar-links { display: none; flex: 1; flex-direction: column; width: 100%; }
 
+/* Ensure sidebar always has a solid background on mobile (prevents content showing through) */
+.tenant-layout .sidebar { background: #fff; }
+.admin-layout .sidebar { background: #0f172a; }
 
-.main-content { width: 100%; box-sizing: border-box; padding: 20px; }
+.main-content { width: 100%; box-sizing: border-box; padding: 20px; position: relative; z-index: 1; }
 
 
 /* =========================================

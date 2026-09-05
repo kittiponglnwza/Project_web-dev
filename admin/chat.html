@@ -37,6 +37,11 @@
         <div class="chat-list-container">
             <div class="chat-list-header">
                 <h2>กล่องข้อความ</h2>
+                <!-- Tabs -->
+                <div class="chat-tabs">
+                    <button class="chat-tab active" onclick="switchChatTab('tenants')">ลูกบ้าน</button>
+                    <button class="chat-tab" onclick="switchChatTab('guests')">บุคคลภายนอก</button>
+                </div>
                 <div class="search-box">
                     <i class="bx bx-search"></i>
                     <input type="text" id="search-input" placeholder="ค้นหาห้องพัก หรือ อีเมล...">
@@ -84,6 +89,6 @@
     <script src="../js/supabase-config.js?v=1.1.0"></script>
     <script src="../js/shared/utils.js"></script>
     <script src="../js/shared/auth-guard.js"></script>
-    <script src="../js/admin/chat.js"></script>
+    <script src="../js/admin/chat.js?v=1.2.0_tabs"></script>
 </body>
 </html>

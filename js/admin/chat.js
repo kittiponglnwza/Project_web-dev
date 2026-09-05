@@ -3,6 +3,14 @@ let activeChatEmail = null;
 let tenantProfiles = {}; 
 let isFetching = false;
 let lastMessageCount = 0;
+let currentChatTab = 'tenants'; // 'tenants' or 'guests'
+
+function switchChatTab(tabName) {
+    currentChatTab = tabName;
+    document.querySelectorAll('.chat-tab').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.chat-tab[onclick*="${tabName}"]`).classList.add('active');
+    loadContacts(); // reload list with new filter
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
     initSidebar();
@@ -66,7 +74,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-// ดึงรายชื่อผู้ติดต่อ (คนที่เคยแชทกับแอดมิน)
+// ดึงรายชื่อผู้ติดต่อ (รวมประวัติแชทและลูกบ้านทั้งหมด)
 async function loadContacts() {
     try {
         const { data: messages, error } = await supabaseClient
@@ -82,6 +90,17 @@ async function loadContacts() {
 
         let newContacts = {};
 
+        // 1. นำรายชื่อลูกบ้านทั้งหมดมาใส่ไว้ก่อน (เพื่อให้แอดมินทักไปก่อนได้)
+        Object.keys(tenantProfiles).forEach(email => {
+            newContacts[email] = {
+                email: email,
+                lastMsg: 'เริ่มสนทนา...',
+                time: '1970-01-01T00:00:00.000Z', // ค่าเริ่มต้นเพื่อให้ไปอยู่ท้ายสุด
+                unreadCount: 0
+            };
+        });
+
+        // 2. นำประวัติการแชทมาอัปเดตทับ
         messages.forEach(msg => {
             const tenantEmail = msg.sender_email === 'admin' ? msg.receiver_email : msg.sender_email;
             if (!newContacts[tenantEmail]) {
@@ -111,15 +130,24 @@ async function loadContacts() {
 
 function renderContactList(contactArray) {
     const listDiv = document.getElementById('contact-list');
-    if(contactArray.length === 0) {
-        if(!listDiv.innerHTML.includes('ไม่มีประวัติ')) {
-            listDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 14px;">ยังไม่มีประวัติการแชท</div>';
+    
+    // กรองข้อมูลตาม Tab ที่เลือก
+    const filteredContacts = contactArray.filter(c => {
+        const isTenant = !!tenantProfiles[c.email];
+        if (currentChatTab === 'tenants') return isTenant;
+        if (currentChatTab === 'guests') return !isTenant;
+        return true;
+    });
+
+    if(filteredContacts.length === 0) {
+        if(!listDiv.innerHTML.includes('ไม่มีรายชื่อในหมวดนี้')) {
+            listDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 14px;">ไม่มีรายชื่อในหมวดนี้</div>';
         }
         return;
     }
 
     let html = '';
-    contactArray.forEach(c => {
+    filteredContacts.forEach(c => {
         let displayName = c.email.split('@')[0];
         let roleBadge = '';
         let isOutsider = !tenantProfiles[c.email];

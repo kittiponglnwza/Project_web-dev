@@ -30,6 +30,13 @@
 /* Chat List Sidebar (Left) */
 .chat-list-header { padding: 20px 20px 10px; border-bottom: none; background: #fff; }
 .chat-list-header h2 { margin: 0 0 15px 0; font-size: 22px; font-weight: 600; color: #000; }
+
+/* Tabs */
+.chat-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+.chat-tab { flex: 1; padding: 8px; border: none; background: #f3f4f6; border-radius: 20px; font-family: 'Prompt', sans-serif; font-size: 13px; font-weight: 500; color: #6b7280; cursor: pointer; transition: 0.2s; }
+.chat-tab:hover { background: #e5e7eb; }
+.chat-tab.active { background: linear-gradient(135deg, #0084ff, #8b5cf6); color: #fff; box-shadow: 0 2px 8px rgba(0, 132, 255, 0.2); }
+
 .search-box { position: relative; }
 .search-box input { width: 100%; padding: 10px 15px 10px 35px; background: #efefef; border: none; border-radius: 10px; font-family: 'Prompt'; outline: none; box-sizing: border-box; font-size: 14px; }
 .search-box i { position: absolute; left: 12px; top: 11px; color: #8e8e8e; font-size: 18px; }

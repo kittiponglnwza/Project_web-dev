@@ -42,6 +42,21 @@ async function loadUsers() {
 let currentPage = 1;
 const rowsPerPage = 5;
 
+function generateRoomOptions(selectedRoom) {
+    let options = '<option value="">ยังไม่ระบุห้อง</option>';
+    for(let f = 1; f <= 9; f++) {
+        for(let r = 1; r <= 16; r++) {
+            let roomNo = `${f}${r.toString().padStart(2, '0')}`;
+            let isOccupied = allUsers.some(u => u.room_no === roomNo);
+            if (!isOccupied || roomNo === selectedRoom) {
+                let selected = roomNo === selectedRoom ? 'selected' : '';
+                options += `<option value="${roomNo}" ${selected}>ห้อง ${roomNo}</option>`;
+            }
+        }
+    }
+    return options;
+}
+
 function renderTable(data, page) {
     const tbody = document.getElementById('users-table-body');
     tbody.innerHTML = '';
@@ -66,7 +81,9 @@ function renderTable(data, page) {
                 <td style="text-align: center;">${roomDisplay}</td>
                 <td style="text-align: center;">
                     <div style="display:flex; justify-content:center; align-items:center;">
-                        <input type="text" id="room_input_${escapeHTML(user.id)}" class="input-room" value="${roomVal}" placeholder="ห้อง">
+                        <select id="room_input_${escapeHTML(user.id)}" class="input-room" style="padding: 5px; border-radius: 4px; border: 1px solid #cbd5e1; width: 80px; font-family: 'Prompt';">
+                            ${generateRoomOptions(user.room_no || '')}
+                        </select>
                         <button class="btn-save" style="margin-left:5px;" onclick="updateRoom('${escapeHTML(user.id)}', '${escapeHTML(user.email)}')">บันทึก</button>
                     </div>
                 </td>
@@ -162,7 +179,7 @@ window.openEditModal = function(userId) {
 
         document.getElementById('e_id').value = user.id;
         document.getElementById('e_email').value = user.email || '';
-        document.getElementById('e_room').value = user.room_no || '';
+        document.getElementById('e_room').innerHTML = generateRoomOptions(user.room_no || '');
         document.getElementById('e_national_id').value = user.national_id || '';
         document.getElementById('e_address').value = user.address || '';
         document.getElementById('e_start_date').value = user.start_date || '';

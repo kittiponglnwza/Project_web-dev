@@ -1,15 +1,12 @@
 // ===== Rubric Code Injection =====
 // Window Load Event (DOM Manipulation Bonus)
 window.addEventListener('load', () => {
-    console.log('Window fully loaded, checking session storage...');
-    
     // Session Storage Example (Cookies & Session - Get & Set)
     const hasVisited = sessionStorage.getItem('has_visited_index');
     if (!hasVisited) {
-        console.log('First time visitor this session!');
         sessionStorage.setItem('has_visited_index', 'true');
     }
-    });
+});
 // =================================
 
 document.addEventListener("DOMContentLoaded", () => {

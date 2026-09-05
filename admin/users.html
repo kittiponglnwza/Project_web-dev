@@ -2,18 +2,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการผู้เช่าและห้องพัก (Admin) - Dorminator</title>
-    <link rel="stylesheet" href="../css/style.css?v=1788092300284">
+    <link rel="stylesheet" href="../css/style.css?v=1.1.0">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css?v=1.1.0" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="../css/admin/users.css">
+    <link rel="stylesheet" href="../css/admin/users.css?v=1.1.0">
 </head>
 <body class="admin-layout">
 
     <nav class="sidebar">
         <div class="sidebar-header">
             <div class="logo" style="margin-bottom: 0;">Dorminator Admin</div>
-            <div class="sidebar-toggle" onclick="document.querySelector('.sidebar-links').classList.toggle('active')">
+            <div class="sidebar-toggle" id="sidebar-toggle">
                 <i class="bx bx-menu"></i>
             </div>
         </div>
@@ -66,6 +66,7 @@
                     <tr><td colspan="5" style="text-align: center;">กำลังโหลดข้อมูล...</td></tr>
                 </tbody>
             </table>
+            <div id="pagination-container"></div>
         </div>
     </main>
 
@@ -127,232 +128,9 @@
         </div>
     </div>
 
-    <script src="../js/supabase-config.js"></script>
-    <script>
-        let allUsers = [];
-
-        document.addEventListener("DOMContentLoaded", async () => {
-            
-            // ================= ADMIN GUARD =================
-            const { data: { session: adminSession } } = await supabaseClient.auth.getSession();
-            if (!adminSession) {
-                window.location.href = "../login.html";
-                return;
-            }
-            const { data: adminProfile } = await supabaseClient.from('tenant_profiles').select('role').eq('email', adminSession.user.email).single();
-            if (!adminProfile || adminProfile.role !== 'admin') {
-                alert("⛔ ไม่อนุญาตให้เข้าถึง! คุณไม่มีสิทธิ์ผู้ดูแลระบบ");
-                window.location.href = "../index.html";
-                return;
-            }
-            // ===============================================
-
-            loadUsers();
-        });
-
-        async function loadUsers() {
-            const { data: users, error } = await supabaseClient
-                .from('tenant_profiles')
-                .select('*')
-                .order('role', { ascending: true }) 
-                .order('room_no', { ascending: true });
-
-            if (error) {
-                console.error("Error fetching users:", error);
-                return;
-            }
-
-            // Calculate Room Stats
-            if (users) {
-                let rooms = users.filter(u => u.role == 'admin' || u.role =="tenant" && u.room_no && u.room_no.trim() !== '').map(u => u.room_no.trim());
-                let occupiedRooms = [...new Set(rooms)].length;
-                document.getElementById('stat-occupied').innerText = occupiedRooms;
-                document.getElementById('stat-available').innerText = (16 - occupiedRooms);
-            }
-
-            allUsers = users;
-            renderTable(allUsers, currentPage);
-        }
-
-        let currentPage = 1;
-        const rowsPerPage = 5;
-
-        function renderTable(data, page) {
-            const tbody = document.getElementById('users-table-body');
-            tbody.innerHTML = '';
-            
-            const startIndex = (page - 1) * rowsPerPage;
-            const endIndex = startIndex + rowsPerPage;
-            const paginatedData = data.slice(startIndex, endIndex);
-
-            paginatedData.forEach(user => {
-                const isAdmin = user.role === 'admin';
-                const roleBadge = isAdmin ? '<span class="role-badge role-admin">Admin</span>' : '<span class="role-badge">ผู้เช่า (Tenant)</span>';
-                
-                const roomVal = user.room_no || '';
-                const roomDisplay = roomVal 
-                    ? `<span class="room-badge">${roomVal}</span>` 
-                    : `<span class="room-badge no-room">ยังไม่ระบุ</span>`;
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="font-weight: 500;">${user.email}</td>
-                        <td>${roleBadge}</td>
-                        <td style="text-align: center;">${roomDisplay}</td>
-                        <td style="text-align: center;">
-                            <div style="display:flex; justify-content:center; align-items:center;">
-                                <input type="text" id="room_input_${user.id}" class="input-room" value="${roomVal}" placeholder="ห้อง">
-                                <button class="btn-save" style="margin-left:5px;" onclick="updateRoom('${user.id}', '${user.email}')">บันทึก</button>
-                            </div>
-                        </td>
-                        <td>${user.national_id || '-'}</td>
-                        <td style="text-align: right;">
-                            <button class="action-btn btn-edit" title="ดู/แก้ไขโปรไฟล์" onclick="openEditModal('${user.id}')"><i class='bx bx-edit'></i></button>
-                            ${isAdmin ? '' : `<button class="action-btn btn-delete" title="ลบผู้ใช้นี้ถาวร" onclick="deleteUser('${user.id}', '${user.email}')"><i class='bx bx-trash'></i></button>`}
-                        </td>
-                    </tr>
-                `;
-            });
-            renderPagination(data.length, page);
-        }
-
-        function renderPagination(totalItems, currentPage) {
-            const container = document.getElementById('pagination-container');
-            if (!container) return;
-            const totalPages = Math.ceil(totalItems / rowsPerPage);
-            
-            if (totalPages <= 1) {
-                container.innerHTML = '';
-                return;
-            }
-            
-            let html = `<div style="font-size: 14px; color: #64748b;">แสดงข้อมูลหน้า ${currentPage} จาก ${totalPages} (${totalItems} รายการ)</div><div style="display: flex; gap: 5px;">`;
-            
-            if (currentPage > 1) {
-                html += `<button onclick="changePage(${currentPage - 1})" class="action-btn" style="padding: 5px 15px;">ก่อนหน้า</button>`;
-            }
-            
-            if (currentPage < totalPages) {
-                html += `<button onclick="changePage(${currentPage + 1})" class="action-btn" style="padding: 5px 15px;">ถัดไป</button>`;
-            }
-            
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-
-        window.changePage = function(newPage) {
-            currentPage = newPage;
-            renderTable(allUsers, currentPage);
-        }
-
-
-        async function updateRoom(id, email) {
-            const newRoom = document.getElementById(`room_input_${id}`).value.trim();
-            const { error } = await supabaseClient.from('tenant_profiles').update({ room_no: newRoom || null }).eq('id', id);
-            
-            if (error) alert('อัปเดตข้อมูลล้มเหลว: ' + error.message);
-            else { alert(`อัปเดตห้องพักของ ${email} เป็น ${newRoom || 'ว่าง'} สำเร็จ!`); loadUsers(); }
-        }
-
-        // --- ระบบแก้ไขข้อมูลแบบละเอียด ---
-        window.openEditModal = function(userId) {
-            try {
-                const user = allUsers.find(u => u.id == userId);
-                
-                if(!user) {
-                    alert("เกิดข้อผิดพลาด: หาข้อมูลผู้ใช้ไม่พบในระบบ (ID: " + userId + ")");
-                    return;
-                }
-
-                document.getElementById('e_id').value = user.id;
-                document.getElementById('e_email').value = user.email || '';
-                document.getElementById('e_room').value = user.room_no || '';
-                document.getElementById('e_national_id').value = user.national_id || '';
-                document.getElementById('e_address').value = user.address || '';
-                document.getElementById('e_start_date').value = user.start_date || '';
-                document.getElementById('e_end_date').value = user.end_date || '';
-                const overlay = document.getElementById('edit-modal');
-                overlay.style.setProperty('display', 'flex', 'important');
-                overlay.style.setProperty('z-index', '9999', 'important');
-                overlay.style.setProperty('opacity', '1', 'important');
-                
-                const modalBox = overlay.querySelector('.modal');
-                if(modalBox) {
-                    modalBox.style.setProperty('display', 'block', 'important');
-                    modalBox.style.setProperty('opacity', '1', 'important');
-                    modalBox.style.setProperty('visibility', 'visible', 'important');
-                }
-            } catch (err) {
-                alert("เกิดข้อผิดพลาดในระบบ Javascript: " + err.message);
-                console.error(err);
-            }
-        };
-
-        function closeModal() {
-            document.getElementById('edit-modal').style.setProperty('display', 'none', 'important');
-        }
-
-        // ปิด Modal เมื่อคลิกที่พื้นที่ว่าง (Overlay)
-        window.onclick = function(event) {
-            const overlay = document.getElementById('edit-modal');
-            if (event.target == overlay) {
-                closeModal();
-            }
-        }
-
-        document.getElementById('edit-user-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('e_id').value;
-            
-            const updates = {
-                room_no: document.getElementById('e_room').value.trim() || null,
-                national_id: document.getElementById('e_national_id').value.trim(),
-                address: document.getElementById('e_address').value.trim(),
-                start_date: document.getElementById('e_start_date').value || null,
-                end_date: document.getElementById('e_end_date').value || null,
-                emergency_contact: document.getElementById('e_emergency_contact').value.trim(),
-                emergency_phone: document.getElementById('e_emergency_phone').value.trim(),
-            };
-
-            const { error } = await supabaseClient.from('tenant_profiles').update(updates).eq('id', id);
-            
-            if (error) {
-                alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + error.message);
-            } else {
-                alert("อัปเดตข้อมูลส่วนตัวผู้เช่าเรียบร้อยแล้ว!");
-                closeModal();
-                loadUsers();
-            }
-        });
-
-        // --- ระบบลบผู้ใช้ ---
-        async function deleteUser(id, email) {
-            const confirmMsg = `คำเตือน! คุณต้องการลบผู้ใช้ "${email}" ออกจากระบบหอพักอย่างถาวรใช่หรือไม่?
-
-(การลบข้อมูลนี้จะไม่สามารถกู้คืนได้)`;
-            
-            if (confirm(confirmMsg)) {
-                // ลบจากตาราง tenant_profiles
-                const { error } = await supabaseClient.from('tenant_profiles').delete().eq('id', id);
-                
-                if (error) {
-                    alert("ไม่สามารถลบผู้ใช้ได้: " + error.message);
-                } else {
-                    alert(`ลบผู้ใช้ ${email} ออกจากระบบเรียบร้อยแล้ว`);
-                    loadUsers();
-                }
-            }
-        }
-
-        async function logout() {
-            // --- Rubric 9: Clear Cookie & Session ---
-            document.cookie = "rememberMe=; max-age=0; path=/;";
-            sessionStorage.clear();
-            // ----------------------------------------
-            await supabaseClient.auth.signOut();
-            window.location.href = "../login.html";
-        }
-    </script>
-
-
-</body></html>
+    <script src="../js/supabase-config.js?v=1.1.0"></script>
+    <script src="../js/shared/utils.js"></script>
+    <script src="../js/shared/auth-guard.js"></script>
+    <script src="../js/admin/users.js"></script>
+</body>
+</html>

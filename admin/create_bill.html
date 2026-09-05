@@ -3,15 +3,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>สร้างบิลค่าเช่ารายเดือน - Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/admin/create_bill.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css?v=1.1.0" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin/create_bill.css?v=1.1.0">
 </head>
 <body class="admin-layout">
 
     <nav class="sidebar">
         <div class="sidebar-header">
             <div class="logo" style="margin-bottom: 0;">Dorminator Admin</div>
-            <div class="sidebar-toggle" onclick="document.querySelector('.sidebar-links').classList.toggle('active')">
+            <div class="sidebar-toggle" id="sidebar-toggle">
                 <i class="bx bx-menu"></i>
             </div>
         </div>
@@ -62,187 +63,9 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/supabase-config.js"></script>
-    <script>
-        let activeTenants = [];
-        
-        function getRoomDetails(roomNo) {
-            if (!roomNo) return { type: '-', price: 0 };
-            const num = parseInt(roomNo.toString().slice(-2));
-            if (num >= 1 && num <= 4) return { type: 'S', price: 5500 };
-            if (num >= 5 && num <= 10) return { type: 'M', price: 7500 };
-            if (num >= 11 && num <= 99) return { type: 'XL', price: 9000 };
-            return { type: '-', price: 0 };
-        }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-
-            // ================= ADMIN GUARD =================
-            const { data: { session: adminSession } } = await supabaseClient.auth.getSession();
-            if (!adminSession) {
-                window.location.href = "../login.html";
-                return;
-            }
-            const { data: adminProfile } = await supabaseClient.from('tenant_profiles').select('role').eq('email', adminSession.user.email).single();
-            if (!adminProfile || adminProfile.role !== 'admin') {
-                alert("⛔ ไม่อนุญาตให้เข้าถึง! คุณไม่มีสิทธิ์ผู้ดูแลระบบ");
-                window.location.href = "../index.html";
-                return;
-            }
-            // ===============================================
-
-            const monthSelect = document.getElementById('b_month');
-            const thaiMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
-            const d = new Date();
-            let startMonth = d.getMonth() - 1; // ย้อนหลังแค่ 1 เดือน (เผื่อทำบิลตกหล่นตอนต้นเดือน)
-            let currentYear = d.getFullYear();
-            
-            for (let i = 0; i < 6; i++) { // สร้างตัวเลือกแค่ 6 เดือน (เดือนที่แล้ว + ปัจจุบัน + ล่วงหน้า 4 เดือน)
-                let targetDate = new Date(currentYear, startMonth + i, 1);
-                let mText = thaiMonths[targetDate.getMonth()];
-                let yText = targetDate.getFullYear() + 543;
-                let val = `${mText} ${yText}`;
-                
-                let option = document.createElement('option');
-                option.value = val;
-                option.text = val;
-                
-                if(targetDate.getMonth() === d.getMonth() && targetDate.getFullYear() === d.getFullYear()) {
-                    option.selected = true;
-                }
-                monthSelect.appendChild(option);
-            }
-            
-            await loadTenants();
-            renderTable();
-        });
-
-        async function loadTenants() {
-            // ดึงเฉพาะผู้ใช้งานที่ไม่ใช่ admin และมีเลขห้องแล้ว
-            const { data } = await supabaseClient.from('tenant_profiles').select('*').neq('role', 'admin').not('room_no', 'is', null);
-            if(data) {
-                // กรองเอาเฉพาะที่เลขห้องไม่ใช่ค่าว่าง
-                activeTenants = data.filter(t => t.room_no.trim() !== '');
-                // อัปเดตปุ่มบันทึกให้แสดงจำนวนผู้เช่าจริง
-                document.getElementById('save-all-btn').innerHTML = `<i class='bx bx-save'></i> บันทึกบิลทั้งหมด (${activeTenants.length} ห้อง)`;
-            }
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('rooms-table-body');
-            tbody.innerHTML = '';
-
-            if (activeTenants.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px;">ไม่มีผู้เช่าที่มีห้องในระบบ</td></tr>';
-                return;
-            }
-
-            // เรียงตามเลขห้อง
-            activeTenants.sort((a, b) => parseInt(a.room_no) - parseInt(b.room_no));
-
-            activeTenants.forEach((tenant) => {
-                const r = getRoomDetails(tenant.room_no);
-                const badgeClass = r.type !== '-' ? `type-${r.type}` : '';
-
-                tbody.innerHTML += `
-                    <tr id="row-${tenant.room_no}" data-room="${tenant.room_no}" data-email="${tenant.email}" data-price="${r.price}">
-                        <td>
-                            ${r.type !== '-' ? `<span class="room-badge ${badgeClass}">${r.type}</span>` : ''} 
-                            <strong style="margin-left:8px; color:#0f172a;">${tenant.room_no}</strong>
-                        </td>
-                        <td style="font-size:13px; max-width:150px; overflow:hidden; text-overflow:ellipsis;">${tenant.email}</td>
-                        <td>${r.price.toLocaleString()}</td>
-                        <td><input type="number" class="input-sm calc-input" id="elec-${tenant.room_no}" value="0" min="0" oninput="calculateRow('${tenant.room_no}')"></td>
-                        <td><input type="number" class="input-sm calc-input" id="water-${tenant.room_no}" value="0" min="0" oninput="calculateRow('${tenant.room_no}')"></td>
-                        <td><input type="number" class="input-sm calc-input" id="other-${tenant.room_no}" value="0" min="0" oninput="calculateRow('${tenant.room_no}')"></td>
-                        <td class="total-col" id="total-${tenant.room_no}">${r.price.toLocaleString()}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        function calculateRow(roomNo) {
-            const row = document.getElementById(`row-${roomNo}`);
-            const basePrice = parseInt(row.getAttribute('data-price')) || 0;
-            
-            const elecUnit = parseInt(document.getElementById(`elec-${roomNo}`).value) || 0;
-            const waterUnit = parseInt(document.getElementById(`water-${roomNo}`).value) || 0;
-            const otherFee = parseInt(document.getElementById(`other-${roomNo}`).value) || 0;
-
-            const total = basePrice + (elecUnit * 8) + (waterUnit * 18) + otherFee;
-            document.getElementById(`total-${roomNo}`).innerText = total.toLocaleString();
-        }
-
-        async function saveAllBills() {
-            if (activeTenants.length === 0) {
-                alert("ไม่มีผู้เช่าให้สร้างบิล");
-                return;
-            }
-
-            const month = document.getElementById('b_month').value;
-            if(!month) {
-                alert("กรุณาระบุประจำเดือน");
-                return;
-            }
-
-            if(!confirm(`ยืนยันการสร้างบิลสำหรับเดือน "${month}" จำนวน ${activeTenants.length} ห้อง?`)) return;
-
-            const btn = document.getElementById('save-all-btn');
-            btn.disabled = true;
-            btn.innerHTML = `<i class='bx bx-loader-alt bx-spin'></i> กำลังบันทึกข้อมูล...`;
-
-            const billsToInsert = [];
-
-            activeTenants.forEach(tenant => {
-                const roomNo = tenant.room_no;
-                const r = getRoomDetails(roomNo);
-                
-                const elecUnit = parseInt(document.getElementById(`elec-${roomNo}`).value) || 0;
-                const waterUnit = parseInt(document.getElementById(`water-${roomNo}`).value) || 0;
-                const otherFee = parseInt(document.getElementById(`other-${roomNo}`).value) || 0;
-                
-                const elecFee = elecUnit * 8;
-                const waterFee = waterUnit * 18;
-                const totalAmount = r.price + elecFee + waterFee + otherFee;
-
-                billsToInsert.push({
-                    email: tenant.email,
-                    room_no: roomNo,
-                    month: month,
-                    rent_fee: r.price,
-                    other_fee: otherFee,
-                    elec_unit: elecUnit,
-                    elec_fee: elecFee,
-                    water_unit: waterUnit,
-                    water_fee: waterFee,
-                    amount: totalAmount,
-                    status: 'pending' 
-                });
-            });
-
-            // Bulk Insert
-            const { data, error } = await supabaseClient.from('bills').insert(billsToInsert);
-
-            if (error) {
-                alert('เกิดข้อผิดพลาดในการสร้างบิล: ' + error.message);
-                console.error(error);
-                btn.disabled = false;
-                btn.innerHTML = `<i class='bx bx-save'></i> บันทึกบิลทั้งหมด (${activeTenants.length} ห้อง)`;
-            } else {
-                alert(`สร้างบิลรายเดือนสำเร็จ ${activeTenants.length} ห้องรวด!`);
-                window.location.href = 'billing.html';
-            }
-        }
-
-        async function logout() {
-            // --- Rubric 9: Clear Cookie & Session ---
-            document.cookie = "rememberMe=; max-age=0; path=/;";
-            sessionStorage.clear();
-            // ----------------------------------------
-            await supabaseClient.auth.signOut();
-            window.location.href = "../login.html";
-        }
-    </script>
-
-
-</body></html>
+    <script src="../js/supabase-config.js?v=1.1.0"></script>
+    <script src="../js/shared/utils.js"></script>
+    <script src="../js/shared/auth-guard.js"></script>
+    <script src="../js/admin/create-bill.js"></script>
+</body>
+</html>

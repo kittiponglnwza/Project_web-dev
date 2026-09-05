@@ -2,12 +2,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ติดต่อแอดมิน - Dorminator</title>
-    <link rel="stylesheet" href="../css/style.css?v=1788092303097">
+    <link rel="stylesheet" href="../css/style.css?v=1.1.0">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css?v=1.1.0" rel="stylesheet">
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="../css/tenant/chat.css">
+    <link rel="stylesheet" href="../css/tenant/chat.css?v=1.1.0">
 </head>
 <body class="tenant-layout">
 
@@ -15,7 +15,7 @@
     <nav class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo" style="margin-bottom: 0;">Dorminator</div>
-            <div class="sidebar-toggle" onclick="document.querySelector('.sidebar-links').classList.toggle('active')">
+            <div class="sidebar-toggle">
                 <i class="bx bx-menu"></i>
             </div>
         </div>
@@ -62,127 +62,8 @@
     </main>
 
     <script src="../js/supabase-config.js"></script>
-    <script>
-        let currentUserEmail = '';
-        let lastMessageCount = 0; // เพื่อเช็คว่ามีข้อความใหม่ไหม
-
-        document.addEventListener("DOMContentLoaded", async () => {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                window.location.href = "../login.html";
-                return;
-            }
-            currentUserEmail = session.user.email;
-
-            // โหลดข้อความครั้งแรก
-            await loadMessages();
-
-            // ตั้งเวลารีเฟรชข้อความทุกๆ 3 วินาที (Polling)
-            setInterval(loadMessages, 3000);
-        });
-
-        // ฟังก์ชันดึงข้อความจากฐานข้อมูล
-        async function loadMessages() {
-            // ดึงข้อความที่ sender หรือ receiver เป็นอีเมลเรา (คุยกับ admin)
-            // หมายเหตุ: ในระบบเราจะใช้คำว่า 'admin' เป็น receiver_email สำหรับการส่งหานิติ
-            const { data: messages, error } = await supabaseClient
-                .from('messages')
-                .select('*')
-                .or(`and(sender_email.eq.${currentUserEmail},receiver_email.eq.admin),and(sender_email.eq.admin,receiver_email.eq.${currentUserEmail})`)
-                .order('created_at', { ascending: true });
-
-            if (error) {
-                console.error("Error loading messages:", error);
-                return;
-            }
-
-            // ถ้าจำนวนข้อความเปลี่ยนไป (มีข้อความใหม่) ค่อยอัปเดต UI
-            if (messages.length !== lastMessageCount) {
-                lastMessageCount = messages.length;
-                renderMessages(messages);
-            }
-        }
-
-        // ฟังก์ชันวาด UI ข้อความ
-        function renderMessages(messages) {
-            const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML = ''; // ล้างของเก่า
-
-            if (messages.length === 0) {
-                chatBox.innerHTML = '<div style="text-align:center; color:#94a3b8; margin-top:20px; font-size:14px;">ยังไม่มีข้อความ เริ่มต้นทักทายแอดมินได้เลย!</div>';
-                return;
-            }
-
-            messages.forEach(msg => {
-                const isMe = msg.sender_email === currentUserEmail;
-                const d = new Date(msg.created_at);
-                const timeStr = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-
-                const div = document.createElement('div');
-                div.className = `msg-row ${isMe ? 'tenant' : 'admin'}`;
-                
-                div.innerHTML = `
-                    <div class="msg-bubble">
-                        ${escapeHTML(msg.message)}
-                        <span class="msg-time">${timeStr}</span>
-                    </div>
-                `;
-                chatBox.appendChild(div);
-            });
-
-            // เลื่อนลงไปล่างสุดอัตโนมัติ
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        // ฟังก์ชันส่งข้อความ
-        document.getElementById('chat-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const input = document.getElementById('msg-input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            input.value = ''; // เคลียร์ช่องพิมพ์
-
-            // ส่งเข้า Database (ส่งหา 'admin')
-            const { error } = await supabaseClient
-                .from('messages')
-                .insert([{
-                    sender_email: currentUserEmail,
-                    receiver_email: 'admin',
-                    message: text
-                }]);
-
-            if (error) {
-                alert("ส่งข้อความไม่สำเร็จ");
-                console.error(error);
-            } else {
-                // โหลดข้อความใหม่ทันที
-                loadMessages();
-            }
-        });
-
-        // ฟังก์ชันป้องกัน XSS
-        function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, 
-                tag => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    "'": '&#39;',
-                    '"': '&quot;'
-                }[tag] || tag)
-            );
-        }
-
-        async function logout() {
-            // --- Rubric 9: Clear Cookie & Session ---
-            document.cookie = "rememberMe=; max-age=0; path=/;";
-            sessionStorage.clear();
-            // ----------------------------------------
-            await supabaseClient.auth.signOut();
-            window.location.href = "../login.html";
-        }
-    </script>
-
-
+    <script src="../js/auth.js?v=2"></script>
+    <script src="../js/shared/utils.js"></script>
+    <script src="../js/shared/auth-guard.js"></script>
+    <script src="../js/tenant/chat.js"></script>
 </body></html>

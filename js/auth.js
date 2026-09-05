@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (emailInput && rememberCheckbox) {
             emailInput.value = savedEmail;
             rememberCheckbox.checked = true;
-            console.log("Session Restored:", sessID);
+            // Session restored from cookie
         }
     }
     // ---------------------------------------------------

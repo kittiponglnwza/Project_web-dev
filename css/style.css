@@ -456,7 +456,7 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
 @media (min-width: 992px) {
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr) !important; }
 }
-/* Tablet */
+/* Desktop */
 @media (min-width: 992px) {
     .stats-grid { grid-template-columns: repeat(4, 1fr) !important; }
     .dash-layout { grid-template-columns: 2fr 1fr !important; }
@@ -490,16 +490,7 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
 body.admin-layout { background-color: #f8fafc; }
 body.tenant-layout { background-color: #f3f4f6; }
 
-/* Desktop overrides for sidebar */
-@media (min-width: 992px) {
-    body { flex-direction: row !important; display: flex; height: 100vh; overflow: hidden; }
-    
-    .sidebar { width: 260px !important; height: 100vh !important; position: fixed !important; top: 0; left: 0; }
-    .sidebar-links { display: flex !important; height: calc(100vh - 80px); flex-direction: column; }
-    .sidebar-toggle { display: none !important; }
-    
-    .main-content { margin-left: 260px !important; width: calc(100% - 260px) !important; padding: 30px 40px !important; overflow-y: auto; height: 100vh; }
-}
+
 
 /* =========================================
    ADMIN SIDEBAR THEME
@@ -530,6 +521,6 @@ body.tenant-layout { background-color: #f3f4f6; }
 .sidebar-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-bottom: 20px; }
 .sidebar-toggle { font-size: 28px; cursor: pointer; display: block; }
 .sidebar-links { display: none; flex: 1; flex-direction: column; width: 100%; }
-.sidebar-links.active { display: flex; }
+
 
 .main-content { width: 100%; box-sizing: border-box; padding: 20px; }

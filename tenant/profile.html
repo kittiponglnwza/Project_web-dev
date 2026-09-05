@@ -2,17 +2,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ข้อมูลผู้เช่า - Dorminator</title>
-    <link rel="stylesheet" href="../css/style.css?v=1788092303130">
+    <link rel="stylesheet" href="../css/style.css?v=1.1.0">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/tenant/profile.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css?v=1.1.0" rel="stylesheet">
+    <link rel="stylesheet" href="../css/tenant/profile.css?v=1.1.0">
 </head>
 <body class="tenant-layout">
 
     <nav class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo" style="margin-bottom: 0;">Dorminator</div>
-            <div class="sidebar-toggle" onclick="document.querySelector('.sidebar-links').classList.toggle('active')">
+            <div class="sidebar-toggle">
                 <i class="bx bx-menu"></i>
             </div>
         </div>
@@ -98,66 +98,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
     <script src="../js/auth.js?v=2"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
-                const user = session.user;
-                document.getElementById("p_email").innerText = user.email;
-                if (user.user_metadata) {
-                    let title = user.user_metadata.title || "";
-                    let fName = user.user_metadata.full_name || "ไม่ระบุ";
-                    if (fName.trim().startsWith(title)) {
-                        document.getElementById("p_name").innerText = fName;
-                    } else {
-                        document.getElementById("p_name").innerText = title + " " + fName;
-                    }
-                    document.getElementById("p_phone").innerText = user.user_metadata.phone || "ไม่ระบุเบอร์โทรศัพท์";
-                }
-                
-                // ดึงข้อมูลสัญญาจาก Database 
-                const { data: profile, error } = await supabaseClient
-                    .from('tenant_profiles')
-                    .select('*')
-                    .eq('email', user.email)
-                    .single();
-                    
-                if (profile && !error) {
-                    document.getElementById("p_nid").innerText = profile.national_id || "ไม่ระบุ";
-                    document.getElementById("p_address").innerText = profile.address || "ไม่ระบุ";
-                    document.getElementById("p_room").innerText = "ห้อง " + (profile.room_no || "-");
-                    document.getElementById("p_start").innerText = profile.start_date || "-";
-                    document.getElementById("p_end").innerText = profile.end_date || "-";
-                    document.getElementById("p_em_name").innerText = profile.emergency_contact || "-";
-                    document.getElementById("p_em_phone").innerText = profile.emergency_phone || "-";
-                    
-                    const statusEl = document.getElementById("p_status");
-                    if (profile.lease_status === "Active") {
-                        statusEl.innerHTML = "🟢 Active (กำลังเช่า)";
-                        statusEl.style.color = "#059669";
-                    } else {
-                        statusEl.innerHTML = "🔴 Inactive";
-                        statusEl.style.color = "#dc2626";
-                    }
-                } else {
-                    // ถ้ายังไม่มีข้อมูลแอดมินป้อนให้
-                    document.getElementById("p_nid").innerText = "ยังไม่มีข้อมูลในระบบ";
-                    document.getElementById("p_address").innerText = "-";
-                    document.getElementById("p_room").innerText = "รอการอนุมัติห้องพัก";
-                    document.getElementById("p_start").innerText = "-";
-                    document.getElementById("p_end").innerText = "-";
-                    document.getElementById("p_em_name").innerText = "-";
-                    document.getElementById("p_em_phone").innerText = "-";
-                    document.getElementById("p_status").innerText = "รอการทำสัญญา";
-                    document.getElementById("p_status").style.color = "#d97706";
-                }
-
-            } else {
-                window.location.href = "../login.html";
-            }
-        });
-    </script>
-
-
-
+    <script src="../js/shared/utils.js"></script>
+    <script src="../js/shared/auth-guard.js"></script>
+    <script src="../js/tenant/profile.js"></script>
 </body></html>

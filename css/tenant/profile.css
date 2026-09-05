@@ -4,8 +4,8 @@
 
 
 
-.recent-section { background: #fff; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); max-width: 850px; margin: 0 auto; border: 1px solid #f3f4f6; }
-.page-title { font-size: 1.8rem; margin: 0 auto 30px auto; color: #111; max-width: 850px; }
+.recent-section { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); max-width: 850px; margin: 0 auto; border: 1px solid #f3f4f6; }
+.page-title { font-size: 1.4rem; margin: 0 auto 20px auto; color: #111; max-width: 850px; }
 .section-header { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 30px; font-size: 1.4rem; font-weight: 600; color: #111; }
 
 .sub-header { font-size: 1.1rem; font-weight: 600; color: #d4af37; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
@@ -18,4 +18,8 @@
 
 @media (max-width: 768px) {
     .profile-grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 768px) {
+    .recent-section { padding: 40px; }
+    .page-title { font-size: 1.8rem; }
 }

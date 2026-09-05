@@ -17,3 +17,7 @@
 .section-header { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; font-size: 1.2rem; font-weight: 600; }
 .btn-home { background: #111; color: #fff; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; transition: 0.3s; margin-right: 15px; }
 .btn-home:hover { background: #d4af37; }
+@media (max-width: 767px) {
+    .card-value { font-size: 1.4rem; }
+    .dashboard-cards { gap: 15px; }
+}

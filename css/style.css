@@ -531,3 +531,122 @@ body.tenant-layout { background-color: #f3f4f6; }
 
 
 .main-content { width: 100%; box-sizing: border-box; padding: 20px; }
+
+
+/* =========================================
+   GAUNTLET LOOP: Mobile Responsive Fixes
+   ========================================= */
+
+/* Header Actions - stack on mobile */
+.header-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+}
+@media (max-width: 767px) {
+    .header-actions {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    .header-actions h1,
+    .header-actions h2 {
+        font-size: 1.3rem !important;
+    }
+}
+
+/* Page Title - smaller on mobile */
+@media (max-width: 767px) {
+    .page-title {
+        font-size: 1.3rem !important;
+    }
+    h1 {
+        font-size: 1.3rem !important;
+    }
+}
+
+/* Filter Bar - wrap on mobile */
+.filter-bar {
+    flex-wrap: wrap;
+}
+
+/* Dashboard Header - stack on mobile */
+@media (max-width: 767px) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+    .month-selector {
+        width: 100%;
+    }
+    .month-selector select {
+        width: 100%;
+        min-width: unset !important;
+    }
+}
+
+/* Tables - better mobile touch */
+@media (max-width: 767px) {
+    th, td {
+        padding: 10px 12px !important;
+        font-size: 13px !important;
+    }
+}
+
+/* Cards - reduce padding on mobile */
+@media (max-width: 767px) {
+    .card {
+        padding: 15px !important;
+    }
+    .recent-section {
+        padding: 15px !important;
+    }
+    .main-content {
+        padding: 15px !important;
+    }
+}
+
+/* Modal - full width on mobile */
+@media (max-width: 767px) {
+    .modal {
+        width: 95% !important;
+        max-width: none !important;
+        padding: 20px !important;
+    }
+    .modal-content {
+        width: 95% !important;
+        padding: 25px !important;
+    }
+    .invoice-modal {
+        width: 95% !important;
+    }
+}
+
+/* Stat cards - ensure text doesn't overflow */
+.stat-info h3 {
+    word-break: break-word;
+}
+
+/* Grid-2 responsive for modal forms */
+@media (min-width: 768px) {
+    .grid-2 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* Sidebar overlay on mobile - close when clicking outside */
+@media (max-width: 991px) {
+    .sidebar {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 9999 !important;
+    }
+    .sidebar-links.active {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: inherit;
+        z-index: 9999;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+}

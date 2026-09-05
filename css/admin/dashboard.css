@@ -3,7 +3,7 @@
         
         
         /* Header */
-        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 10px; }
         .admin-profile { display: flex; align-items: center; gap: 10px; background: #fff; padding: 8px 15px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .admin-profile i { font-size: 24px; color: #3b82f6; }
 

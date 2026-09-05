@@ -110,8 +110,32 @@ window.changePage = function(newPage) {
     renderTable(allUsers, currentPage);
 };
 
+function validateRoomNumber(newRoom, userId) {
+    if (!newRoom) return true; // อนุญาตให้เว้นว่าง (ยกเลิกการกำหนดห้อง)
+    
+    // 1. ตรวจสอบรูปแบบ: เลขชั้น (1-9) + เลขห้อง (01-16)
+    const roomRegex = /^[1-9](0[1-9]|1[0-6])$/;
+    if (!roomRegex.test(newRoom)) {
+        alert("รูปแบบเลขห้องไม่ถูกต้อง!\nกรุณาระบุเลขชั้น (1-9) ตามด้วยเลขห้อง 2 หลัก (01-16)\nตัวอย่าง: 101, 109, 216");
+        return false;
+    }
+
+    // 2. ตรวจสอบห้องซ้ำ
+    const isDuplicate = allUsers.some(u => u.room_no === newRoom && u.id !== userId);
+    if (isDuplicate) {
+        alert(`เลขห้อง ${newRoom} มีผู้เช่าคนอื่นใช้อยู่แล้ว! ไม่สามารถตั้งซ้ำได้`);
+        return false;
+    }
+
+    return true;
+}
+
 window.updateRoom = async function(id, email) {
     const newRoom = document.getElementById(`room_input_${id}`).value.trim();
+    
+    // ตรวจสอบเงื่อนไขห้อง
+    if (!validateRoomNumber(newRoom, id)) return;
+
     try {
         const { error } = await supabaseClient.from('tenant_profiles').update({ room_no: newRoom || null }).eq('id', id);
         
@@ -174,9 +198,13 @@ window.onclick = function(event) {
 document.getElementById('edit-user-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const id = document.getElementById('e_id').value;
+    const newRoom = document.getElementById('e_room').value.trim();
+    
+    // ตรวจสอบเงื่อนไขห้อง
+    if (!validateRoomNumber(newRoom, id)) return;
     
     const updates = {
-        room_no: document.getElementById('e_room').value.trim() || null,
+        room_no: newRoom || null,
         national_id: document.getElementById('e_national_id').value.trim(),
         address: document.getElementById('e_address').value.trim(),
         start_date: document.getElementById('e_start_date').value || null,

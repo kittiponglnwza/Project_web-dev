@@ -44,14 +44,13 @@ const rowsPerPage = 5;
 
 function generateRoomOptions(selectedRoom) {
     let options = '<option value="">ยังไม่ระบุห้อง</option>';
-    for(let f = 1; f <= 9; f++) {
-        for(let r = 1; r <= 16; r++) {
-            let roomNo = `${f}${r.toString().padStart(2, '0')}`;
-            let isOccupied = allUsers.some(u => u.room_no === roomNo);
-            if (!isOccupied || roomNo === selectedRoom) {
-                let selected = roomNo === selectedRoom ? 'selected' : '';
-                options += `<option value="${roomNo}" ${selected}>ห้อง ${roomNo}</option>`;
-            }
+    let f = 1; // ตึกที่ 1
+    for(let r = 1; r <= 16; r++) {
+        let roomNo = `${f}${r.toString().padStart(2, '0')}`;
+        let isOccupied = allUsers.some(u => u.room_no === roomNo);
+        if (!isOccupied || roomNo === selectedRoom) {
+            let selected = roomNo === selectedRoom ? 'selected' : '';
+            options += `<option value="${roomNo}" ${selected}>ห้อง ${roomNo}</option>`;
         }
     }
     return options;
@@ -130,10 +129,10 @@ window.changePage = function(newPage) {
 function validateRoomNumber(newRoom, userId) {
     if (!newRoom) return true; // อนุญาตให้เว้นว่าง (ยกเลิกการกำหนดห้อง)
     
-    // 1. ตรวจสอบรูปแบบ: เลขชั้น (1-9) + เลขห้อง (01-16)
-    const roomRegex = /^[1-9](0[1-9]|1[0-6])$/;
+    // 1. ตรวจสอบรูปแบบ: ตึก 1 + เลขห้อง (01-16)
+    const roomRegex = /^1(0[1-9]|1[0-6])$/;
     if (!roomRegex.test(newRoom)) {
-        alert("รูปแบบเลขห้องไม่ถูกต้อง!\nกรุณาระบุเลขชั้น (1-9) ตามด้วยเลขห้อง 2 หลัก (01-16)\nตัวอย่าง: 101, 109, 216");
+        alert("รูปแบบเลขห้องไม่ถูกต้อง!\nต้องเป็นตึก 1 ตามด้วยเลขห้อง 2 หลัก (01-16)\nตัวอย่าง: 101, 109, 116");
         return false;
     }
 

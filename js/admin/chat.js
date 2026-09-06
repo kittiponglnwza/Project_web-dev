@@ -5,11 +5,60 @@ let isFetching = false;
 let lastMessageCount = 0;
 let currentChatTab = 'tenants'; // 'tenants' or 'guests'
 
-function switchChatTab(tabName) {
+function isMessageContactedHelper(msgId) {
+    if (!msgId) return false;
+    try {
+        const localStatus = JSON.parse(localStorage.getItem('dorm_messages_contacted_status_v1') || '{}');
+        return !!localStatus[msgId];
+    } catch(e) {
+        return false;
+    }
+}
+
+function getMockBookingMessages() {
+    const key = 'dorm_mock_booking_messages_v1';
+    let stored = localStorage.getItem(key);
+    if (!stored) {
+        const today = new Date();
+        const initial = [
+            {
+                id: 'msg-seed-booking-1',
+                sender_email: 'system_booking@mydorm.com',
+                receiver_email: 'admin',
+                message: '🔔 แจ้งเตือน! มีลูกค้าสนใจจอง/ดูห้องพัก\nชื่อ: คุณพงศกร ธนโชติ\nเบอร์โทร: 081-445-6789\nวันที่คาดว่าจะเข้าอยู่: 2026-09-10\nID ห้องที่สนใจ: 302',
+                is_read: false,
+                is_contacted: false,
+                created_at: new Date(today.getTime() - 3600000 * 2).toISOString()
+            },
+            {
+                id: 'msg-seed-booking-2',
+                sender_email: 'system_booking@mydorm.com',
+                receiver_email: 'admin',
+                message: '🔔 แจ้งเตือน! มีลูกค้าสนใจจอง/ดูห้องพัก\nชื่อ: คุณสุดารัตน์ พิมพากร\nเบอร์โทร: 089-987-6543\nวันที่คาดว่าจะเข้าอยู่: 2026-09-15\nID ห้องที่สนใจ: 105',
+                is_read: false,
+                is_contacted: false,
+                created_at: new Date(today.getTime() - 1800000).toISOString()
+            }
+        ];
+        localStorage.setItem(key, JSON.stringify(initial));
+        return initial;
+    }
+    try {
+        return JSON.parse(stored);
+    } catch(e) {
+        return [];
+    }
+}
+
+window.switchChatTab = function(tabName) {
     currentChatTab = tabName;
     document.querySelectorAll('.chat-tab').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.chat-tab[onclick*="${tabName}"]`).classList.add('active');
+    const targetBtn = document.querySelector(`.chat-tab[onclick*="${tabName}"]`);
+    if (targetBtn) targetBtn.classList.add('active');
     loadContacts(); // reload list with new filter
+};
+function switchChatTab(tabName) {
+    window.switchChatTab(tabName);
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -117,8 +166,26 @@ async function loadContacts() {
 
             if (msg.sender_email === tenantEmail && msg.receiver_email === 'admin' && !msg.is_read) {
                 newContacts[tenantEmail].unreadCount++;
+                const isContacted = isMessageContactedHelper(msg.id) || msg.is_contacted === true;
+                if (!isContacted) {
+                    newContacts[tenantEmail].unreadCount++;
+                }
             }
         });
+
+        // Ensure system_booking appears even if messages table has no records yet (local fallback)
+        if (!newContacts['system_booking@mydorm.com']) {
+            const mockBookings = getMockBookingMessages();
+            if (mockBookings.length > 0) {
+                const uncontactedCount = mockBookings.filter(m => !isMessageContactedHelper(m.id) && m.is_contacted !== true).length;
+                newContacts['system_booking@mydorm.com'] = {
+                    email: 'system_booking@mydorm.com',
+                    lastMsg: mockBookings[mockBookings.length - 1].message,
+                    time: mockBookings[mockBookings.length - 1].created_at,
+                    unreadCount: uncontactedCount
+                };
+            }
+        }
 
         const contactArray = Object.values(newContacts).sort((a, b) => new Date(b.time) - new Date(a.time));
         
@@ -223,12 +290,16 @@ window.openChat = async function(tenantEmail) {
     items.forEach(item => item.classList.remove('active'));
     
     try {
-        await supabaseClient
-            .from('messages')
-            .update({ is_read: true })
-            .eq('sender_email', tenantEmail)
-            .eq('receiver_email', 'admin')
-            .eq('is_read', false);
+        // Do NOT bulk mark all booking notifications as read on open
+        // Per-card action specifically marks individual message as acknowledged & contacted!
+        if (tenantEmail !== 'system_booking@mydorm.com') {
+            await supabaseClient
+                .from('messages')
+                .update({ is_read: true })
+                .eq('sender_email', tenantEmail)
+                .eq('receiver_email', 'admin')
+                .eq('is_read', false);
+        }
 
         await loadActiveChatMessages(true);
         loadContacts(); 
@@ -241,7 +312,8 @@ async function loadActiveChatMessages(forceScroll = false) {
     if (!activeChatEmail) return;
 
     try {
-        const { data: messages, error } = await supabaseClient
+        let messages = [];
+        const { data, error } = await supabaseClient
             .from('messages')
             .select('*')
             .or(`and(sender_email.eq.admin,receiver_email.eq.${activeChatEmail}),and(sender_email.eq.${activeChatEmail},receiver_email.eq.admin)`)
@@ -249,7 +321,13 @@ async function loadActiveChatMessages(forceScroll = false) {
 
         if (error) {
             console.error(error);
-            return;
+        } else if (data) {
+            messages = data;
+        }
+
+        // Fallback for system_booking if empty or offline
+        if (activeChatEmail === 'system_booking@mydorm.com' && messages.length === 0) {
+            messages = getMockBookingMessages();
         }
 
         if (messages.length !== lastMessageCount || forceScroll) {
@@ -258,7 +336,48 @@ async function loadActiveChatMessages(forceScroll = false) {
         }
     } catch (err) {
         console.error(err);
+        if (activeChatEmail === 'system_booking@mydorm.com') {
+            const mock = getMockBookingMessages();
+            renderMessages(mock, forceScroll);
+        }
     }
+}
+
+function formatBookingMessageBody(rawMessage) {
+    const nameMatch = rawMessage.match(/ชื่อ:\s*([^\n\r]+)/);
+    const phoneMatch = rawMessage.match(/เบอร์โทร:\s*([^\n\r]+)/);
+    const dateMatch = rawMessage.match(/วันที่คาดว่าจะเข้าอยู่:\s*([^\n\r]+)/);
+    const roomMatch = rawMessage.match(/ID ห้องที่สนใจ:\s*([^\n\r]+)/);
+
+    if (nameMatch || phoneMatch || dateMatch || roomMatch) {
+        const name = nameMatch ? nameMatch[1].trim() : 'ไม่ระบุชื่อ';
+        const phone = phoneMatch ? phoneMatch[1].trim() : '-';
+        const dateVal = dateMatch ? dateMatch[1].trim() : 'ไม่ได้ระบุ';
+        const roomId = roomMatch ? roomMatch[1].trim() : '-';
+
+        return `
+            <div class="booking-grid">
+                <div class="booking-field">
+                    <span class="field-label"><i class='bx bx-user'></i> ผู้สนใจ / นัดดู:</span>
+                    <strong class="field-value">${escapeHTML(name)}</strong>
+                </div>
+                <div class="booking-field">
+                    <span class="field-label"><i class='bx bx-phone'></i> เบอร์โทรศัพท์:</span>
+                    <span class="field-value"><a href="tel:${escapeHTML(phone)}" class="phone-link">${escapeHTML(phone)}</a></span>
+                </div>
+                <div class="booking-field">
+                    <span class="field-label"><i class='bx bx-calendar'></i> คาดว่าจะเข้าอยู่:</span>
+                    <span class="field-value">${escapeHTML(dateVal)}</span>
+                </div>
+                <div class="booking-field">
+                    <span class="field-label"><i class='bx bx-door-open'></i> ห้องที่สนใจ:</span>
+                    <span class="field-value"><span class="room-pill">ห้อง ${escapeHTML(roomId)}</span></span>
+                </div>
+            </div>
+        `;
+    }
+
+    return `<div style="white-space: pre-line; line-height: 1.5;">${escapeHTML(rawMessage)}</div>`;
 }
 
 function renderMessages(messages, forceScroll) {
@@ -267,21 +386,60 @@ function renderMessages(messages, forceScroll) {
 
     messages.forEach(msg => {
         const isAdmin = msg.sender_email === 'admin';
+        const isBookingNotif = msg.sender_email === 'system_booking@mydorm.com' || (msg.message && msg.message.includes('🔔 แจ้งเตือน'));
+        const isContacted = msg.is_contacted === true || isMessageContactedHelper(msg.id);
         const d = new Date(msg.created_at);
         const timeStr = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
 
-        html += `
-            <div class="msg-row ${isAdmin ? 'admin' : 'tenant'}" style="position: relative;">
-                ${!isAdmin ? `<button onclick="deleteMessage('${escapeHTML(msg.id)}')" title="ลบข้อความนี้" style="background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer; align-self:center; margin-right:8px;"><i class='bx bx-trash'></i></button>` : ''}
-                
-                <div class="msg-bubble">
-                    ${escapeHTML(msg.message)}
-                    <span class="msg-time">${timeStr}</span>
+        if (isBookingNotif) {
+            html += `
+                <div class="msg-row tenant booking-row" style="position: relative;">
+                    <button onclick="deleteMessage('${escapeHTML(msg.id)}')" title="ลบข้อความนี้" style="background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer; align-self:flex-start; margin-top:14px; margin-right:8px;"><i class='bx bx-trash'></i></button>
+                    
+                    <div class="booking-notif-card ${isContacted ? 'is-contacted' : ''}" id="booking-card-${escapeHTML(msg.id)}">
+                        <div class="booking-notif-header">
+                            <div class="booking-notif-type">
+                                <i class='bx bxs-bell-ring'></i>
+                                <span>แจ้งเตือนจอง / นัดดูห้องพัก</span>
+                            </div>
+                            <div class="booking-notif-status ${isContacted ? 'contacted' : 'uncontacted'}" id="status-badge-${escapeHTML(msg.id)}">
+                                <i class='bx ${isContacted ? 'bx-check-double' : 'bx-time-five'}'></i>
+                                <span>${isContacted ? 'ติดต่อเรียบร้อยแล้ว' : 'รอดำเนินการติดต่อ'}</span>
+                            </div>
+                        </div>
+
+                        <div class="booking-notif-body">
+                            ${formatBookingMessageBody(msg.message)}
+                        </div>
+
+                        <div class="booking-notif-footer">
+                            <button type="button" 
+                                    class="btn-contact-action ${isContacted ? 'is-contacted' : ''}" 
+                                    id="btn-contact-${escapeHTML(msg.id)}" 
+                                    onclick="toggleMessageContactStatus('${escapeHTML(msg.id)}', event)"
+                                    title="${isContacted ? 'คลิกเพื่อสลับกลับเป็นยังไม่ติดต่อ' : 'คลิกเพื่อบันทึกว่าติดต่อลูกค้าแล้ว'}">
+                                <i class='bx ${isContacted ? 'bxs-check-circle' : 'bx-check-circle'}'></i>
+                                <span class="btn-contact-text">${isContacted ? 'รับทราบและติดต่อเรียบร้อยแล้ว' : 'รับทราบและติดต่อเรียบร้อย'}</span>
+                            </button>
+                            <span class="msg-time" style="margin:0;">${timeStr}</span>
+                        </div>
+                    </div>
                 </div>
-                
-                ${isAdmin ? `<button onclick="deleteMessage('${escapeHTML(msg.id)}')" title="ลบข้อความนี้" style="background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer; align-self:center; margin-left:8px;"><i class='bx bx-trash'></i></button>` : ''}
-            </div>
-        `;
+            `;
+        } else {
+            html += `
+                <div class="msg-row ${isAdmin ? 'admin' : 'tenant'}" style="position: relative;">
+                    ${!isAdmin ? `<button onclick="deleteMessage('${escapeHTML(msg.id)}')" title="ลบข้อความนี้" style="background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer; align-self:center; margin-right:8px;"><i class='bx bx-trash'></i></button>` : ''}
+                    
+                    <div class="msg-bubble">
+                        ${escapeHTML(msg.message)}
+                        <span class="msg-time">${timeStr}</span>
+                    </div>
+                    
+                    ${isAdmin ? `<button onclick="deleteMessage('${escapeHTML(msg.id)}')" title="ลบข้อความนี้" style="background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer; align-self:center; margin-left:8px;"><i class='bx bx-trash'></i></button>` : ''}
+                </div>
+            `;
+        }
     });
 
     chatBox.innerHTML = html;
@@ -291,18 +449,105 @@ function renderMessages(messages, forceScroll) {
     }
 }
 
-window.deleteMessage = async function(msgId) {
-    if(confirm("แน่ใจหรือไม่ว่าต้องการลบข้อความนี้? (ผู้เช่าก็จะมองไม่เห็นเช่นกัน)")) {
+window.toggleMessageContactStatus = async function(msgId, event) {
+    if (event) event.stopPropagation();
+
+    let localStatus = {};
+    try {
+        localStatus = JSON.parse(localStorage.getItem('dorm_messages_contacted_status_v1') || '{}');
+    } catch(e) {}
+
+    const card = document.getElementById(`booking-card-${msgId}`);
+    const currentlyContacted = card ? card.classList.contains('is-contacted') : !!localStatus[msgId];
+    const newStatus = !currentlyContacted;
+
+    // 1. Update local state fallback
+    localStatus[msgId] = newStatus;
+    localStorage.setItem('dorm_messages_contacted_status_v1', JSON.stringify(localStatus));
+
+    // Update in mock list if applicable
+    try {
+        const mockKey = 'dorm_mock_booking_messages_v1';
+        let mockList = JSON.parse(localStorage.getItem(mockKey) || '[]');
+        const target = mockList.find(m => m.id === msgId);
+        if (target) {
+            target.is_contacted = newStatus;
+            target.is_read = newStatus;
+            localStorage.setItem(mockKey, JSON.stringify(mockList));
+        }
+    } catch(e) {}
+
+    // 2. Update card in DOM immediately for instant UI feedback
+    if (card) {
+        const statusBadge = document.getElementById(`status-badge-${msgId}`);
+        const btn = document.getElementById(`btn-contact-${msgId}`);
+
+        if (newStatus) {
+            card.classList.add('is-contacted');
+            if (statusBadge) {
+                statusBadge.className = 'booking-notif-status contacted';
+                statusBadge.innerHTML = `<i class='bx bx-check-double'></i> <span>ติดต่อเรียบร้อยแล้ว</span>`;
+            }
+            if (btn) {
+                btn.classList.add('is-contacted');
+                btn.innerHTML = `<i class='bx bxs-check-circle'></i> <span class="btn-contact-text">รับทราบและติดต่อเรียบร้อยแล้ว</span>`;
+                btn.setAttribute('title', 'คลิกเพื่อสลับกลับเป็นยังไม่ติดต่อ');
+            }
+        } else {
+            card.classList.remove('is-contacted');
+            if (statusBadge) {
+                statusBadge.className = 'booking-notif-status uncontacted';
+                statusBadge.innerHTML = `<i class='bx bx-time-five'></i> <span>รอดำเนินการติดต่อ</span>`;
+            }
+            if (btn) {
+                btn.classList.remove('is-contacted');
+                btn.innerHTML = `<i class='bx bx-check-circle'></i> <span class="btn-contact-text">รับทราบและติดต่อเรียบร้อย</span>`;
+                btn.setAttribute('title', 'คลิกเพื่อบันทึกว่าติดต่อลูกค้าแล้ว');
+            }
+        }
+    }
+
+    // 3. Supabase update query for the specific message
+    if (window.supabaseClient) {
         try {
-            const { error } = await supabaseClient.from('messages').delete().eq('id', msgId);
-            if(!error) {
-                loadActiveChatMessages(true);
-            } else {
-                console.error(error);
+            const { error } = await supabaseClient
+                .from('messages')
+                .update({ is_contacted: newStatus, is_read: true })
+                .eq('id', msgId);
+
+            if (error) {
+                console.warn('Supabase update returned error, kept in local state:', error);
             }
         } catch (err) {
-            console.error(err);
+            console.warn('Supabase update offline or failed, kept in local state:', err);
         }
+    }
+
+    // 4. Update sidebar list unread counts
+    if (typeof loadContacts === 'function') {
+        loadContacts();
+    }
+};
+
+window.deleteMessage = async function(msgId) {
+    if (confirm("แน่ใจหรือไม่ว่าต้องการลบข้อความนี้? (ผู้เช่าก็จะมองไม่เห็นเช่นกัน)")) {
+        try {
+            if (window.supabaseClient) {
+                const { error } = await supabaseClient.from('messages').delete().eq('id', msgId);
+                if (error) console.warn(error);
+            }
+        } catch (err) {
+            console.warn(err);
+        }
+        try {
+            const mockKey = 'dorm_mock_booking_messages_v1';
+            let mockList = JSON.parse(localStorage.getItem(mockKey) || '[]');
+            mockList = mockList.filter(m => m.id !== msgId);
+            localStorage.setItem(mockKey, JSON.stringify(mockList));
+        } catch(e) {}
+
+        loadActiveChatMessages(true);
+        loadContacts();
     }
 };
 

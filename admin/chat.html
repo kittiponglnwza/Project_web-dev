@@ -8,6 +8,7 @@
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../css/admin/chat.css?v=1.3.0_mobile">
+    <link rel="stylesheet" href="../css/admin/chat-enhancements.css?v=1.1.0_gridfix">
 </head>
 <body class="admin-layout">
 
@@ -36,7 +37,14 @@
         <!-- Left: Contact List -->
         <div class="chat-list-container">
             <div class="chat-list-header">
-                <h2>กล่องข้อความ</h2>
+                <div class="chat-list-title-bar">
+                    <h2>กล่องข้อความ</h2>
+                    <button type="button" class="btn-calendar-trigger" id="btn-open-calendar" onclick="openAppointmentModal()" title="เปิดปฏิทินนัดหมาย">
+                        <i class="bx bx-calendar-event"></i>
+                        <span>ปฏิทินนัดหมาย</span>
+                        <span class="calendar-badge-count" id="calendar-badge-count" style="display: none;">0</span>
+                    </button>
+                </div>
                 <!-- Tabs -->
                 <div class="chat-tabs">
                     <button class="chat-tab active" onclick="switchChatTab('tenants')">ลูกบ้าน</button>
@@ -66,9 +74,24 @@
             <div class="chat-window-header" id="chat-header" style="display: none;">
                 <i class="bx bx-arrow-back mobile-back-btn" id="back-to-list"></i>
                 <div class="contact-avatar"><i class="bx bx-user"></i></div>
-                <div>
-                    <h3 id="active-chat-name">ผู้เช่า</h3>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <h3 id="active-chat-name" style="margin: 0;">ผู้เช่า</h3>
+                        <span id="active-chat-replied-pill" class="badge-replied" style="display: none;">
+                            <i class="bx bx-check-double"></i> ตอบแล้ว
+                        </span>
+                    </div>
                     <p id="active-chat-email">email@example.com</p>
+                </div>
+                <!-- Chat Header Actions -->
+                <div class="chat-header-actions" id="chat-header-actions">
+                    <button type="button" class="btn-header-calendar" id="btn-header-calendar" onclick="openAppointmentModal()" title="เปิดปฏิทินนัดหมาย">
+                        <i class="bx bx-calendar-event"></i>
+                    </button>
+                    <button type="button" class="btn-mark-replied" id="btn-mark-replied" onclick="toggleRepliedStatus()" title="สลับสถานะตอบกลับแล้ว">
+                        <i class="bx bx-check"></i>
+                        <span id="btn-replied-label">ทำเครื่องหมายว่าตอบแล้ว</span>
+                    </button>
                 </div>
             </div>
 
@@ -86,9 +109,133 @@
         </div>
     </div>
 
+    <!-- Monthly Appointment Calendar Modal -->
+    <div id="appointment-modal" class="apt-modal-overlay" style="display: none;">
+        <div class="apt-modal-container">
+            <!-- Modal Header -->
+            <div class="apt-modal-header">
+                <div class="apt-header-title">
+                    <div class="apt-icon-box"><i class="bx bx-calendar-check"></i></div>
+                    <div>
+                        <h3>ปฏิทินนัดหมาย (Monthly Calendar)</h3>
+                        <p>ตารางนัดหมายดูห้องพักและติดต่อผู้เช่าประจำเดือน</p>
+                    </div>
+                </div>
+                <button type="button" class="apt-modal-close" onclick="closeAppointmentModal()" title="ปิดหน้าต่าง">
+                    <i class="bx bx-x"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body (Two-Column Responsive Layout) -->
+            <div class="apt-modal-body">
+                
+                <!-- Left Pane: Calendar Month View -->
+                <div class="apt-calendar-pane">
+                    <div class="apt-month-nav">
+                        <button type="button" class="btn-nav" onclick="changeMonth(-1)" title="เดือนก่อนหน้า">
+                            <i class="bx bx-chevron-left"></i>
+                        </button>
+                        <div class="apt-current-month-display">
+                            <span id="apt-month-name">กันยายน</span>
+                            <span id="apt-year-name">2026</span>
+                        </div>
+                        <button type="button" class="btn-nav" onclick="changeMonth(1)" title="เดือนถัดไป">
+                            <i class="bx bx-chevron-right"></i>
+                        </button>
+                        <button type="button" class="btn-today" onclick="goToToday()">วันนี้</button>
+                    </div>
+
+                    <!-- Weekday Headers -->
+                    <div class="apt-weekdays-grid">
+                        <div>อา.</div>
+                        <div>จ.</div>
+                        <div>อ.</div>
+                        <div>พ.</div>
+                        <div>พฤ.</div>
+                        <div>ศ.</div>
+                        <div>ส.</div>
+                    </div>
+
+                    <!-- Dynamic Days Grid -->
+                    <div class="apt-days-grid" id="apt-days-grid">
+                        <!-- Days generated dynamically -->
+                    </div>
+
+                    <!-- Visual Legend -->
+                    <div class="apt-legend">
+                        <div class="legend-item"><span class="legend-dot today"></span> วันนี้</div>
+                        <div class="legend-item"><span class="legend-dot has-apt"></span> มีนัดหมาย</div>
+                        <div class="legend-item"><span class="legend-dot selected"></span> วันที่เลือก</div>
+                    </div>
+                </div>
+
+                <!-- Right Pane: Daily Slots & Admin Controls -->
+                <div class="apt-details-pane">
+                    <div class="apt-selected-date-header">
+                        <div>
+                            <div class="text-xs text-muted">รายการนัดหมาย</div>
+                            <h4 id="apt-selected-date-label">วันอาทิตย์ที่ 6 กันยายน 2026</h4>
+                        </div>
+                        <span id="apt-date-count-badge" class="apt-count-pill">0 นัดหมาย</span>
+                    </div>
+
+                    <!-- Appointment Slots List -->
+                    <div class="apt-slots-list" id="apt-slots-list">
+                        <!-- Cards injected dynamically -->
+                    </div>
+
+                    <!-- Admin Form: Set / Edit Schedule Slot -->
+                    <div class="apt-form-card">
+                        <div class="apt-form-header">
+                            <h5 id="apt-form-title"><i class="bx bx-plus-circle"></i> เพิ่มนัดหมายใหม่</h5>
+                            <button type="button" id="apt-btn-cancel-edit" class="btn-cancel-edit" style="display:none;" onclick="cancelEditAppointment()">ยกเลิก</button>
+                        </div>
+                        <form id="apt-slot-form" onsubmit="handleSaveAppointment(event)">
+                            <input type="hidden" id="apt-edit-id" value="">
+                            
+                            <div class="apt-form-row">
+                                <div class="apt-form-group">
+                                    <label for="apt-input-time"><i class="bx bx-time-five"></i> เวลา</label>
+                                    <input type="time" id="apt-input-time" required value="10:00">
+                                </div>
+                                <div class="apt-form-group">
+                                    <label for="apt-input-type"><i class="bx bx-tag"></i> ประเภท</label>
+                                    <select id="apt-input-type">
+                                        <option value="นัดดูห้องพัก">นัดดูห้องพัก</option>
+                                        <option value="ตรวจรับห้อง / ย้ายเข้า">ตรวจรับห้อง / ย้ายเข้า</option>
+                                        <option value="แจ้งซ่อมบำรุง">แจ้งซ่อมบำรุง</option>
+                                        <option value="ต่อสัญญา / เอกสาร">ต่อสัญญา / เอกสาร</option>
+                                        <option value="อื่นๆ">อื่นๆ</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="apt-form-group">
+                                <label for="apt-input-name"><i class="bx bx-user"></i> ชื่อลูกค้า / ผู้ติดต่อ</label>
+                                <input type="text" id="apt-input-name" placeholder="เช่น คุณสมชาย (081-234-5678)" required autocomplete="off">
+                            </div>
+
+                            <div class="apt-form-group">
+                                <label for="apt-input-note"><i class="bx bx-notepad"></i> หัวข้อ / ห้องที่สนใจ</label>
+                                <input type="text" id="apt-input-note" placeholder="เช่น ห้อง 302 สนใจสัญญา 1 ปี" autocomplete="off">
+                            </div>
+
+                            <button type="submit" class="apt-btn-submit" id="apt-btn-submit">
+                                <i class="bx bx-calendar-plus"></i>
+                                <span id="apt-btn-submit-text">บันทึกนัดหมาย</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script src="../js/supabase-config.js?v=1.2.0"></script>
     <script src="../js/shared/utils.js"></script>
     <script src="../js/shared/auth-guard.js"></script>
-    <script src="../js/admin/chat.js?v=1.2.0_tabs"></script>
+    <script src="../js/admin/chat.js"></script>
+    <script src="../js/admin/chat-enhancements.js"></script>
 </body>
 </html>

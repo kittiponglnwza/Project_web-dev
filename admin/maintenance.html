@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="th"><head>
+﻿<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จัดการแจ้งซ่อม (Admin) - Dorminator</title>
+    <title>เธเธฑเธ”เธเธฒเธฃเนเธเนเธเธเนเธญเธก (Admin) - Dorminator</title>
     <link rel="stylesheet" href="../css/style.css?v=1.2.1">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css?v=1.2.0" rel="stylesheet">
@@ -18,30 +18,30 @@
             </div>
         </div>
         <div class="sidebar-links" style="flex: 1;">
-        <a href="dashboard.html"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
-        <a href="billing.html"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
-        <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
-        <a href="maintenance.html" class="active"><i class="bx bx-wrench"></i> รายการแจ้งซ่อม</a>
-        <a href="chat.html"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
+        <a href="dashboard.html"><i class="bx bxs-dashboard"></i> เธ เธฒเธเธฃเธงเธก (Dashboard)</a>
+        <a href="billing.html"><i class="bx bx-receipt"></i> เธเธฑเธ”เธเธฒเธฃเธเธดเธฅ / เธ•เธฃเธงเธเธชเธฅเธดเธ</a>
+        <a href="users.html"><i class="bx bx-user-pin"></i> เธเธฑเธ”เธเธฒเธฃเธเธนเนเน€เธเนเธฒ / เธซเนเธญเธเธเธฑเธ</a>
+        <a href="maintenance.html" class="active"><i class="bx bx-wrench"></i> เธฃเธฒเธขเธเธฒเธฃเนเธเนเธเธเนเธญเธก</a>
+        <a href="chat.html"><i class="bx bxs-message-dots"></i> เธเนเธญเธเธงเธฒเธก (Chat)</a>
         
-        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> เธญเธญเธเธเธฒเธเธฃเธฐเธเธ</a>
     </div>
     </nav>
 
     <main class="main-content">
         <header class="header-actions">
-            <h2>ระบบสรุปรายการแจ้งซ่อมรายเดือน</h2>
+            <h2>เธฃเธฐเธเธเธชเธฃเธธเธเธฃเธฒเธขเธเธฒเธฃเนเธเนเธเธเนเธญเธกเธฃเธฒเธขเน€เธ”เธทเธญเธ</h2>
         </header>
 
         <div class="dashboard-header">
             <div class="month-selector">
-                <label style="font-weight: 500; color: #334155;">สรุปข้อมูลประจำเดือน:</label>
+                <label style="font-weight: 500; color: #334155;">เธชเธฃเธธเธเธเนเธญเธกเธนเธฅเธเธฃเธฐเธเธณเน€เธ”เธทเธญเธ:</label>
                 <select id="monthSelect" onchange="changeMonth()">
-                    <option value="">-- โหลดข้อมูล --</option>
+                    <option value="">-- เนเธซเธฅเธ”เธเนเธญเธกเธนเธฅ --</option>
                 </select>
             </div>
             <div style="color: #64748b; font-size: 14px;">
-                อัปเดตล่าสุด: <span id="last-update" style="color: #0f172a; font-weight: 500;">-</span>
+                เธญเธฑเธเน€เธ”เธ•เธฅเนเธฒเธชเธธเธ”: <span id="last-update" style="color: #0f172a; font-weight: 500;">-</span>
             </div>
         </div>
 
@@ -50,46 +50,46 @@
                 <div class="stat-icon bg-blue"><i class="bx bx-wrench"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-total">0</h3>
-                    <p>รายการแจ้งซ่อมทั้งหมด</p>
+                    <p>เธฃเธฒเธขเธเธฒเธฃเนเธเนเธเธเนเธญเธกเธ—เธฑเนเธเธซเธกเธ”</p>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon bg-orange"><i class="bx bx-time"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-pending">0</h3>
-                    <p>รอดำเนินการ / กำลังซ่อม</p>
+                    <p>เธฃเธญเธ”เธณเน€เธเธดเธเธเธฒเธฃ / เธเธณเธฅเธฑเธเธเนเธญเธก</p>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon bg-green"><i class="bx bx-check-shield"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-completed">0</h3>
-                    <p>ซ่อมเสร็จแล้ว</p>
+                    <p>เธเนเธญเธกเน€เธชเธฃเนเธเนเธฅเนเธง</p>
                 </div>
             </div>
         </section>
 
         <div class="card">
             <div class="filter-bar">
-                <button class="filter-btn active" onclick="filterData('all', this)">ทั้งหมด</button>
-                <button class="filter-btn" onclick="filterData('pending', this)">รอดำเนินการ 🔴</button>
-                <button class="filter-btn" onclick="filterData('in_progress', this)">กำลังซ่อม 🔵</button>
-                <button class="filter-btn" onclick="filterData('completed', this)">ซ่อมเสร็จแล้ว 🟢</button>
+                <button class="filter-btn active" onclick="filterData('all', this)">เธ—เธฑเนเธเธซเธกเธ”</button>
+                <button class="filter-btn" onclick="filterData('pending', this)">เธฃเธญเธ”เธณเน€เธเธดเธเธเธฒเธฃ ๐”ด</button>
+                <button class="filter-btn" onclick="filterData('in_progress', this)">เธเธณเธฅเธฑเธเธเนเธญเธก ๐”ต</button>
+                <button class="filter-btn" onclick="filterData('completed', this)">เธเนเธญเธกเน€เธชเธฃเนเธเนเธฅเนเธง ๐ข</button>
             </div>
             
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 15%;">วันที่แจ้ง</th>
-                        <th style="width: 10%;">ห้องพัก</th>
-                        <th style="width: 25%;">หัวข้อปัญหา</th>
-                        <th style="width: 30%;">รายละเอียด</th>
-                        <th style="width: 10%;">สถานะ</th>
-                        <th style="width: 10%; text-align: center;">จัดการ</th>
+                        <th style="width: 15%;">เธงเธฑเธเธ—เธตเนเนเธเนเธ</th>
+                        <th style="width: 10%;">เธซเนเธญเธเธเธฑเธ</th>
+                        <th style="width: 25%;">เธซเธฑเธงเธเนเธญเธเธฑเธเธซเธฒ</th>
+                        <th style="width: 30%;">เธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”</th>
+                        <th style="width: 10%;">เธชเธ–เธฒเธเธฐ</th>
+                        <th style="width: 10%; text-align: center;">เธเธฑเธ”เธเธฒเธฃ</th>
                     </tr>
                 </thead>
                 <tbody id="maintenance-table-body">
-                    <tr><td colspan="6" style="text-align: center; padding: 30px;">กำลังโหลดข้อมูล...</td></tr>
+                    <tr><td colspan="6" style="text-align: center; padding: 30px;">เธเธณเธฅเธฑเธเนเธซเธฅเธ”เธเนเธญเธกเธนเธฅ...</td></tr>
                 </tbody>
             </table>
         </div>

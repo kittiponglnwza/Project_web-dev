@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="th"><head>
+﻿<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Dorminator</title>
@@ -22,13 +22,13 @@
             </div>
         </div>
         <div class="sidebar-links" style="flex: 1;">
-        <a href="dashboard.html" class="active"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
-        <a href="billing.html"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
-        <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
-        <a href="maintenance.html"><i class="bx bx-wrench"></i> รายการแจ้งซ่อม</a>
-        <a href="chat.html"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
+        <a href="dashboard.html" class="active"><i class="bx bxs-dashboard"></i> เธ เธฒเธเธฃเธงเธก (Dashboard)</a>
+        <a href="billing.html"><i class="bx bx-receipt"></i> เธเธฑเธ”เธเธฒเธฃเธเธดเธฅ / เธ•เธฃเธงเธเธชเธฅเธดเธ</a>
+        <a href="users.html"><i class="bx bx-user-pin"></i> เธเธฑเธ”เธเธฒเธฃเธเธนเนเน€เธเนเธฒ / เธซเนเธญเธเธเธฑเธ</a>
+        <a href="maintenance.html"><i class="bx bx-wrench"></i> เธฃเธฒเธขเธเธฒเธฃเนเธเนเธเธเนเธญเธก</a>
+        <a href="chat.html"><i class="bx bxs-message-dots"></i> เธเนเธญเธเธงเธฒเธก (Chat)</a>
         
-        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> เธญเธญเธเธเธฒเธเธฃเธฐเธเธ</a>
     </div>
     </nav>
 
@@ -36,12 +36,12 @@
     <main class="main-content">
         <header class="header-actions">
             <div>
-                <h2>ศูนย์ควบคุมระบบ (Command Center)</h2>
-                <p style="margin: 5px 0 0; color: #64748b; font-size: 14px;" id="current-date">กำลังโหลดข้อมูล...</p>
+                <h2>เธจเธนเธเธขเนเธเธงเธเธเธธเธกเธฃเธฐเธเธ (Command Center)</h2>
+                <p style="margin: 5px 0 0; color: #64748b; font-size: 14px;" id="current-date">เธเธณเธฅเธฑเธเนเธซเธฅเธ”เธเนเธญเธกเธนเธฅ...</p>
             </div>
             <div style="background: #e2e8f0; padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 8px;">
                 <i class="bx bxs-user-circle"></i>
-                <span style="font-weight: 500; color: #334155;">ผู้ดูแลระบบ (Admin)</span>
+                <span style="font-weight: 500; color: #334155;">เธเธนเนเธ”เธนเนเธฅเธฃเธฐเธเธ (Admin)</span>
             </div>
         </header>
 
@@ -50,29 +50,29 @@
             <div class="stat-card">
                 <div class="stat-icon bg-green"><i class="bx bx-money"></i></div>
                 <div class="stat-info">
-                    <h3 id="stat-revenue">0 ฿</h3>
-                    <p>รายรับรวมเดือนนี้</p>
+                    <h3 id="stat-revenue">0 เธฟ</h3>
+                    <p>เธฃเธฒเธขเธฃเธฑเธเธฃเธงเธกเน€เธ”เธทเธญเธเธเธตเน</p>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon bg-blue"><i class="bx bx-group"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-tenants">0</h3>
-                    <p>ผู้เช่าทั้งหมดในระบบ</p>
+                    <p>เธเธนเนเน€เธเนเธฒเธ—เธฑเนเธเธซเธกเธ”เนเธเธฃเธฐเธเธ</p>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon bg-orange"><i class="bx bx-wrench"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-maintenance">0</h3>
-                    <p>แจ้งซ่อมรอดำเนินการ</p>
+                    <p>เนเธเนเธเธเนเธญเธกเธฃเธญเธ”เธณเน€เธเธดเธเธเธฒเธฃ</p>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon bg-red"><i class="bx bxs-message-rounded-error"></i></div>
                 <div class="stat-info">
                     <h3 id="stat-chat">0</h3>
-                    <p>ข้อความใหม่ยังไม่ได้อ่าน</p>
+                    <p>เธเนเธญเธเธงเธฒเธกเนเธซเธกเนเธขเธฑเธเนเธกเนเนเธ”เนเธญเนเธฒเธ</p>
                 </div>
             </div>
         </section>
@@ -81,7 +81,7 @@
             <!-- Left Column: Announcements Section -->
             <div class="card">
                 <div class="card-header">
-                    <h3><i class="bx bxs-megaphone"></i> จัดการข่าวประชาสัมพันธ์ (Announcements)</h3>
+                    <h3><i class="bx bxs-megaphone"></i> เธเธฑเธ”เธเธฒเธฃเธเนเธฒเธงเธเธฃเธฐเธเธฒเธชเธฑเธกเธเธฑเธเธเน (Announcements)</h3>
                 </div>
                 
                 <div class="grid-2">
@@ -89,30 +89,30 @@
                     <div>
                         <form id="announcement-form" style="display: flex; flex-direction: column; gap: 15px;">
                             <div>
-                                <label style="font-size: 13px; color: #64748b; font-weight: 500;">หัวข้อประกาศ</label>
-                                <input type="text" id="announce-title" required="" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px;" placeholder="เช่น แจ้งล้างแอร์ประจำปี 2567">
+                                <label style="font-size: 13px; color: #64748b; font-weight: 500;">เธซเธฑเธงเธเนเธญเธเธฃเธฐเธเธฒเธจ</label>
+                                <input type="text" id="announce-title" required="" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px;" placeholder="เน€เธเนเธ เนเธเนเธเธฅเนเธฒเธเนเธญเธฃเนเธเธฃเธฐเธเธณเธเธต 2567">
                             </div>
                             <div>
-                                <label style="font-size: 13px; color: #64748b; font-weight: 500;">รายละเอียด</label>
-                                <textarea id="announce-content" required="" rows="4" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px; resize: vertical;" placeholder="กรอกรายละเอียดข่าวสาร..."></textarea>
+                                <label style="font-size: 13px; color: #64748b; font-weight: 500;">เธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”</label>
+                                <textarea id="announce-content" required="" rows="4" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px; resize: vertical;" placeholder="เธเธฃเธญเธเธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”เธเนเธฒเธงเธชเธฒเธฃ..."></textarea>
                             </div>
                             <div>
-                                <label style="font-size: 13px; color: #64748b; font-weight: 500;">ประเภท (สีแถบด้านข้าง)</label>
+                                <label style="font-size: 13px; color: #64748b; font-weight: 500;">เธเธฃเธฐเน€เธ เธ— (เธชเธตเนเธ–เธเธ”เนเธฒเธเธเนเธฒเธ)</label>
                                 <select id="announce-type" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; margin-top: 5px;">
-                                    <option value="info">สีน้ำเงิน (อัปเดตทั่วไป / ข่าวสาร)</option>
-                                    <option value="warning">สีเหลือง (แจ้งเตือน / ซ่อมบำรุง)</option>
-                                    <option value="urgent">สีแดง (เรื่องด่วน / สำคัญมาก)</option>
+                                    <option value="info">เธชเธตเธเนเธณเน€เธเธดเธ (เธญเธฑเธเน€เธ”เธ•เธ—เธฑเนเธงเนเธ / เธเนเธฒเธงเธชเธฒเธฃ)</option>
+                                    <option value="warning">เธชเธตเน€เธซเธฅเธทเธญเธ (เนเธเนเธเน€เธ•เธทเธญเธ / เธเนเธญเธกเธเธณเธฃเธธเธ)</option>
+                                    <option value="urgent">เธชเธตเนเธ”เธ (เน€เธฃเธทเนเธญเธเธ”เนเธงเธ / เธชเธณเธเธฑเธเธกเธฒเธ)</option>
                                 </select>
                             </div>
-                            <button type="submit" style="background: #0f172a; color: #fff; border: none; padding: 12px; border-radius: 8px; font-family: 'Prompt'; cursor: pointer; font-weight: 500;">ประกาศข้อความ</button>
+                            <button type="submit" style="background: #0f172a; color: #fff; border: none; padding: 12px; border-radius: 8px; font-family: 'Prompt'; cursor: pointer; font-weight: 500;">เธเธฃเธฐเธเธฒเธจเธเนเธญเธเธงเธฒเธก</button>
                         </form>
                     </div>
                     
                     <!-- Announcement Log -->
                     <div style="border-left: 1px solid #e2e8f0; padding-left: 20px;">
-                        <h4 style="margin-top: 0; color: #475569;">ประวัติการประกาศ</h4>
+                        <h4 style="margin-top: 0; color: #475569;">เธเธฃเธฐเธงเธฑเธ•เธดเธเธฒเธฃเธเธฃเธฐเธเธฒเธจ</h4>
                         <div id="admin-announcement-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto; padding-right: 10px;">
-                            <div style="text-align: center; color: #94a3b8; padding: 20px;">กำลังโหลด...</div>
+                            <div style="text-align: center; color: #94a3b8; padding: 20px;">เธเธณเธฅเธฑเธเนเธซเธฅเธ”...</div>
                         </div>
                     </div>
                 </div>
@@ -121,10 +121,10 @@
             <!-- Right Column: Action Alerts -->
             <div class="card">
                 <div class="card-header">
-                    <h3><i class="bx bxs-bell-ring"></i> สิ่งที่ต้องจัดการด่วน</h3>
+                    <h3><i class="bx bxs-bell-ring"></i> เธชเธดเนเธเธ—เธตเนเธ•เนเธญเธเธเธฑเธ”เธเธฒเธฃเธ”เนเธงเธ</h3>
                 </div>
                 <div class="alert-list" id="alert-list">
-                    <div style="text-align: center; color: #94a3b8; padding: 20px;">กำลังโหลด...</div>
+                    <div style="text-align: center; color: #94a3b8; padding: 20px;">เธเธณเธฅเธฑเธเนเธซเธฅเธ”...</div>
                 </div>
             </div>
         </div>
@@ -132,9 +132,9 @@
         <!-- Full Width Chart -->
         <div class="card" style="margin-top: 20px;">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin: 0;"><i class="bx bx-line-chart"></i> สรุปรายรับ (Revenue Trend)</h3>
+                <h3 style="margin: 0;"><i class="bx bx-line-chart"></i> เธชเธฃเธธเธเธฃเธฒเธขเธฃเธฑเธ (Revenue Trend)</h3>
                 <select id="chart-year-filter" onchange="filterChart()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'Prompt'; font-size: 13px; outline: none; cursor: pointer;">
-                    <option value="all">รวมทุกปี</option>
+                    <option value="all">เธฃเธงเธกเธ—เธธเธเธเธต</option>
                 </select>
             </div>
             <div style="position: relative; height: 350px; width: 100%;">

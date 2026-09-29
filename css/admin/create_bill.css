@@ -39,3 +39,9 @@
         .btn-submit { width: 100%; background: #0f172a; color: #fff; border: none; padding: 15px; border-radius: 12px; font-family: 'Prompt'; font-size: 16px; font-weight: 500; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-submit:hover { background: #1e293b; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(15, 23, 42, 0.2); }
         .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+/* Promotion styles */
+.promo-banner { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #bbf7d0; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; }
+.promo-banner-title { font-weight: 600; color: #166534; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-size: 15px; }
+.promo-tag { display: inline-block; background: #fff; border: 1px solid #bbf7d0; padding: 5px 12px; border-radius: 20px; font-size: 13px; color: #166534; margin: 3px 5px 3px 0; }
+.promo-applied-tag { display: inline-flex; align-items: center; gap: 4px; background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 5px; font-weight: 500; }
+.discount-col { color: #10b981; font-weight: 600; font-size: 14px; }

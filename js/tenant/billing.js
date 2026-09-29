@@ -105,7 +105,8 @@ function downloadPDF() {
             ['1', 'Room Rent', '1 Month', (bill.rent_fee || 0).toLocaleString()],
             ['2', 'Electricity', (bill.elec_unit || 0) + ' Units', (bill.elec_fee || 0).toLocaleString()],
             ['3', 'Water', (bill.water_unit || 0) + ' Units', (bill.water_fee || 0).toLocaleString()],
-            ['4', 'Others / Fines', '-', (bill.other_fee || 0).toLocaleString()]
+            ['4', 'Others / Fines', '-', (bill.other_fee || 0).toLocaleString()],
+            ...(bill.discount_amount > 0 ? [['5', 'Promotion Discount', bill.discount_detail || 'Promotion', '-' + (bill.discount_amount || 0).toLocaleString()]] : [])
         ],
         theme: 'grid',
         headStyles: { fillColor: [30, 64, 175], textColor: [255, 255, 255], halign: 'center' },
@@ -270,6 +271,22 @@ function openDetailModal(id) {
     let utility = (bill.elec_fee || 0) + (bill.water_fee || 0);
     document.getElementById('detail-utility').innerText = utility.toLocaleString();
     document.getElementById('detail-other').innerText = (bill.other_fee || 0).toLocaleString();
+
+    // Show discount if applicable
+    const discountRow = document.getElementById('detail-discount-row');
+    const discountName = document.getElementById('detail-discount-name');
+    if (bill.discount_amount && bill.discount_amount > 0) {
+        discountRow.style.display = 'flex';
+        document.getElementById('detail-discount').innerText = bill.discount_amount.toLocaleString();
+        if (bill.discount_detail) {
+            discountName.style.display = 'block';
+            discountName.innerText = '🎉 ' + bill.discount_detail;
+        }
+    } else {
+        discountRow.style.display = 'none';
+        discountName.style.display = 'none';
+    }
+
     document.getElementById('detail-total').innerText = bill.amount.toLocaleString();
 
     let d = new Date(bill.created_at);

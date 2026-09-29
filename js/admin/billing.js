@@ -177,6 +177,7 @@ function renderBills(bills) {
 
     bills.forEach(bill => {
         const utilTotal = (bill.elec_fee || 0) + (bill.water_fee || 0) + (bill.other_fee || 0);
+        const discountAmt = bill.discount_amount || 0;
         
         let badge = '';
         let actionBtn = '';
@@ -209,7 +210,10 @@ function renderBills(bills) {
                 <td>${escapeHTML(bill.month)}</td>
                 <td>${(bill.rent_fee || 0).toLocaleString()}</td>
                 <td style="color: #64748b;">${utilTotal.toLocaleString()}</td>
-                <td style="font-weight: 600; color: #dc2626; font-size: 15px;">${bill.amount.toLocaleString()}</td>
+                <td style="color: #10b981; font-weight: 500;">${discountAmt > 0 ? '-' + discountAmt.toLocaleString() : '0'}</td>
+                <td style="font-weight: 600; color: #dc2626; font-size: 15px;">
+                    ${bill.amount.toLocaleString()}
+                </td>
                 <td>${badge}</td>
                 <td style="text-align: center;">${actionBtn}</td>
             </tr>

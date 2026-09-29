@@ -1,0 +1,64 @@
+.header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.header-actions h2 { margin: 0; color: #0f172a; font-size: 24px; display: flex; align-items: center; gap: 10px; }
+
+.btn-primary { background: #0f172a; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Prompt'; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; text-decoration: none; }
+.btn-primary:hover { background: #1e293b; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(15, 23, 42, 0.2); }
+
+.promo-section { margin-bottom: 30px; }
+.section-title { color: #334155; font-size: 18px; display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
+
+.promo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+
+.promo-card { background: #fff; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); padding: 25px; border: 1px solid #f1f5f9; transition: 0.3s; position: relative; overflow: hidden; }
+.promo-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+.promo-card.inactive { opacity: 0.6; }
+
+.promo-type-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; margin-bottom: 12px; }
+.promo-type-badge.new_tenant { background: #dbeafe; color: #1e40af; }
+.promo-type-badge.seasonal { background: #fef3c7; color: #92400e; }
+.promo-type-badge.free_common_fee { background: #d1fae5; color: #065f46; }
+
+.promo-name { font-size: 18px; font-weight: 600; color: #0f172a; margin: 0 0 8px; }
+.promo-desc { color: #64748b; font-size: 14px; margin: 0 0 15px; line-height: 1.6; }
+
+.promo-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+.promo-meta-item { display: flex; align-items: center; gap: 5px; font-size: 13px; color: #64748b; background: #f8fafc; padding: 4px 10px; border-radius: 6px; }
+.promo-meta-item i { font-size: 16px; }
+
+.promo-discount-display { background: linear-gradient(135deg, #0f172a, #1e40af); color: #fff; padding: 12px 20px; border-radius: 12px; font-size: 20px; font-weight: 600; text-align: center; margin-bottom: 15px; }
+.promo-discount-display small { font-size: 13px; font-weight: 400; opacity: 0.8; display: block; }
+
+.promo-actions { display: flex; gap: 8px; }
+.promo-actions button { flex: 1; padding: 8px; border: none; border-radius: 8px; font-family: 'Prompt'; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; }
+.btn-toggle-active { background: #dcfce7; color: #166534; }
+.btn-toggle-active:hover { background: #bbf7d0; }
+.btn-toggle-inactive { background: #fef3c7; color: #92400e; }
+.btn-toggle-inactive:hover { background: #fde68a; }
+.btn-edit { background: #dbeafe; color: #1e40af; }
+.btn-edit:hover { background: #bfdbfe; }
+.btn-delete { background: #fee2e2; color: #991b1b; }
+.btn-delete:hover { background: #fecaca; }
+
+/* Modal */
+.promo-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 9999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+.promo-modal-content { background: #fff; border-radius: 20px; padding: 35px; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.2); animation: slideUp 0.3s ease; }
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.promo-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+.promo-modal-header h2 { margin: 0; color: #0f172a; font-size: 20px; display: flex; align-items: center; gap: 8px; }
+.close-btn { font-size: 28px; cursor: pointer; color: #9ca3af; transition: 0.2s; background: none; border: none; }
+.close-btn:hover { color: #ef4444; }
+
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 13px; color: #64748b; margin-bottom: 6px; font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; font-size: 14px; box-sizing: border-box; outline: none; transition: 0.2s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+.form-group textarea { resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+.btn-save { width: 100%; background: #0f172a; color: #fff; border: none; padding: 14px; border-radius: 12px; font-family: 'Prompt'; font-size: 15px; font-weight: 500; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
+.btn-save:hover { background: #1e293b; }
+
+@media (max-width: 768px) {
+    .promo-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,124 @@
+<!DOCTYPE html><html lang="th"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการโปรโมชั่น - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css?v=1.2.0" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css?v=1.2.1">
+    <link rel="stylesheet" href="../css/admin/promotions.css?v=1.0.0">
+</head>
+<body class="admin-layout">
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo" style="margin-bottom: 0;">Dorminator Admin</div>
+            <div class="sidebar-toggle" id="sidebar-toggle">
+                <i class="bx bx-menu"></i>
+            </div>
+        </div>
+        <div class="sidebar-links" style="flex: 1;">
+        <a href="dashboard.html"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
+        <a href="promotions.html" class="active"><i class="bx bx-gift"></i> โปรโมชั่น</a>
+        <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
+        <a href="maintenance.html"><i class="bx bx-wrench"></i> รายการแจ้งซ่อม</a>
+        <a href="chat.html"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
+        
+        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+    </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="header-actions">
+            <h2><i class="bx bx-gift"></i> จัดการโปรโมชั่น (Promotions)</h2>
+            <button class="btn-primary" onclick="openCreateModal()"><i class="bx bx-plus"></i> สร้างโปรโมชั่นใหม่</button>
+        </header>
+
+        <!-- Active Promotions -->
+        <div class="promo-section">
+            <h3 class="section-title"><i class="bx bx-check-circle" style="color:#10b981"></i> โปรโมชั่นที่เปิดใช้งานอยู่</h3>
+            <div class="promo-grid" id="active-promos">
+                <div style="text-align: center; color: #94a3b8; padding: 40px;">กำลังโหลด...</div>
+            </div>
+        </div>
+
+        <!-- Inactive Promotions -->
+        <div class="promo-section">
+            <h3 class="section-title"><i class="bx bx-pause-circle" style="color:#94a3b8"></i> โปรโมชั่นที่ปิดอยู่</h3>
+            <div class="promo-grid" id="inactive-promos">
+                <div style="text-align: center; color: #94a3b8; padding: 40px;">กำลังโหลด...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create/Edit Promotion Modal -->
+    <div id="promoModal" class="promo-modal" style="display:none;">
+        <div class="promo-modal-content">
+            <div class="promo-modal-header">
+                <h2 id="modal-title"><i class="bx bx-gift"></i> สร้างโปรโมชั่นใหม่</h2>
+                <span class="close-btn" onclick="closePromoModal()">&times;</span>
+            </div>
+            <form id="promo-form" onsubmit="savePromotion(event)">
+                <input type="hidden" id="promo-id" value="">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ชื่อโปรโมชั่น</label>
+                        <input type="text" id="promo-name" required placeholder="เช่น โปรผู้เช่าใหม่ ลด 50%">
+                    </div>
+                    <div class="form-group">
+                        <label>ประเภทโปรโมชั่น</label>
+                        <select id="promo-type" required onchange="updateDiscountUI()">
+                            <option value="new_tenant">โปรผู้เช่าใหม่ (เดือนแรกลดราคา)</option>
+                            <option value="seasonal">โปรตามช่วงเวลา (Low Season)</option>
+                            <option value="free_common_fee">ฟรีค่าส่วนกลาง</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>รายละเอียด</label>
+                    <textarea id="promo-desc" rows="2" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
+                </div>
+                <div class="form-row" id="discount-fields">
+                    <div class="form-group">
+                        <label>รูปแบบส่วนลด</label>
+                        <select id="promo-discount-type">
+                            <option value="percent">เปอร์เซ็นต์ (%)</option>
+                            <option value="fixed">จำนวนเงินคงที่ (บาท)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>มูลค่าส่วนลด</label>
+                        <input type="number" id="promo-discount-value" min="0" max="100" value="0" placeholder="เช่น 50">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>วันเริ่มต้น</label>
+                        <input type="date" id="promo-start" required>
+                    </div>
+                    <div class="form-group">
+                        <label>วันสิ้นสุด</label>
+                        <input type="date" id="promo-end" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>สถานะ</label>
+                        <select id="promo-active">
+                            <option value="true">เปิดใช้งาน (คำนวณส่วนลดอัตโนมัติ)</option>
+                            <option value="false">ปิดการใช้งาน</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn-save"><i class="bx bx-save"></i> บันทึกโปรโมชั่น</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js?v=1.2.0"></script>
+    <script src="../js/shared/utils.js"></script>
+    <script src="../js/shared/auth-guard.js"></script>
+    <script src="../js/admin/promotions.js?v=1.0.0"></script>
+</body>
+</html>

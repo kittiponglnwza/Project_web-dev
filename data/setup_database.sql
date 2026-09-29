@@ -97,3 +97,45 @@ VALUES
 INSERT INTO maintenance_requests (email, title, description, status)
 VALUES 
 ('testtopzver2@gmail.com', 'แอร์ไม่เย็น', 'เปิดทิ้งไว้ 3 ชั่วโมงแล้วก็ยังมีแต่ลมร้อน', 'pending');
+
+-- =========================================================================================
+-- 🎉 ตารางโปรโมชั่น (Promotions)
+-- =========================================================================================
+
+-- 4. ตารางโปรโมชั่น
+DROP TABLE IF EXISTS promotions CASCADE;
+CREATE TABLE promotions (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    type TEXT NOT NULL CHECK (type IN ('new_tenant', 'seasonal', 'free_common_fee')),
+    discount_type TEXT NOT NULL CHECK (discount_type IN ('percent', 'fixed', 'free_field')),
+    discount_value NUMERIC DEFAULT 0,
+    discount_field TEXT DEFAULT 'rent_fee',
+    start_date DATE,
+    end_date DATE,
+    is_active BOOLEAN DEFAULT true,
+    auto_apply BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+ALTER TABLE promotions ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Admins สามารถจัดการโปรโมชั่นได้ทั้งหมด
+CREATE POLICY "Admins can manage promotions" ON public.promotions USING (
+  EXISTS (SELECT 1 FROM tenant_profiles WHERE email = auth.jwt() ->> 'email' AND role = 'admin')
+);
+-- Policy: ทุกคนสามารถดูโปรโมชั่นที่ active ได้
+CREATE POLICY "Anyone can view active promotions" ON public.promotions
+FOR SELECT USING (is_active = true);
+
+-- เพิ่มคอลัมน์ส่วนลดในตาราง bills
+ALTER TABLE bills ADD COLUMN IF NOT EXISTS discount_amount INTEGER DEFAULT 0;
+ALTER TABLE bills ADD COLUMN IF NOT EXISTS discount_detail TEXT;
+ALTER TABLE bills ADD COLUMN IF NOT EXISTS promotion_id INTEGER REFERENCES promotions(id);
+
+-- ข้อมูลจำลอง: โปรโมชั่นตัวอย่าง
+INSERT INTO promotions (name, description, type, discount_type, discount_value, discount_field, start_date, end_date, is_active, auto_apply)
+VALUES 
+('โปรผู้เช่าใหม่ ลด 50%', 'เดือนแรกของการเข้าอยู่ ลดค่าเช่า 50%', 'new_tenant', 'percent', 50, 'rent_fee', '2024-01-01', '2030-12-31', true, true),
+('Low Season ลด 20%', 'ช่วง มี.ค. - พ.ค. ลดค่าเช่า 20%', 'seasonal', 'percent', 20, 'rent_fee', '2025-03-01', '2025-05-31', true, true),
+('ฟรีค่าส่วนกลาง', 'ยกเว้นค่าส่วนกลาง (other_fee) ฟรี', 'free_common_fee', 'free_field', 0, 'other_fee', '2024-01-01', '2030-12-31', false, true);

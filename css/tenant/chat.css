@@ -1,5 +1,5 @@
 /* ==========================================================
-   Main Content (Chat Area) - Tenant Side (Gauntlet Loop 10/10)
+   Tenant Chat - Responsive conversation layout
    ========================================================== */
 
 /* Overrides for native app feel on mobile */
@@ -35,7 +35,7 @@
     .chat-container {
         border-radius: 12px;
         border: 1px solid #efefef;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        box-shadow: var(--app-shadow);
         height: calc(100vh - 100px);
     }
 }
@@ -44,16 +44,16 @@
 .chat-header { 
     flex-shrink: 0;
     padding: 15px 25px; 
-    background: #fff; 
-    color: #000; 
-    border-bottom: 1px solid #efefef; 
+    background: var(--app-surface);
+    color: var(--app-heading);
+    border-bottom: 1px solid var(--app-border);
     display: flex; 
     align-items: center; 
     gap: 15px; 
 }
-.chat-header i { font-size: 28px; background: linear-gradient(135deg, #0084ff, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.chat-header i { font-size: 28px; color: var(--app-accent); }
 .chat-header h2 { margin: 0; font-size: 17px; font-weight: 600; }
-.chat-header p { margin: 2px 0 0; font-size: 12px; color: #8e8e8e; font-weight: 400;}
+.chat-header p { margin: 2px 0 0; font-size: 12px; color: var(--app-muted); font-weight: 400;}
 
 /* Chat Messages Area */
 .chat-messages { 
@@ -63,7 +63,7 @@
     display: flex; 
     flex-direction: column; 
     gap: 8px; 
-    background: #fff; 
+    background: var(--app-bg);
 }
 
 /* IG Style Message Bubbles */
@@ -88,15 +88,15 @@
 
 /* Received (Admin) */
 .msg-row.admin .msg-bubble { 
-    background: #efefef; 
-    color: #000; 
-    border-radius: 20px 20px 20px 4px; 
+    background: #f1f5f9;
+    color: var(--app-text);
+    border-radius: 14px 14px 14px 4px;
 }
 /* Sent (Tenant) */
 .msg-row.tenant .msg-bubble { 
-    background: linear-gradient(135deg, #0084ff, #8b5cf6); 
+    background: var(--app-accent);
     color: #fff; 
-    border-radius: 20px 20px 4px 20px; 
+    border-radius: 14px 14px 4px 14px;
 }
 
 .msg-time { display: block; font-size: 0.65rem; margin-top: 5px; text-align: right; }
@@ -108,12 +108,12 @@
     flex-shrink: 0;
     padding: 12px 20px; 
     background: #fff; 
-    border-top: 1px solid #efefef; 
+    border-top: 1px solid var(--app-border);
     display: flex; 
     gap: 10px; 
     align-items: center; 
 }
-.chat-input-area input { flex: 1; padding: 12px 20px; background: #efefef; border: 1px solid transparent; border-radius: 24px; font-family: 'Prompt', sans-serif; font-size: 0.95rem; outline: none; transition: 0.2s; }
-.chat-input-area input:focus { border: 1px solid #dbdbdb; background: #fff; }
-.btn-send { width: 40px; height: 40px; background: transparent; color: #0084ff; border: none; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; margin-left: 5px; }
-.btn-send:hover { transform: scale(1.1); color: #0066cc; }
+.chat-input-area input { flex: 1; padding: 10px 14px; background: #fff; border: 1px solid var(--app-border-strong); border-radius: 8px; font-family: 'Prompt', sans-serif; font-size: 0.95rem; outline: none; transition: 0.2s; }
+.chat-input-area input:focus { border-color: #93c5fd; background: #fff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
+.btn-send { width: 40px; height: 40px; background: transparent; color: var(--app-accent); border: none; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; margin-left: 5px; }
+.btn-send:hover { color: var(--app-accent-hover); }

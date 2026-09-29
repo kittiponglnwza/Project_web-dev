@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    renderTenantSidebar();
     initSidebar();
     
     const auth = await requireTenant(); 

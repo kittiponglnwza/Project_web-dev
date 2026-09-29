@@ -1,6 +1,7 @@
 let allUsers = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
+    renderAdminSidebar();
     initSidebar();
     
     // ================= ADMIN GUARD =================

@@ -66,6 +66,7 @@ function calculateDiscount(basePrice, otherFee, promos) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    renderAdminSidebar();
     initSidebar();
 
     const auth = await requireAdmin();

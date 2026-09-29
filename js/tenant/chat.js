@@ -3,6 +3,7 @@ let lastMessageCount = 0;
 let isFetching = false;
 
 document.addEventListener("DOMContentLoaded", async () => {
+    renderTenantSidebar();
     initSidebar();
     
     const auth = await requireTenant(); 

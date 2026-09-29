@@ -4,6 +4,7 @@ let currentMonthBills = [];
 let uniqueMonths = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
+    renderAdminSidebar();
     initSidebar();
     
     // ================= ADMIN GUARD =================

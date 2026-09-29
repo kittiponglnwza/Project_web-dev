@@ -1,6 +1,7 @@
 let allPromotions = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
+    renderAdminSidebar();
     initSidebar();
 
     const auth = await requireAdmin();

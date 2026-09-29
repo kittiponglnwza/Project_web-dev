@@ -1,7 +1,7 @@
-﻿<!DOCTYPE html><html lang="th"><head>
+<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เธฃเธฐเธเธเธ•เธญเธเนเธเธ—เธฅเธนเธเธเนเธฒ (Admin) - Dorminator</title>
+    <title>ระบบตอบแชทลูกค้า (Admin) - Dorminator</title>
     <link rel="stylesheet" href="../css/style.css?v=1.2.1">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css?v=1.2.0" rel="stylesheet">
@@ -21,13 +21,14 @@
             </div>
         </div>
         <div class="sidebar-links" style="flex: 1;">
-        <a href="dashboard.html"><i class="bx bxs-dashboard"></i> เธ เธฒเธเธฃเธงเธก (Dashboard)</a>
-        <a href="billing.html"><i class="bx bx-receipt"></i> เธเธฑเธ”เธเธฒเธฃเธเธดเธฅ / เธ•เธฃเธงเธเธชเธฅเธดเธ</a>
-        <a href="users.html"><i class="bx bx-user-pin"></i> เธเธฑเธ”เธเธฒเธฃเธเธนเนเน€เธเนเธฒ / เธซเนเธญเธเธเธฑเธ</a>
-        <a href="maintenance.html"><i class="bx bx-wrench"></i> เธฃเธฒเธขเธเธฒเธฃเนเธเนเธเธเนเธญเธก</a>
-        <a href="chat.html" class="active"><i class="bx bxs-message-dots"></i> เธเนเธญเธเธงเธฒเธก (Chat)</a>
+        <a href="dashboard.html"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
+        <a href="billing.html"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
+        <a href="promotions.html"><i class="bx bx-gift"></i> โปรโมชั่น</a>
+        <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
+        <a href="maintenance.html"><i class="bx bx-wrench"></i> รายการแจ้งซ่อม</a>
+        <a href="chat.html" class="active"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
         
-        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> เธญเธญเธเธเธฒเธเธฃเธฐเธเธ</a>
+        <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
     </div>
     </nav>
 
@@ -38,25 +39,25 @@
         <div class="chat-list-container">
             <div class="chat-list-header">
                 <div class="chat-list-title-bar">
-                    <h2>เธเธฅเนเธญเธเธเนเธญเธเธงเธฒเธก</h2>
-                    <button type="button" class="btn-calendar-trigger" id="btn-open-calendar" onclick="openAppointmentModal()" title="เน€เธเธดเธ”เธเธเธดเธ—เธดเธเธเธฑเธ”เธซเธกเธฒเธข">
+                    <h2>กล่องข้อความ</h2>
+                    <button type="button" class="btn-calendar-trigger" id="btn-open-calendar" onclick="openAppointmentModal()" title="เปิดปฏิทินนัดหมาย">
                         <i class="bx bx-calendar-event"></i>
-                        <span>เธเธเธดเธ—เธดเธเธเธฑเธ”เธซเธกเธฒเธข</span>
+                        <span>ปฏิทินนัดหมาย</span>
                         <span class="calendar-badge-count" id="calendar-badge-count" style="display: none;">0</span>
                     </button>
                 </div>
                 <!-- Tabs -->
                 <div class="chat-tabs">
-                    <button class="chat-tab active" onclick="switchChatTab('tenants')">เธฅเธนเธเธเนเธฒเธ</button>
-                    <button class="chat-tab" onclick="switchChatTab('guests')">เธเธธเธเธเธฅเธ เธฒเธขเธเธญเธ</button>
+                    <button class="chat-tab active" onclick="switchChatTab('tenants')">ลูกบ้าน</button>
+                    <button class="chat-tab" onclick="switchChatTab('guests')">บุคคลภายนอก</button>
                 </div>
                 <div class="search-box">
                     <i class="bx bx-search"></i>
-                    <input type="text" id="search-input" placeholder="เธเนเธเธซเธฒเธซเนเธญเธเธเธฑเธ เธซเธฃเธทเธญ เธญเธตเน€เธกเธฅ...">
+                    <input type="text" id="search-input" placeholder="ค้นหาห้องพัก หรือ อีเมล...">
                 </div>
             </div>
             <div class="chat-list" id="contact-list">
-                <div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 14px;">เธเธณเธฅเธฑเธเนเธซเธฅเธ”...</div>
+                <div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 14px;">กำลังโหลด...</div>
             </div>
         </div>
 
@@ -66,8 +67,8 @@
             <!-- Default State (No chat selected) -->
             <div class="empty-chat-state" id="empty-state">
                 <i class="bx bx-message-square-dots"></i>
-                <h2>เธฃเธฐเธเธเธเธฑเธ”เธเธฒเธฃเนเธเธ—</h2>
-                <p>เน€เธฅเธทเธญเธเธเธนเนเน€เธเนเธฒเธเธฒเธเนเธ–เธเธ”เนเธฒเธเธเนเธฒเธขเน€เธเธทเนเธญเน€เธฃเธดเนเธกเธชเธเธ—เธเธฒ</p>
+                <h2>ระบบจัดการแชท</h2>
+                <p>เลือกผู้เช่าจากแถบด้านซ้ายเพื่อเริ่มสนทนา</p>
             </div>
 
             <!-- Active Chat Header -->
@@ -76,21 +77,21 @@
                 <div class="contact-avatar"><i class="bx bx-user"></i></div>
                 <div style="flex: 1; min-width: 0;">
                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                        <h3 id="active-chat-name" style="margin: 0;">เธเธนเนเน€เธเนเธฒ</h3>
+                        <h3 id="active-chat-name" style="margin: 0;">ผู้เช่า</h3>
                         <span id="active-chat-replied-pill" class="badge-replied" style="display: none;">
-                            <i class="bx bx-check-double"></i> เธ•เธญเธเนเธฅเนเธง
+                            <i class="bx bx-check-double"></i> ตอบแล้ว
                         </span>
                     </div>
                     <p id="active-chat-email">email@example.com</p>
                 </div>
                 <!-- Chat Header Actions -->
                 <div class="chat-header-actions" id="chat-header-actions">
-                    <button type="button" class="btn-header-calendar" id="btn-header-calendar" onclick="openAppointmentModal()" title="เน€เธเธดเธ”เธเธเธดเธ—เธดเธเธเธฑเธ”เธซเธกเธฒเธข">
+                    <button type="button" class="btn-header-calendar" id="btn-header-calendar" onclick="openAppointmentModal()" title="เปิดปฏิทินนัดหมาย">
                         <i class="bx bx-calendar-event"></i>
                     </button>
-                    <button type="button" class="btn-mark-replied" id="btn-mark-replied" onclick="toggleRepliedStatus()" title="เธชเธฅเธฑเธเธชเธ–เธฒเธเธฐเธ•เธญเธเธเธฅเธฑเธเนเธฅเนเธง">
+                    <button type="button" class="btn-mark-replied" id="btn-mark-replied" onclick="toggleRepliedStatus()" title="สลับสถานะตอบกลับแล้ว">
                         <i class="bx bx-check"></i>
-                        <span id="btn-replied-label">เธ—เธณเน€เธเธฃเธทเนเธญเธเธซเธกเธฒเธขเธงเนเธฒเธ•เธญเธเนเธฅเนเธง</span>
+                        <span id="btn-replied-label">ทำเครื่องหมายว่าตอบแล้ว</span>
                     </button>
                 </div>
             </div>
@@ -102,7 +103,7 @@
 
             <!-- Input Form -->
             <form class="chat-input-area" id="chat-form" style="display: none;">
-                <input type="text" id="msg-input" placeholder="เธเธดเธกเธเนเธเนเธญเธเธงเธฒเธกเธ•เธญเธเธเธฅเธฑเธ..." autocomplete="off" required="">
+                <input type="text" id="msg-input" placeholder="พิมพ์ข้อความตอบกลับ..." autocomplete="off" required="">
                 <button type="submit" class="btn-send"><i class="bx bxs-send"></i></button>
             </form>
 
@@ -117,11 +118,11 @@
                 <div class="apt-header-title">
                     <div class="apt-icon-box"><i class="bx bx-calendar-check"></i></div>
                     <div>
-                        <h3>เธเธเธดเธ—เธดเธเธเธฑเธ”เธซเธกเธฒเธข (Monthly Calendar)</h3>
-                        <p>เธ•เธฒเธฃเธฒเธเธเธฑเธ”เธซเธกเธฒเธขเธ”เธนเธซเนเธญเธเธเธฑเธเนเธฅเธฐเธ•เธดเธ”เธ•เนเธญเธเธนเนเน€เธเนเธฒเธเธฃเธฐเธเธณเน€เธ”เธทเธญเธ</p>
+                        <h3>ปฏิทินนัดหมาย (Monthly Calendar)</h3>
+                        <p>ตารางนัดหมายดูห้องพักและติดต่อผู้เช่าประจำเดือน</p>
                     </div>
                 </div>
-                <button type="button" class="apt-modal-close" onclick="closeAppointmentModal()" title="เธเธดเธ”เธซเธเนเธฒเธ•เนเธฒเธ">
+                <button type="button" class="apt-modal-close" onclick="closeAppointmentModal()" title="ปิดหน้าต่าง">
                     <i class="bx bx-x"></i>
                 </button>
             </div>
@@ -132,28 +133,28 @@
                 <!-- Left Pane: Calendar Month View -->
                 <div class="apt-calendar-pane">
                     <div class="apt-month-nav">
-                        <button type="button" class="btn-nav" onclick="changeMonth(-1)" title="เน€เธ”เธทเธญเธเธเนเธญเธเธซเธเนเธฒ">
+                        <button type="button" class="btn-nav" onclick="changeMonth(-1)" title="เดือนก่อนหน้า">
                             <i class="bx bx-chevron-left"></i>
                         </button>
                         <div class="apt-current-month-display">
-                            <span id="apt-month-name">เธเธฑเธเธขเธฒเธขเธ</span>
+                            <span id="apt-month-name">กันยายน</span>
                             <span id="apt-year-name">2026</span>
                         </div>
-                        <button type="button" class="btn-nav" onclick="changeMonth(1)" title="เน€เธ”เธทเธญเธเธ–เธฑเธ”เนเธ">
+                        <button type="button" class="btn-nav" onclick="changeMonth(1)" title="เดือนถัดไป">
                             <i class="bx bx-chevron-right"></i>
                         </button>
-                        <button type="button" class="btn-today" onclick="goToToday()">เธงเธฑเธเธเธตเน</button>
+                        <button type="button" class="btn-today" onclick="goToToday()">วันนี้</button>
                     </div>
 
                     <!-- Weekday Headers -->
                     <div class="apt-weekdays-grid">
-                        <div>เธญเธฒ.</div>
-                        <div>เธ.</div>
-                        <div>เธญ.</div>
-                        <div>เธ.</div>
-                        <div>เธเธค.</div>
-                        <div>เธจ.</div>
-                        <div>เธช.</div>
+                        <div>อา.</div>
+                        <div>จ.</div>
+                        <div>อ.</div>
+                        <div>พ.</div>
+                        <div>พฤ.</div>
+                        <div>ศ.</div>
+                        <div>ส.</div>
                     </div>
 
                     <!-- Dynamic Days Grid -->
@@ -163,9 +164,9 @@
 
                     <!-- Visual Legend -->
                     <div class="apt-legend">
-                        <div class="legend-item"><span class="legend-dot today"></span> เธงเธฑเธเธเธตเน</div>
-                        <div class="legend-item"><span class="legend-dot has-apt"></span> เธกเธตเธเธฑเธ”เธซเธกเธฒเธข</div>
-                        <div class="legend-item"><span class="legend-dot selected"></span> เธงเธฑเธเธ—เธตเนเน€เธฅเธทเธญเธ</div>
+                        <div class="legend-item"><span class="legend-dot today"></span> วันนี้</div>
+                        <div class="legend-item"><span class="legend-dot has-apt"></span> มีนัดหมาย</div>
+                        <div class="legend-item"><span class="legend-dot selected"></span> วันที่เลือก</div>
                     </div>
                 </div>
 
@@ -173,10 +174,10 @@
                 <div class="apt-details-pane">
                     <div class="apt-selected-date-header">
                         <div>
-                            <div class="text-xs text-muted">เธฃเธฒเธขเธเธฒเธฃเธเธฑเธ”เธซเธกเธฒเธข</div>
-                            <h4 id="apt-selected-date-label">เธงเธฑเธเธญเธฒเธ—เธดเธ•เธขเนเธ—เธตเน 6 เธเธฑเธเธขเธฒเธขเธ 2026</h4>
+                            <div class="text-xs text-muted">รายการนัดหมาย</div>
+                            <h4 id="apt-selected-date-label">วันอาทิตย์ที่ 6 กันยายน 2026</h4>
                         </div>
-                        <span id="apt-date-count-badge" class="apt-count-pill">0 เธเธฑเธ”เธซเธกเธฒเธข</span>
+                        <span id="apt-date-count-badge" class="apt-count-pill">0 นัดหมาย</span>
                     </div>
 
                     <!-- Appointment Slots List -->
@@ -187,42 +188,42 @@
                     <!-- Admin Form: Set / Edit Schedule Slot -->
                     <div class="apt-form-card">
                         <div class="apt-form-header">
-                            <h5 id="apt-form-title"><i class="bx bx-plus-circle"></i> เน€เธเธดเนเธกเธเธฑเธ”เธซเธกเธฒเธขเนเธซเธกเน</h5>
-                            <button type="button" id="apt-btn-cancel-edit" class="btn-cancel-edit" style="display:none;" onclick="cancelEditAppointment()">เธขเธเน€เธฅเธดเธ</button>
+                            <h5 id="apt-form-title"><i class="bx bx-plus-circle"></i> เพิ่มนัดหมายใหม่</h5>
+                            <button type="button" id="apt-btn-cancel-edit" class="btn-cancel-edit" style="display:none;" onclick="cancelEditAppointment()">ยกเลิก</button>
                         </div>
                         <form id="apt-slot-form" onsubmit="handleSaveAppointment(event)">
                             <input type="hidden" id="apt-edit-id" value="">
                             
                             <div class="apt-form-row">
                                 <div class="apt-form-group">
-                                    <label for="apt-input-time"><i class="bx bx-time-five"></i> เน€เธงเธฅเธฒ</label>
+                                    <label for="apt-input-time"><i class="bx bx-time-five"></i> เวลา</label>
                                     <input type="time" id="apt-input-time" required value="10:00">
                                 </div>
                                 <div class="apt-form-group">
-                                    <label for="apt-input-type"><i class="bx bx-tag"></i> เธเธฃเธฐเน€เธ เธ—</label>
+                                    <label for="apt-input-type"><i class="bx bx-tag"></i> ประเภท</label>
                                     <select id="apt-input-type">
-                                        <option value="เธเธฑเธ”เธ”เธนเธซเนเธญเธเธเธฑเธ">เธเธฑเธ”เธ”เธนเธซเนเธญเธเธเธฑเธ</option>
-                                        <option value="เธ•เธฃเธงเธเธฃเธฑเธเธซเนเธญเธ / เธขเนเธฒเธขเน€เธเนเธฒ">เธ•เธฃเธงเธเธฃเธฑเธเธซเนเธญเธ / เธขเนเธฒเธขเน€เธเนเธฒ</option>
-                                        <option value="เนเธเนเธเธเนเธญเธกเธเธณเธฃเธธเธ">เนเธเนเธเธเนเธญเธกเธเธณเธฃเธธเธ</option>
-                                        <option value="เธ•เนเธญเธชเธฑเธเธเธฒ / เน€เธญเธเธชเธฒเธฃ">เธ•เนเธญเธชเธฑเธเธเธฒ / เน€เธญเธเธชเธฒเธฃ</option>
-                                        <option value="เธญเธทเนเธเน">เธญเธทเนเธเน</option>
+                                        <option value="นัดดูห้องพัก">นัดดูห้องพัก</option>
+                                        <option value="ตรวจรับห้อง / ย้ายเข้า">ตรวจรับห้อง / ย้ายเข้า</option>
+                                        <option value="แจ้งซ่อมบำรุง">แจ้งซ่อมบำรุง</option>
+                                        <option value="ต่อสัญญา / เอกสาร">ต่อสัญญา / เอกสาร</option>
+                                        <option value="อื่นๆ">อื่นๆ</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div class="apt-form-group">
-                                <label for="apt-input-name"><i class="bx bx-user"></i> เธเธทเนเธญเธฅเธนเธเธเนเธฒ / เธเธนเนเธ•เธดเธ”เธ•เนเธญ</label>
-                                <input type="text" id="apt-input-name" placeholder="เน€เธเนเธ เธเธธเธ“เธชเธกเธเธฒเธข (081-234-5678)" required autocomplete="off">
+                                <label for="apt-input-name"><i class="bx bx-user"></i> ชื่อลูกค้า / ผู้ติดต่อ</label>
+                                <input type="text" id="apt-input-name" placeholder="เช่น คุณสมชาย (081-234-5678)" required autocomplete="off">
                             </div>
 
                             <div class="apt-form-group">
-                                <label for="apt-input-note"><i class="bx bx-notepad"></i> เธซเธฑเธงเธเนเธญ / เธซเนเธญเธเธ—เธตเนเธชเธเนเธ</label>
-                                <input type="text" id="apt-input-note" placeholder="เน€เธเนเธ เธซเนเธญเธ 302 เธชเธเนเธเธชเธฑเธเธเธฒ 1 เธเธต" autocomplete="off">
+                                <label for="apt-input-note"><i class="bx bx-notepad"></i> หัวข้อ / ห้องที่สนใจ</label>
+                                <input type="text" id="apt-input-note" placeholder="เช่น ห้อง 302 สนใจสัญญา 1 ปี" autocomplete="off">
                             </div>
 
                             <button type="submit" class="apt-btn-submit" id="apt-btn-submit">
                                 <i class="bx bx-calendar-plus"></i>
-                                <span id="apt-btn-submit-text">เธเธฑเธเธ—เธถเธเธเธฑเธ”เธซเธกเธฒเธข</span>
+                                <span id="apt-btn-submit-text">บันทึกนัดหมาย</span>
                             </button>
                         </form>
                     </div>

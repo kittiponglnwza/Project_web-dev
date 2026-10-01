@@ -4,6 +4,7 @@ let tenantProfiles = {};
 let isFetching = false;
 let lastMessageCount = 0;
 let currentChatTab = 'tenants'; // 'tenants' or 'guests'
+let isCalendarOpen = false; // หยุด polling ขณะเปิดปฏิทิน
 
 function isMessageContactedHelper(msgId) {
     if (!msgId) return false;
@@ -93,7 +94,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // locked setTimeout polling pattern
         const pollData = async () => {
-            if (!isFetching) {
+            if (!isFetching && !isCalendarOpen) {
                 isFetching = true;
                 try {
                     await loadContacts();
@@ -478,7 +479,30 @@ window.toggleMessageContactStatus = async function(msgId, event) {
         }
     } catch(e) {}
 
-    // 2. Update card in DOM immediately for instant UI feedback
+    // 2. ดึงข้อมูลจากการ์ดก่อน (ก่อนที่ DOM จะถูก re-render)
+    let bookingData = null;
+    if (newStatus && card) {
+        bookingData = {};
+        const fields = card.querySelectorAll('.booking-field');
+        fields.forEach(field => {
+            const label = field.querySelector('.field-label');
+            const value = field.querySelector('.field-value');
+            if (label && value) {
+                const labelText = label.innerText.trim();
+                if (labelText.includes('ผู้สนใจ')) {
+                    bookingData.name = value.innerText.trim();
+                } else if (labelText.includes('เบอร์โทร')) {
+                    bookingData.phone = value.innerText.trim();
+                } else if (labelText.includes('เข้าอยู่')) {
+                    bookingData.date = value.innerText.trim();
+                } else if (labelText.includes('ห้อง')) {
+                    bookingData.room = value.innerText.trim();
+                }
+            }
+        });
+    }
+
+    // 3. Update card in DOM immediately for instant UI feedback
     if (card) {
         const statusBadge = document.getElementById(`status-badge-${msgId}`);
         const btn = document.getElementById(`btn-contact-${msgId}`);
@@ -494,31 +518,6 @@ window.toggleMessageContactStatus = async function(msgId, event) {
                 btn.innerHTML = `<i class='bx bxs-check-circle'></i> <span class="btn-contact-text">รับทราบและติดต่อเรียบร้อยแล้ว</span>`;
                 btn.setAttribute('title', 'คลิกเพื่อสลับกลับเป็นยังไม่ติดต่อ');
             }
-
-            // ดึงข้อมูลจากการ์ดแจ้งเตือนแล้วส่งไปเติมในปฏิทิน
-            const bookingData = {};
-            const fields = card.querySelectorAll('.booking-field');
-            fields.forEach(field => {
-                const label = field.querySelector('.field-label');
-                const value = field.querySelector('.field-value');
-                if (label && value) {
-                    const labelText = label.innerText.trim();
-                    if (labelText.includes('ผู้สนใจ')) {
-                        bookingData.name = value.innerText.trim();
-                    } else if (labelText.includes('เบอร์โทร')) {
-                        bookingData.phone = value.innerText.trim();
-                    } else if (labelText.includes('เข้าอยู่')) {
-                        bookingData.date = value.innerText.trim();
-                    } else if (labelText.includes('ห้อง')) {
-                        bookingData.room = value.innerText.trim();
-                    }
-                }
-            });
-
-            // เปิดหน้าต่างปฏิทินนัดหมาย พร้อมเติมข้อมูลลูกค้า
-            if (typeof window.openAppointmentModal === 'function') {
-                window.openAppointmentModal(bookingData);
-            }
         } else {
             card.classList.remove('is-contacted');
             if (statusBadge) {
@@ -533,7 +532,7 @@ window.toggleMessageContactStatus = async function(msgId, event) {
         }
     }
 
-    // 3. Supabase update query for the specific message
+    // 4. Supabase update query - await ให้เสร็จก่อน
     if (window.supabaseClient) {
         try {
             const { error } = await supabaseClient
@@ -549,9 +548,14 @@ window.toggleMessageContactStatus = async function(msgId, event) {
         }
     }
 
-    // 4. Update sidebar list unread counts
+    // 5. Update sidebar list unread counts
     if (typeof loadContacts === 'function') {
         loadContacts();
+    }
+
+    // 6. เปิดปฏิทินนัดหมาย พร้อมข้อมูลลูกค้า (เฉพาะตอนกดรับทราบ ไม่ใช่ตอนยกเลิก)
+    if (newStatus && bookingData && typeof window.openAppointmentModal === 'function') {
+        window.openAppointmentModal(bookingData);
     }
 };
 

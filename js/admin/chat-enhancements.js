@@ -306,6 +306,9 @@
         // Allow display:flex to apply before adding class for smooth transition
         setTimeout(() => modal.classList.add('show'), 10);
 
+        // หยุด polling ขณะเปิดปฏิทิน
+        window.isCalendarOpen = true;
+
         // ถ้ามีข้อมูลจากการ์ดแจ้งเตือน ให้เลื่อนปฏิทินไปยังวันที่ของลูกค้า
         if (bookingData && bookingData.date) {
             const parsed = parseDateYMD(bookingData.date);
@@ -357,6 +360,11 @@
         setTimeout(() => {
             modal.style.display = 'none';
             cancelEditAppointment();
+
+            // เปิด polling ใหม่ + refresh ข้อมูลให้สดหลังปิดปฏิทิน
+            window.isCalendarOpen = false;
+            if (typeof loadContacts === 'function') loadContacts();
+            if (typeof loadActiveChatMessages === 'function') loadActiveChatMessages(false);
         }, 250);
     };
 

@@ -69,13 +69,15 @@ async function loadBills() {
     try {
         const { data, error } = await supabaseClient
             .from('bills')
-            .select('*')
+            .select(`*,tenant_profiles(
+                id,email,room_no,national_id,address,lease_status,start_date,end_date)`)
             .order('created_at', { ascending: false });
 
         if (!error && data) {
             data.forEach(bill => {
                 // ดึงเลขห้องปัจจุบันจาก tenantProfiles เสมอ เพื่อไม่ให้ข้อมูลขัดแย้งกันกรณีเปลี่ยนห้อง
-                const tenant = tenantProfiles.find(t => t.email === bill.email);
+                // const tenant = tenantProfiles.find(t => t.email === bill.email);\
+                const tenant = bill.tenant_profiles;
                 if (tenant && tenant.room_no) {
                     bill.room_no = tenant.room_no;
                 } else if (!bill.room_no || bill.room_no === 'null') {

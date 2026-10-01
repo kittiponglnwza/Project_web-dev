@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap');
+
+:root { --primary-color: #1a202c; --secondary-color: #d4af37; --bg-color: #f9fafb; --text-color: #374151; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Prompt', sans-serif; }
+body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+
+/* =========================================
+   LOGIN & REGISTER PAGE (Full Page Split Layout)
+   ========================================= */
+.login-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    background: #fff;
+}
+.login-left {
+    width: 100%;
+    height: 250px;
+    background: url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200') center/cover no-repeat;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 30px;
+}
+.login-left::before {
+    content: '';
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+}
+.login-branding { position: relative; z-index: 1; color: #fff; }
+.login-branding h2 { font-size: clamp(2rem, 8vw, 3.5rem); margin-bottom: 5px; font-weight: 600; letter-spacing: 2px; color: #d4af37; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+.login-branding p { font-size: 1.2rem; font-weight: 300; opacity: 0.9; }
+
+.login-right {
+    width: 100%;
+    padding: 40px 25px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: #fff;
+}
+.back-home { position: absolute; top: 40px; right: 50px; color: #9ca3af; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.3s; font-size: 0.95rem; }
+.back-home:hover { color: #111; }
+
+
+
+
+
+/* =========================================
+   LUXURY FORM INPUTS (เธเธญเธฃเนเธกเธซเธฃเธนเธซเธฃเธฒ)
+   ========================================= */
+.lux-input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: 0.3s all ease;
+    background-color: #f9fafb;
+    font-family: 'Prompt', sans-serif;
+    color: #111;
+}
+.lux-input:focus {
+    border-color: #d4af37;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+}
+.lux-input::placeholder {
+    color: #9ca3af;
+}
+.lux-input-group {
+    position: relative;
+}
+.lux-input-group i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.3rem;
+    color: #9ca3af;
+    transition: 0.3s;
+}
+.lux-input-group .lux-input {
+    padding-left: 48px;
+}
+.lux-input-group .lux-input:focus + i, 
+.lux-input-group .lux-input:focus ~ i {
+    color: #d4af37;
+}
+
+
+/* Shared form/button rules */
+.lux-btn-reserve {
+    width: 100%; background: #111; color: #fff; border: none; padding: 18px;
+    font-size: 1.05rem; border-radius: 12px; cursor: pointer; transition: 0.3s;
+    display: flex; justify-content: center; align-items: center; gap: 10px; font-weight: 500;
+}
+.lux-btn-reserve:hover { background: #333; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+
+.lux-input {
+    width: 100%; padding: 14px 18px; border: 1px solid #e5e7eb; border-radius: 12px;
+    font-size: 0.95rem; outline: none; transition: 0.3s all ease;
+    background-color: #f9fafb; font-family: 'Prompt', sans-serif; color: #111;
+}
+.lux-input:focus { border-color: #d4af37; background-color: #fff; box-shadow: 0 0 0 4px rgba(212,175,55,0.15); }
+.lux-input::placeholder { color: #9ca3af; }
+.lux-input-group { position: relative; }
+.lux-input-group i {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    font-size: 1.3rem; color: #9ca3af; transition: 0.3s;
+}
+.lux-input-group .lux-input { padding-left: 48px; }
+.lux-input-group .lux-input:focus + i,
+.lux-input-group .lux-input:focus ~ i { color: #d4af37; }
+
+.form-group { margin-bottom: 20px; text-align: left; }
+.form-group label { display: block; font-weight: 500; margin-bottom: 8px; color: #374151; font-size: 0.95rem; }
+.form-group input {
+    width: 100%; padding: 14px 18px; border: 1px solid #d1d5db; border-radius: 10px;
+    font-size: 1rem; outline: none; transition: 0.3s;
+}
+.form-group input:focus { border-color: #111; box-shadow: 0 0 0 4px rgba(17,17,17,0.05); }
+.error-msg { display: none; color: #ef4444; font-size: 0.85rem; margin-top: 8px; font-weight: 500; }
+.form-group input.invalid { border-color: #ef4444; background-color: #fef2f2; }
+.form-group input.invalid:focus { box-shadow: 0 0 0 4px rgba(239,68,68,0.1); }
+
+/* Register-specific */
+#registerForm { position: relative; }
+input[type="text"], input[type="email"], input[type="tel"], input[type="password"] { transition: all 0.3s ease; }
+input[type="email"]:focus { box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+#registerForm .lux-input:focus { box-shadow: 0 0 0 3px rgba(212,175,55,0.2); }
+
+.section-title {
+    font-size: 1.05rem; color: #d4af37; margin-bottom: 20px;
+    font-weight: 500; letter-spacing: 0.5px;
+}
+.login-right.register-page {
+    justify-content: flex-start; padding-top: 60px; padding-bottom: 60px; overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+    .login-wrapper { flex-direction: row; }
+    .login-left { width: 50%; height: auto; padding: 60px; }
+    .login-right { width: 50%; padding: 40px; }
+}
+@media (min-width: 900px) {
+    .login-right { padding: 60px 80px; }
+}

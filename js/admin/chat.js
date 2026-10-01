@@ -494,6 +494,11 @@ window.toggleMessageContactStatus = async function(msgId, event) {
                 btn.innerHTML = `<i class='bx bxs-check-circle'></i> <span class="btn-contact-text">รับทราบและติดต่อเรียบร้อยแล้ว</span>`;
                 btn.setAttribute('title', 'คลิกเพื่อสลับกลับเป็นยังไม่ติดต่อ');
             }
+
+            // เปิดหน้าต่างปฏิทินนัดหมายเมื่อกดรับทราบ
+            if (typeof window.openAppointmentModal === 'function') {
+                window.openAppointmentModal();
+            }
         } else {
             card.classList.remove('is-contacted');
             if (statusBadge) {

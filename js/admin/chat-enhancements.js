@@ -208,29 +208,34 @@
         return [];
     }
 
-    function getAllAppointments() {
+    let appointmentsList = [];
+
+    // ดึงข้อมูลจากฐานข้อมูล Supabase เมื่อเริ่มทำงาน
+    async function fetchAppointments() {
+        if (!window.supabaseClient) return;
         try {
-            const raw = localStorage.getItem(CALENDAR_STORAGE_KEY);
-            if (!raw) {
-                const initial = getInitialAppointments();
-                saveAllAppointments(initial);
-                return initial;
+            const { data, error } = await supabaseClient.from('appointments').select('*');
+            if (error) {
+                console.error('Error fetching appointments', error);
+                return;
             }
-            return JSON.parse(raw);
+            if (data) {
+                appointmentsList = data;
+                updateCalendarBadge();
+                renderCalendar();
+                renderSelectedDateSlots();
+            }
         } catch (e) {
-            console.error('Error fetching calendar appointments', e);
-            return [];
+            console.error('Error in fetchAppointments', e);
         }
     }
 
-    function saveAllAppointments(list) {
-        try {
-            localStorage.setItem(CALENDAR_STORAGE_KEY, JSON.stringify(list));
-            updateCalendarBadge();
-        } catch (e) {
-            console.error('Error saving calendar appointments', e);
-        }
+    function getAllAppointments() {
+        return appointmentsList;
     }
+
+    // saveAllAppointments ไม่ต้องใช้แล้วสำหรับ local storage 
+    // เราจะเซฟลง db โดยตรงในฟังก์ชัน handleSave และ delete
 
     function updateCalendarBadge() {
         const badge = document.getElementById('calendar-badge-count');
@@ -479,7 +484,7 @@
     }
 
     // Appointment Form Handlers
-    window.handleSaveAppointment = function (e) {
+    window.handleSaveAppointment = async function (e) {
         e.preventDefault();
 
         const timeInput = document.getElementById('apt-input-time');
@@ -499,31 +504,54 @@
             return;
         }
 
-        let allApts = getAllAppointments();
+        const submitBtn = document.getElementById('apt-btn-submit');
+        if (submitBtn) submitBtn.disabled = true;
 
         if (editId) {
-            // Edit existing
-            const index = allApts.findIndex(a => a.id === editId);
-            if (index !== -1) {
-                allApts[index].time = time;
-                allApts[index].type = type;
-                allApts[index].name = name;
-                allApts[index].note = note;
+            // Edit existing in Supabase
+            if (window.supabaseClient) {
+                const { error } = await supabaseClient
+                    .from('appointments')
+                    .update({ time, type, name, note })
+                    .eq('id', editId);
+                
+                if (error) {
+                    alert('เกิดข้อผิดพลาดในการแก้ไข: ' + error.message);
+                } else {
+                    const index = appointmentsList.findIndex(a => a.id === editId);
+                    if (index !== -1) {
+                        appointmentsList[index] = { ...appointmentsList[index], time, type, name, note };
+                    }
+                }
             }
         } else {
-            // Create new
+            // Create new in Supabase
+            const newId = 'apt-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
             const newApt = {
-                id: 'apt-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+                id: newId,
                 date: calState.selectedDate,
                 time: time,
                 type: type,
                 name: name,
                 note: note
             };
-            allApts.push(newApt);
+
+            if (window.supabaseClient) {
+                const { error } = await supabaseClient
+                    .from('appointments')
+                    .insert([newApt]);
+                
+                if (error) {
+                    alert('เกิดข้อผิดพลาดในการบันทึก: ' + error.message);
+                } else {
+                    appointmentsList.push(newApt);
+                }
+            }
         }
 
-        saveAllAppointments(allApts);
+        if (submitBtn) submitBtn.disabled = false;
+
+        updateCalendarBadge();
         cancelEditAppointment();
         renderCalendar();
         renderSelectedDateSlots();
@@ -577,12 +605,23 @@
         if (cancelBtn) cancelBtn.style.display = 'none';
     };
 
-    window.deleteAppointment = function (id) {
+    window.deleteAppointment = async function (id) {
         if (!confirm('ต้องการลบนัดหมายนี้ใช่หรือไม่?')) return;
 
-        let allApts = getAllAppointments();
-        allApts = allApts.filter(a => a.id !== id);
-        saveAllAppointments(allApts);
+        if (window.supabaseClient) {
+            const { error } = await supabaseClient
+                .from('appointments')
+                .delete()
+                .eq('id', id);
+            
+            if (error) {
+                alert('เกิดข้อผิดพลาดในการลบ: ' + error.message);
+                return;
+            }
+        }
+
+        appointmentsList = appointmentsList.filter(a => a.id !== id);
+        updateCalendarBadge();
 
         if (calState.editingId === id) {
             cancelEditAppointment();
@@ -623,11 +662,13 @@
     // =========================================================================
     // INITIALIZATION
     // =========================================================================
-    function initEnhancements() {
+    async function initEnhancements() {
         hookOpenChat();
         hookRenderContactList();
         hookChatFormSubmit();
         initModalEventListeners();
+        
+        await fetchAppointments();
         updateCalendarBadge();
 
         // Initial check for active chat email if already open

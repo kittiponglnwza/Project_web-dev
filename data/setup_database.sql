@@ -139,3 +139,25 @@ VALUES
 ('โปรผู้เช่าใหม่ ลด 50%', 'เดือนแรกของการเข้าอยู่ ลดค่าเช่า 50%', 'new_tenant', 'percent', 50, 'rent_fee', '2024-01-01', '2030-12-31', true, true),
 ('Low Season ลด 20%', 'ช่วง มี.ค. - พ.ค. ลดค่าเช่า 20%', 'seasonal', 'percent', 20, 'rent_fee', '2025-03-01', '2025-05-31', true, true),
 ('ฟรีค่าส่วนกลาง', 'ยกเว้นค่าส่วนกลาง (other_fee) ฟรี', 'free_common_fee', 'free_field', 0, 'other_fee', '2024-01-01', '2030-12-31', false, true);
+
+-- 5. ���ҧ�Ѵ���� (Appointments)
+DROP TABLE IF EXISTS appointments CASCADE;
+CREATE TABLE appointments (
+    id TEXT PRIMARY KEY,
+    date TEXT NOT NULL,
+    time TEXT NOT NULL,
+    name TEXT NOT NULL,
+    type TEXT,
+    note TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Admins ����ö�Ѵ��ùѴ�����������
+CREATE POLICY "Admins can manage appointments" ON public.appointments USING (
+  EXISTS (SELECT 1 FROM tenant_profiles WHERE email = auth.jwt() ->> 'email' AND role = 'admin')
+);
+-- Policy: ��ҹ�������� (����Ѻ�����Ŵ��ԷԹ)
+CREATE POLICY "Public read for appointments if needed" ON public.appointments
+FOR SELECT USING (true);
+

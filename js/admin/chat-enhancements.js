@@ -298,7 +298,7 @@
     }
 
     // Modal Control
-    window.openAppointmentModal = function () {
+    window.openAppointmentModal = function (bookingData) {
         const modal = document.getElementById('appointment-modal');
         if (!modal) return;
 
@@ -306,8 +306,47 @@
         // Allow display:flex to apply before adding class for smooth transition
         setTimeout(() => modal.classList.add('show'), 10);
 
+        // ถ้ามีข้อมูลจากการ์ดแจ้งเตือน ให้เลื่อนปฏิทินไปยังวันที่ของลูกค้า
+        if (bookingData && bookingData.date) {
+            const parsed = parseDateYMD(bookingData.date);
+            if (!isNaN(parsed.getTime())) {
+                calState.year = parsed.getFullYear();
+                calState.month = parsed.getMonth();
+                calState.selectedDate = bookingData.date;
+            }
+        }
+
         renderCalendar();
         renderSelectedDateSlots();
+
+        // เติมข้อมูลลูกค้าจากการ์ดแจ้งเตือนลงในฟอร์มเพิ่มนัดหมาย
+        if (bookingData) {
+            // รีเซ็ตฟอร์มก่อน
+            cancelEditAppointment();
+
+            const nameInput = document.getElementById('apt-input-name');
+            const noteInput = document.getElementById('apt-input-note');
+            const typeInput = document.getElementById('apt-input-type');
+
+            // เติมชื่อ + เบอร์โทร
+            if (nameInput) {
+                let nameVal = bookingData.name || '';
+                if (bookingData.phone) {
+                    nameVal += ` (${bookingData.phone})`;
+                }
+                nameInput.value = nameVal;
+            }
+
+            // เติมห้องที่สนใจลงในหมายเหตุ
+            if (noteInput && bookingData.room) {
+                noteInput.value = bookingData.room;
+            }
+
+            // ตั้งประเภทเป็น "นัดดูห้องพัก"
+            if (typeInput) {
+                typeInput.value = 'นัดดูห้องพัก';
+            }
+        }
     };
 
     window.closeAppointmentModal = function () {

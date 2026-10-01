@@ -495,9 +495,29 @@ window.toggleMessageContactStatus = async function(msgId, event) {
                 btn.setAttribute('title', 'คลิกเพื่อสลับกลับเป็นยังไม่ติดต่อ');
             }
 
-            // เปิดหน้าต่างปฏิทินนัดหมายเมื่อกดรับทราบ
+            // ดึงข้อมูลจากการ์ดแจ้งเตือนแล้วส่งไปเติมในปฏิทิน
+            const bookingData = {};
+            const fields = card.querySelectorAll('.booking-field');
+            fields.forEach(field => {
+                const label = field.querySelector('.field-label');
+                const value = field.querySelector('.field-value');
+                if (label && value) {
+                    const labelText = label.innerText.trim();
+                    if (labelText.includes('ผู้สนใจ')) {
+                        bookingData.name = value.innerText.trim();
+                    } else if (labelText.includes('เบอร์โทร')) {
+                        bookingData.phone = value.innerText.trim();
+                    } else if (labelText.includes('เข้าอยู่')) {
+                        bookingData.date = value.innerText.trim();
+                    } else if (labelText.includes('ห้อง')) {
+                        bookingData.room = value.innerText.trim();
+                    }
+                }
+            });
+
+            // เปิดหน้าต่างปฏิทินนัดหมาย พร้อมเติมข้อมูลลูกค้า
             if (typeof window.openAppointmentModal === 'function') {
-                window.openAppointmentModal();
+                window.openAppointmentModal(bookingData);
             }
         } else {
             card.classList.remove('is-contacted');

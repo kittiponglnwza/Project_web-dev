@@ -212,7 +212,7 @@
 
     // ดึงข้อมูลจากฐานข้อมูล Supabase เมื่อเริ่มทำงาน
     async function fetchAppointments() {
-        if (!window.supabaseClient) return;
+        if (typeof supabaseClient === 'undefined') return;
         try {
             const { data, error } = await supabaseClient.from('appointments').select('*');
             if (error) {
@@ -509,7 +509,7 @@
 
         if (editId) {
             // Edit existing in Supabase
-            if (window.supabaseClient) {
+            if (typeof supabaseClient !== 'undefined') {
                 const { error } = await supabaseClient
                     .from('appointments')
                     .update({ time, type, name, note })
@@ -536,7 +536,7 @@
                 note: note
             };
 
-            if (window.supabaseClient) {
+            if (typeof supabaseClient !== 'undefined') {
                 const { error } = await supabaseClient
                     .from('appointments')
                     .insert([newApt]);
@@ -608,7 +608,7 @@
     window.deleteAppointment = async function (id) {
         if (!confirm('ต้องการลบนัดหมายนี้ใช่หรือไม่?')) return;
 
-        if (window.supabaseClient) {
+        if (typeof supabaseClient !== 'undefined') {
             const { error } = await supabaseClient
                 .from('appointments')
                 .delete()

@@ -4,6 +4,8 @@
 
 The repository contains one database setup script, [`data/setup_database.sql`](../data/setup_database.sql), and no migration directory, generated Supabase types, or other schema definition. This document describes the final structure produced by that script, including its later `ALTER TABLE bills` statements. Application queries are cross-check evidence, not proof of undeclared database objects or constraints.
 
+A read-only request for the configured Supabase REST schema metadata returned HTTP 401. The deployed database could not be independently inspected, so “confirmed” below means confirmed by repository DDL; additional deployed objects or constraints may exist.
+
 The script defines **4 confirmed tables** and **1 confirmed foreign key**. Supabase Auth is used by the application, but its managed `auth` schema is not defined by this project SQL and is not included as a project table here.
 
 `SERIAL` columns are PostgreSQL integer columns with sequence-generated defaults. Unless stated otherwise, columns without `NOT NULL` are nullable. Defaults do not imply `NOT NULL`.

@@ -205,55 +205,7 @@
 
     // Pre-seed realistic appointments for new users around today's date
     function getInitialAppointments() {
-        const today = new Date();
-        const y = today.getFullYear();
-        const m = String(today.getMonth() + 1).padStart(2, '0');
-        const dStr = (d) => `${y}-${m}-${String(d).padStart(2, '0')}`;
-
-        const curDay = today.getDate();
-
-        return [
-            {
-                id: 'apt-seed-1',
-                date: dStr(curDay),
-                time: '10:30',
-                name: 'คุณกิตติศักดิ์ พูลสวัสดิ์',
-                type: 'นัดดูห้องพัก',
-                note: 'ห้อง 302 (Deluxe แอร์) โทร 089-112-3456'
-            },
-            {
-                id: 'apt-seed-2',
-                date: dStr(curDay),
-                time: '14:00',
-                name: 'คุณณิชาภัทร วัฒนกุล',
-                type: 'ตรวจรับห้อง / ย้ายเข้า',
-                note: 'ห้อง 105 นัดส่งมอบกุญแจและสัญญาเช่า'
-            },
-            {
-                id: 'apt-seed-3',
-                date: dStr(Math.min(curDay + 2, 28)),
-                time: '11:00',
-                name: 'คุณธนกร เลิศวิชัย',
-                type: 'นัดดูห้องพัก',
-                note: 'ห้อง 405 (Studio) โทร 092-334-7711'
-            },
-            {
-                id: 'apt-seed-4',
-                date: dStr(Math.min(curDay + 5, 28)),
-                time: '13:30',
-                name: 'คุณวรรณภา จันทร์โอชา',
-                type: 'แจ้งซ่อมบำรุง',
-                note: 'ห้อง 208 ช่างเข้าตรวจเช็คแอร์น้ำหยด'
-            },
-            {
-                id: 'apt-seed-5',
-                date: dStr(Math.min(curDay + 9, 28)),
-                time: '15:00',
-                name: 'คุณปฏิภาณ สุขุมวิท',
-                type: 'ต่อสัญญา / เอกสาร',
-                note: 'ห้อง 501 ต่อสัญญาเช่าล่วงหน้า 1 ปี'
-            }
-        ];
+        return [];
     }
 
     function getAllAppointments() {

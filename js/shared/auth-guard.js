@@ -90,7 +90,7 @@ async function logout() {
 
     // Rubric 9: Terminate a session
     DormSession.terminate();
-
+    deleteCookie('rememberedEmail');
     try {
         await supabaseClient.auth.signOut();
     } catch (err) {

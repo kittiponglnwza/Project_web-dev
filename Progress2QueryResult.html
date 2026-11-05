@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปผลการ Query ข้อมูล - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css?v=1.2.0" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=1.2.1">
+    <link rel="stylesheet" href="css/admin/create_bill.css?v=1.3.0">
+    <style>
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .badge-active { background-color: #e6fffa; color: #234e52; border: 1px solid #b2f5ea; }
+        .badge-warning { background-color: #fffaf0; color: #7b341e; border: 1px solid #feebc8; }
+        .badge-danger { background-color: #fff5f5; color: #9b2c2c; border: 1px solid #fed7d7; }
+        .card + .card { margin-top: 25px; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+    </style>
+</head>
+<body class="admin-layout">
+
+    <nav class="sidebar" id="app-sidebar"></nav>
+
+    <main class="main-content">
+        <header class="header-actions">
+            <h2></i> สรุปผลลัพธ์การ Query ข้อมูล (Progress 2)</h2>
+            
+        </header>
+
+        <!-- Query 1 Card -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="font-size: 1.1rem; color: #2d3748; font-weight: 600;">
+                     Query 1: สรุปยอดรายได้และส่วนลดแยกตามห้องพัก
+                </h3>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center">เลขห้อง</th>
+                        <th>อีเมลผู้เช่า</th>
+                        <th class="text-center">สถานะสัญญา</th>
+                        <th class="text-center">จำนวนบิล</th>
+                        <th class="text-right">ยอดรวมค่าเช่า (฿)</th>
+                        <th class="text-right">ยอดรวมค่าไฟ (฿)</th>
+                        <th class="text-right">ยอดรวมค่าน้ำ (฿)</th>
+                        <th class="text-right">ส่วนลดรวม (฿)</th>
+                        <th class="text-right">ยอดสุทธิต้องชำระรวม (฿)</th>
+                        <th>โปรโมชั่นที่ใช้</th>
+                    </tr>
+                </thead>
+                <tbody id="query1-table-body">
+                    <tr><td colspan="10" class="text-center">กำลังโหลดข้อมูลจาก Supabase...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Query 2 Card -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="font-size: 1.1rem; color: #2d3748; font-weight: 600;">
+                     Query 2: รายงานผู้เช่าที่มีประวัติการแจ้งซ่อมและบิลค้างชำระ
+                </h3>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center">เลขห้อง</th>
+                        <th>อีเมลผู้เช่า</th>
+                        <th class="text-center">จำนวนครั้งที่แจ้งซ่อม</th>
+                        <th class="text-center">จำนวนบิลค้างชำระ</th>
+                        <th class="text-right">ยอดเงินค้างชำระรวม (฿)</th>
+                    </tr>
+                </thead>
+                <tbody id="query2-table-body">
+                    <tr><td colspan="5" class="text-center">กำลังโหลดข้อมูลจาก Supabase...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Supabase & Shared Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js?v=1.2.0"></script>
+    <script src="js/shared/utils.js"></script>
+    <script src="js/shared/auth-guard.js"></script>
+    <script src="js/shared/components.js"></script>
+
+    <!-- Script สำหรับ Query ดึงข้อมูลจาก View จริง -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. ตรวจสอบและดึง Supabase Client Instance จาก supabase-config.js
+            let db = null;
+
+            if (typeof supabaseClient !== 'undefined' && typeof supabaseClient.from === 'function') {
+                db = supabaseClient;
+            } else if (typeof window.supabaseClient !== 'undefined' && typeof window.supabaseClient.from === 'function') {
+                db = window.supabaseClient;
+            } else if (typeof supabase !== 'undefined' && typeof supabase.from === 'function') {
+                db = supabase;
+            } else if (window.supabase && typeof window.supabase.createClient === 'function') {
+                // กรณีใน supabase-config.js ประกาศ SUPABASE_URL และ SUPABASE_ANON_KEY ไว้
+                if (typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_ANON_KEY !== 'undefined') {
+                    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                }
+            }
+
+            if (!db || typeof db.from !== 'function') {
+                console.error('ไม่สามารถเชื่อมต่อ Supabase Client ได้ กรุณาตรวจสอบไฟล์ supabase-config.js');
+                const errText = `<tr><td colspan="10" class="text-center" style="color: red;">ไม่สามารถเชื่อมต่อ Supabase ได้ (โปรดเปิดผ่าน Live Server และตรวจสอบ supabase-config.js)</td></tr>`;
+                document.getElementById('query1-table-body').innerHTML = errText;
+                document.getElementById('query2-table-body').innerHTML = errText;
+                return;
+            }
+
+            // 2. ดึงข้อมูล Query 1
+            async function fetchQuery1() {
+                const tbody = document.getElementById('query1-table-body');
+                try {
+                    const { data, error } = await db
+                        .from('view_tenant_billing_summary')
+                        .select('*');
+
+                    if (error) throw error;
+
+                    if (!data || data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="10" class="text-center">ไม่พบข้อมูล</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = data.map(row => `
+                        <tr>
+                            <td class="text-center" style="font-weight: 600;">${row.room_no}</td>
+                            <td>${row.email}</td>
+                            <td class="text-center"><span class="badge badge-active">${row.lease_status}</span></td>
+                            <td class="text-center">${row.total_bills}</td>
+                            <td class="text-right">${Number(row.sum_rent_fee).toLocaleString()}</td>
+                            <td class="text-right">${Number(row.sum_elec_fee).toLocaleString()}</td>
+                            <td class="text-right">${Number(row.sum_water_fee).toLocaleString()}</td>
+                            <td class="text-right" style="color: #e53e3e;">${Number(row.sum_discount).toLocaleString()}</td>
+                            <td class="text-right" style="font-weight: 600; color: #2b6cb0;">${Number(row.sum_net_amount).toLocaleString()}</td>
+                            <td>${row.used_promotions}</td>
+                        </tr>
+                    `).join('');
+
+                } catch (err) {
+                    console.error('Error fetching Query 1:', err);
+                    tbody.innerHTML = `<tr><td colspan="10" class="text-center" style="color: red;">เกิดข้อผิดพลาด: ${err.message}</td></tr>`;
+                }
+            }
+
+            // 3. ดึงข้อมูล Query 2
+            async function fetchQuery2() {
+                const tbody = document.getElementById('query2-table-body');
+                try {
+                    const { data, error } = await db
+                        .from('view_tenant_maintenance_unpaid')
+                        .select('*');
+
+                    if (error) throw error;
+
+                    if (!data || data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="text-center">ไม่พบข้อมูล</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = data.map(row => `
+                        <tr>
+                            <td class="text-center" style="font-weight: 600;">${row.room_no}</td>
+                            <td>${row.email}</td>
+                            <td class="text-center"><span class="badge badge-warning">${row.maintenance_count} ครั้ง</span></td>
+                            <td class="text-center"><span class="badge ${row.unpaid_bills_count > 0 ? 'badge-danger' : 'badge-active'}">${row.unpaid_bills_count} บิล</span></td>
+                            <td class="text-right" style="font-weight: 600; color: ${row.total_unpaid_amount > 0 ? '#e53e3e' : '#2b6cb0'};">
+                                ${Number(row.total_unpaid_amount).toLocaleString()}
+                            </td>
+                        </tr>
+                    `).join('');
+
+                } catch (err) {
+                    console.error('Error fetching Query 2:', err);
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="color: red;">เกิดข้อผิดพลาด: ${err.message}</td></tr>`;
+                }
+            }
+
+            // เรียกดึงข้อมูลทั้งสองตาราง
+            fetchQuery1();
+            fetchQuery2();
+        });
+    </script>
+</body>
+</html>

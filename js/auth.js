@@ -98,6 +98,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Rubric 9: สร้าง Session แล้วเก็บข้อมูลจากฐานข้อมูล
                 let profile = await loadSessionProfile(data.user.email);
 
+                if (profile && profile.archived_at) {
+                    DormSession.terminate();
+                    await supabaseClient.auth.signOut();
+                    alert('บัญชีนี้ถูกเก็บเข้าคลังแล้ว ไม่สามารถเข้าสู่ระบบได้ กรุณาติดต่อผู้ดูแลระบบ');
+                    return;
+                }
+
                 // สมัครแบบต้องยืนยันอีเมลจะยังไม่มีโปรไฟล์ จึงสร้างให้เมื่อเข้าสู่ระบบครั้งแรก
                 if (!profile) {
                     const { error: profileError } = await supabaseClient
@@ -276,7 +283,13 @@ async function checkLoginStatus() {
         }
         
         // เช็ค Role จาก Database
-        const { data: profile } = await supabaseClient.from('tenant_profiles').select('role').eq('email', user.email).maybeSingle();
+        const { data: profile } = await supabaseClient.from('tenant_profiles').select('role, archived_at').eq('email', user.email).maybeSingle();
+        if (profile && profile.archived_at) {
+            DormSession.terminate();
+            try { await supabaseClient.auth.signOut(); } catch (err) { console.error('Archived account sign-out error:', err); }
+            alert('บัญชีนี้ถูกเก็บเข้าคลังแล้ว ไม่สามารถเข้าสู่ระบบได้');
+            return;
+        }
         const isAdmin = profile && profile.role === 'admin';
 
         if (loginBtn) {

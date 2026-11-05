@@ -66,7 +66,7 @@ async function loadSessionProfile(email) {
 
     const { data: profile, error } = await supabaseClient
         .from('tenant_profiles')
-        .select('role, room_no')
+        .select('role, room_no, archived_at')
         .eq('email', email)
         .maybeSingle();
 

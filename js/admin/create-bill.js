@@ -165,7 +165,7 @@ function renderPromoBanner() {
 
 async function loadTenants() {
     try {
-        const { data, error } = await supabaseClient.from('tenant_profiles').select('*').neq('role', 'admin').not('room_no', 'is', null);
+        const { data, error } = await supabaseClient.from('tenant_profiles').select('*').neq('role', 'admin').is('archived_at', null).not('room_no', 'is', null);
         if (data) {
             activeTenants = data.filter(t => t.room_no.trim() !== '');
             document.getElementById('save-all-btn').innerHTML = `<i class='bx bx-save'></i> บันทึกบิลทั้งหมด (${activeTenants.length} ห้อง)`;

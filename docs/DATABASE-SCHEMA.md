@@ -2,7 +2,7 @@
 
 ## Sources and Scope
 
-The schema is defined by [`data/setup_database.sql`](../data/setup_database.sql) followed by [`data/migration_rubric.sql`](../data/migration_rubric.sql). This document describes the final structure produced by the two scripts. Only `migration_rubric.sql` is safe to re-run on a database that holds data, because `setup_database.sql` drops its tables first.
+The schema is defined by [`data/setup_database.sql`](../data/setup_database.sql), [`data/migration_rubric.sql`](../data/migration_rubric.sql), and (for archived tenant profiles) [`data/migration_tenant_archive.sql`](../data/migration_tenant_archive.sql), in that order. This document describes the structure after those migrations. `migration_rubric.sql` and `migration_tenant_archive.sql` are safe to re-run; `setup_database.sql` drops its tables first. The archive migration preserves profile and bill rows.
 
 The deployed database could not be inspected, so “confirmed” below means confirmed by repository DDL; additional deployed objects or constraints may exist.
 
@@ -29,6 +29,7 @@ Purpose: tenant and administrator profile and lease details. RLS is enabled by t
 | `end_date` | `DATE` | Yes | — | — |
 | `emergency_contact` | `TEXT` | Yes | — | — |
 | `emergency_phone` | `TEXT` | Yes | — | — |
+| `archived_at` | `TIMESTAMP WITH TIME ZONE` | Yes | — | Set when an admin archives the tenant; archived profiles have no assigned room |
 
 ### `bills`
 
@@ -37,7 +38,7 @@ Purpose: tenant billing and payment-slip data. RLS is enabled by the setup scrip
 | Column | Data type | Nullable | Default | Constraints / notes |
 |---|---|---:|---|---|
 | `id` | `SERIAL` | No | sequence-generated | Primary key |
-| `email` | `TEXT` | No | — | No FK to `tenant_profiles.email` in this SQL |
+| `email` | `TEXT` | No | — | No FK to `tenant_profiles.email` in the repository setup SQL; the archive migration leaves any deployed bill constraints unchanged |
 | `month` | `TEXT` | No | — | — |
 | `room_no` | `TEXT` | Yes | — | — |
 | `rent_fee` | `INTEGER` | Yes | `0` | — |

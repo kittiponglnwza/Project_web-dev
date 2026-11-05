@@ -6,7 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css?v=1.2.0" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="../css/admin/users.css?v=1.2.0">
+    <link rel="stylesheet" href="../css/admin/users.css?v=1.2.1">
 </head>
 <body class="admin-layout">
 
@@ -34,7 +34,7 @@
         </section>
 
         <section class="card" aria-label="รายชื่อผู้เช่า">
-            <p style="color: #64748b; margin-top: 0; margin-bottom: 15px; font-size: 14px;">จัดการข้อมูลส่วนตัว, กำหนดเลขห้องพัก, และลบผู้ใช้ออกจากระบบได้ที่นี่</p>
+            <p style="color: #64748b; margin-top: 0; margin-bottom: 15px; font-size: 14px;">จัดการข้อมูลส่วนตัวและห้องพักได้ที่นี่ การเก็บเข้าคลังจะคืนห้องและเก็บประวัติบิลไว้</p>
 
             <div class="list-toolbar">
                 <input type="search" id="user-search" placeholder="ค้นหาอีเมล เลขห้อง เลขบัตรประชาชน หรือสิทธิ์..." aria-label="ค้นหาผู้ใช้">
@@ -42,6 +42,10 @@
                     <option value="all">ทุกสถานะห้อง</option>
                     <option value="has-room">มีห้องแล้ว</option>
                     <option value="no-room">ยังไม่ระบุห้อง</option>
+                </select>
+                <select id="user-archive-filter" aria-label="กรองตามสถานะผู้ใช้">
+                    <option value="active">ผู้ใช้ปัจจุบัน</option>
+                    <option value="archived">ผู้ใช้ในคลัง</option>
                 </select>
             </div>
 
@@ -146,6 +150,6 @@
     <script src="../js/shared/session.js?v=1.3.0"></script>
     <script src="../js/shared/auth-guard.js?v=1.3.0"></script>
     <script src="../js/shared/components.js"></script>
-    <script src="../js/admin/users.js?v=1.3.0"></script>
+    <script src="../js/admin/users.js?v=1.3.1"></script>
 </body>
 </html>

@@ -24,9 +24,17 @@ async function requireAdmin() {
 
         const { data: profile, error } = await supabaseClient
             .from('tenant_profiles')
-            .select('role')
+            .select('role, archived_at')
             .eq('email', session.user.email)
             .single();
+
+        if (profile && profile.archived_at) {
+            DormSession.terminate();
+            try { await supabaseClient.auth.signOut(); } catch (err) { console.error('Archived account sign-out error:', err); }
+            alert('บัญชีนี้ถูกเก็บเข้าคลังแล้ว กรุณาติดต่อผู้ดูแลระบบหากต้องการกู้คืน');
+            window.location.href = '../login.html';
+            return null;
+        }
 
         if (error || !profile || profile.role !== 'admin') {
             alert('⛔ ไม่อนุญาตให้เข้าถึง! คุณไม่มีสิทธิ์ผู้ดูแลระบบ');
@@ -64,8 +72,14 @@ async function requireTenant() {
             return null;
         }
 
-        if (!DormSession.id() || DormSession.get('user_email') !== session.user.email) {
-            await loadSessionProfile(session.user.email);
+        // ตรวจโปรไฟล์ใหม่จากฐานข้อมูลเพื่อให้ archive มีผลกับ session ที่เปิดค้างอยู่
+        const profile = await loadSessionProfile(session.user.email);
+        if (profile && profile.archived_at) {
+            DormSession.terminate();
+            try { await supabaseClient.auth.signOut(); } catch (err) { console.error('Archived account sign-out error:', err); }
+            alert('บัญชีนี้ถูกเก็บเข้าคลังแล้ว กรุณาติดต่อผู้ดูแลระบบหากต้องการกู้คืน');
+            window.location.href = '../login.html';
+            return null;
         }
 
         return { session, user: session.user };

@@ -102,7 +102,7 @@ let revenueChartInstance = null;
 async function fetchDashboardData() {
     try {
         // 1. Fetch Tenants
-        const { data: tenants, error: err1 } = await supabaseClient.from('tenant_profiles').select('*').neq('role', 'admin');
+        const { data: tenants, error: err1 } = await supabaseClient.from('tenant_profiles').select('*').neq('role', 'admin').is('archived_at', null);
         if (err1) console.error(err1);
         document.getElementById('stat-tenants').innerText = tenants ? tenants.length : 0;
 

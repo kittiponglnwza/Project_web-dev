@@ -42,6 +42,7 @@ async function loadTenantsAndCheckExpiry() {
             expiryList.innerHTML = '';
 
             tenantProfiles.forEach(t => {
+                if (t.archived_at) return;
                 if (t.end_date) {
                     const endDate = new Date(t.end_date);
                     const diffTime = endDate - today;
@@ -75,7 +76,7 @@ async function loadTenantsAndCheckExpiry() {
 
 async function loadBills() {
     try {
-        // ตาราง bills ไม่มี Foreign Key ไป tenant_profiles จึงเชื่อมข้อมูลด้วยอีเมลในหน้านี้แทนการ embed
+        // อ่านบิลแยกจากโปรไฟล์ เพื่อคงการแสดงประวัติได้แม้โปรไฟล์ถูก archive
         const { data, error } = await supabaseClient
             .from('bills')
             .select('*')

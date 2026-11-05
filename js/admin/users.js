@@ -23,9 +23,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         applyUserFilters();
     });
 
+    await loadRoomInventory();
     loadUsers();
     loadRoomTypes();
 });
+
+async function loadRoomInventory() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('room_inventory')
+            .select('room_no, room_size')
+            .order('room_no', { ascending: true });
+        if (error) throw error;
+        setRoomInventory(data);
+    } catch (err) {
+        console.error('Room inventory load error:', err);
+        setRoomInventory([]);
+    }
+}
 
 async function loadUsers() {
     try {
@@ -42,10 +57,10 @@ async function loadUsers() {
 
         // Calculate Room Stats (นับเฉพาะผู้เช่าที่มีห้องจริง ไม่นับห้องทำงานของแอดมิน)
         if (users) {
-            let rooms = users.filter(u => u.role !== 'admin' && !u.archived_at && u.room_no && u.room_no.trim() !== '').map(u => u.room_no.trim());
-            let occupiedRooms = [...new Set(rooms)].length;
+            let rooms = users.filter(u => u.role !== 'admin' && !u.archived_at && getRoomSize(u.room_no)).map(u => u.room_no.trim());
+            let occupiedRooms = new Set(rooms).size;
             document.getElementById('stat-occupied').innerText = occupiedRooms;
-            document.getElementById('stat-available').innerText = (16 - occupiedRooms);
+            document.getElementById('stat-available').innerText = Math.max(0, roomInventory.length - occupiedRooms);
         }
 
         allUsers = users || [];
@@ -84,15 +99,14 @@ function applyUserFilters() {
 
 function generateRoomOptions(selectedRoom) {
     let options = '<option value="">ยังไม่ระบุห้อง</option>';
-    let f = 1; // ตึกที่ 1
-    for(let r = 1; r <= 16; r++) {
-        let roomNo = `${f}${r.toString().padStart(2, '0')}`;
+    roomInventory.forEach(room => {
+        const roomNo = room.room_no;
         let isOccupied = allUsers.some(u => u.role !== 'admin' && !u.archived_at && u.room_no === roomNo);
         if (!isOccupied || roomNo === selectedRoom) {
             let selected = roomNo === selectedRoom ? 'selected' : '';
-            options += `<option value="${roomNo}" ${selected}>ห้อง ${roomNo}</option>`;
+            options += `<option value="${escapeHTML(roomNo)}" ${selected}>ห้อง ${escapeHTML(roomNo)} (${escapeHTML(room.room_size)})</option>`;
         }
-    }
+    });
     return options;
 }
 
@@ -222,10 +236,9 @@ window.importRoomsFromJson = async function() {
 function validateRoomNumber(newRoom, userId) {
     if (!newRoom) return true; // อนุญาตให้เว้นว่าง (ยกเลิกการกำหนดห้อง)
     
-    // 1. ตรวจสอบรูปแบบ: ตึก 1 + เลขห้อง (01-16)
-    const roomRegex = /^1(0[1-9]|1[0-6])$/;
-    if (!roomRegex.test(newRoom)) {
-        alert("รูปแบบเลขห้องไม่ถูกต้อง!\nต้องเป็นตึก 1 ตามด้วยเลขห้อง 2 หลัก (01-16)\nตัวอย่าง: 101, 109, 116");
+    // 1. ตรวจว่ามีเลขห้องนี้อยู่ใน SQL inventory
+    if (!getRoomSize(newRoom)) {
+        alert("ไม่พบเลขห้องนี้ใน inventory ของฐานข้อมูล");
         return false;
     }
 

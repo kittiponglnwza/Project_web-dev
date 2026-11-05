@@ -119,6 +119,7 @@ body.admin-layout {
 .msg-time { display: block; font-size: 0.65rem; margin-top: 5px; text-align: right; }
 .msg-row.admin .msg-time { color: rgba(255,255,255,0.7); }
 .msg-row.tenant .msg-time { color: #8e8e8e; text-align: left; }
+.msg-read-status { display: block; margin-top: 2px; font-size: 0.65rem; text-align: right; color: rgba(255,255,255,0.78); }
 
 .chat-input-area { 
     flex-shrink: 0;

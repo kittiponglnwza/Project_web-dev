@@ -1,5 +1,5 @@
 let currentUserEmail = '';
-let lastMessageCount = 0;
+let lastMessageSignature = '';
 let isFetching = false;
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -26,6 +26,9 @@ async function pollMessages() {
 async function loadMessages() {
     isFetching = true;
     try {
+        const { error: readError } = await supabaseClient.rpc('mark_received_chat_messages_read');
+        if (readError) console.error('Could not mark received messages as read:', readError);
+
         const { data: messages, error } = await supabaseClient
             .from('messages')
             .select('*')
@@ -37,8 +40,9 @@ async function loadMessages() {
             return;
         }
 
-        if (messages.length !== lastMessageCount) {
-            lastMessageCount = messages.length;
+        const messageSignature = messages.map(msg => `${msg.id}:${Boolean(msg.is_read)}`).join('|');
+        if (messageSignature !== lastMessageSignature) {
+            lastMessageSignature = messageSignature;
             renderMessages(messages);
         }
     } catch (error) {
@@ -69,6 +73,7 @@ function renderMessages(messages) {
             <div class="msg-bubble">
                 ${escapeHTML(msg.message)}
                 <span class="msg-time">${timeStr}</span>
+                ${isMe ? `<span class="msg-read-status">${msg.is_read ? 'อ่านแล้ว' : 'ส่งแล้ว'}</span>` : ''}
             </div>
         `;
         chatBox.appendChild(div);

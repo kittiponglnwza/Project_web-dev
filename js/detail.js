@@ -121,15 +121,15 @@ async function fetchRoomDetail(id) {
         // จุดที่ 2: ข้อมูลห้องจากฐานข้อมูล
         const rows = await ajaxGetJSON(`${supabaseUrl}/rest/v1/rooms?select=*&id=eq.${encodeURIComponent(id)}`, headers);
         if (rows.length > 0) {
-            // จุดที่ 3: ห้องที่มีผู้เช่า เพื่อคำนวณจำนวนห้องว่างให้ตรงกับหน้าแรก
-            const occupied = await ajaxGetJSON(`${supabaseUrl}/rest/v1/occupied_rooms?select=room_no`, headers);
-            room = computeRoomAvailability(rows, occupied)[0];
+            // สรุปจำนวนห้องจาก SQL view เพื่อให้ตรงกับหน้าแรก
+            const availability = await ajaxGetJSON(`${supabaseUrl}/rest/v1/room_availability?select=room_size,total_rooms,available_rooms,occupied_rooms`, headers);
+            room = computeRoomAvailability(rows, availability)[0];
         }
     } catch (error) {
         console.error("Error fetching detail, using rooms.json:", error);
     }
 
-    room = room || jsonRoom;
+    room = room || (jsonRoom ? { ...jsonRoom, isAvailable: true, availableCount: null, availabilityEstimated: true } : null);
     if (!room) {
         document.getElementById("room-detail-container").innerHTML = "<p style='text-align:center; padding: 100px;'>⚠️ ไม่พบข้อมูลห้องพักที่ท่านค้นหา</p>";
         return;
@@ -142,7 +142,7 @@ async function fetchRoomDetail(id) {
 function renderUltraPremiumDetail(room) {
     const container = document.getElementById("room-detail-container");
     const formattedPrice = new Intl.NumberFormat('th-TH').format(room.price);
-    const statusText = room.isAvailable ? `Available (${room.availableCount} Rooms)` : "Fully Booked (เต็มแล้ว)";
+    const statusText = room.availabilityEstimated ? 'มีห้องว่าง*' : (room.isAvailable ? `Available (${room.availableCount} Rooms)` : "Fully Booked (เต็มแล้ว)");
     const statusColor = room.isAvailable ? "#10b981" : "#ef4444"; 
     // ดึงรูปแรกมาขยายขนาดความละเอียดสำหรับแบนเนอร์ใหญ่
     room.images = room.images && room.images.length > 0 ? room.images : ['images/1.jpg'];
@@ -264,6 +264,7 @@ function renderUltraPremiumDetail(room) {
                         <span class="lux-dot" style="background-color: ${statusColor};"></span>
                         <span style="color: ${statusColor}; font-weight: 500;">${statusText}</span>
                     </div>
+                    ${room.availabilityEstimated ? `<small style="display:block; color:#64748b; margin-top:6px;">* สถานะสำรองเมื่อเชื่อมต่อฐานข้อมูลไม่ได้ โปรดติดต่อสอบถามก่อนเข้าพัก</small>` : ''}
                     
                     <div class="lux-promo">
                         <i class='bx bxs-star' style="color: #d4af37; font-size: 1.2rem;"></i>

@@ -52,10 +52,8 @@ async function fetchRooms() {
         }
         // ---------------------------------------------
 
-        // 2. ดึงข้อมูลผู้เช่าทั้งหมดที่มีเลขห้อง เพื่อคำนวณห้องที่ถูกจองแล้ว
-        // (เปลี่ยนไปคิวรีจาก View: occupied_rooms แทน เพื่อความปลอดภัย ไม่ให้ข้อมูลส่วนตัวผู้เช่าหลุด)
-        // --- Rubric 10: Ajax Fetch API -> Database (2nd endpoint) ---
-        const fetchUrl2 = supabaseUrl + '/rest/v1/occupied_rooms?select=room_no';
+        // 2. อ่านสรุปจำนวนห้องจาก SQL view โดยไม่เปิดเผยข้อมูลผู้เช่า
+        const fetchUrl2 = supabaseUrl + '/rest/v1/room_availability?select=room_size,total_rooms,available_rooms,occupied_rooms';
         const response2 = await fetch(fetchUrl2, {
             method: 'GET',
             headers: {
@@ -68,16 +66,16 @@ async function fetchRooms() {
             throw new Error("HTTP Fetch Error (occupied_rooms): " + response2.status);
         }
 
-        const tenantsData = await response2.json();
+        const availabilityData = await response2.json();
         // --------------------------------------------------------
 
-        const totalOccupied = new Set(tenantsData.map(t => (t.room_no || '').trim()).filter(Boolean)).size;
-
-        // 3. อัปเดตป้ายบอกจำนวนห้องว่างรวมที่หน้า Index (สมมติว่าตึกนี้มีทั้งหมด 16 ห้อง ตามที่แอดมินแจ้ง)
-        const TOTAL_BUILDING_ROOMS = 16;
+        // 3. คำนวณห้องว่างแต่ละประเภท แล้วใช้ผลรวมเดียวกันกับป้ายหน้าแรก
+        const formattedData = computeRoomAvailability(roomsData, availabilityData);
+        const availableTotal = formattedData.reduce((sum, room) => sum + room.availableCount, 0);
         const heroBadge = document.getElementById('hero-availability');
+        const availabilityNote = document.getElementById('hero-availability-note');
+        if (availabilityNote) availabilityNote.style.display = 'none';
         if (heroBadge) {
-            const availableTotal = TOTAL_BUILDING_ROOMS - totalOccupied;
             if (availableTotal > 0) {
                 heroBadge.innerHTML = `<i class='bx bx-check-circle'></i> มีห้องว่าง ${availableTotal} ห้อง พร้อมเข้าอยู่ทันที!`;
                 heroBadge.style.background = '#10b981';
@@ -89,11 +87,9 @@ async function fetchRooms() {
                 heroBadge.style.background = '#ef4444';
                 heroBadge.style.color = '#fff';
                 heroBadge.style.border = 'none';
+                heroBadge.style.boxShadow = 'none';
             }
         }
-        
-        // 4. คำนวณจำนวนห้องว่างของแต่ละ Type (S, M, XL) จากข้อมูล JSON
-        const formattedData = computeRoomAvailability(roomsData, tenantsData);
 
         renderRooms(formattedData);
         renderRoomSummary(formattedData);
@@ -110,17 +106,31 @@ async function fetchRooms() {
                 type: room.type,
                 description: room.description,
                 price: room.price,
-                isAvailable: room.isAvailable,
-                availableCount: room.availableCount,
+                isAvailable: true,
+                availableCount: null,
+                availabilityEstimated: true,
                 images: room.images
             }));
             
             renderRooms(fallbackData);
             renderRoomSummary(fallbackData);
-
-            const availableTotal = fallbackData.reduce((sum, room) => sum + room.availableCount, 0);
-            document.getElementById('hero-availability').textContent = `มีห้องว่าง ${availableTotal} ห้อง (ข้อมูลสำรอง)`;
+            const heroBadge = document.getElementById('hero-availability');
+            heroBadge.innerHTML = `<i class='bx bx-check-circle'></i> มีห้องว่าง*`;
+            heroBadge.style.background = '#10b981';
+            heroBadge.style.color = '#fff';
+            heroBadge.style.border = 'none';
+            const availabilityNote = document.getElementById('hero-availability-note');
+            if (availabilityNote) availabilityNote.style.display = 'block';
         } catch (fetchError) {
+            const heroBadge = document.getElementById('hero-availability');
+            if (heroBadge) {
+                heroBadge.innerHTML = `<i class='bx bx-check-circle'></i> มีห้องว่าง*`;
+                heroBadge.style.background = '#10b981';
+                heroBadge.style.color = '#fff';
+                heroBadge.style.border = 'none';
+            }
+            const availabilityNote = document.getElementById('hero-availability-note');
+            if (availabilityNote) availabilityNote.style.display = 'block';
             document.getElementById("room-container").innerHTML = "<p style='text-align:center;'>เกิดข้อผิดพลาดในการดึงข้อมูลทั้งจากฐานข้อมูลและไฟล์สำรอง</p>";
         }
     }
@@ -134,14 +144,15 @@ function renderRoomSummary(rooms) {
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     const avgPrice = Math.round(prices.reduce((sum, price) => sum + price, 0) / prices.length);
-    const totalAvailable = rooms.reduce((sum, room) => sum + room.availableCount, 0);
+    const availabilityEstimated = rooms.some(room => room.availabilityEstimated);
+    const totalAvailable = availabilityEstimated ? null : rooms.reduce((sum, room) => sum + room.availableCount, 0);
     const money = value => Number(value).toLocaleString('th-TH');
 
     const rows = rooms.map(room => `
         <tr>
             <td>${escapeHTML(room.type)}</td>
             <td>${money(room.price)} บาท</td>
-            <td>${room.availableCount} ห้อง</td>
+            <td>${room.availabilityEstimated ? 'ตรวจสอบเมื่อเชื่อมต่อ' : `${room.availableCount} ห้อง`}</td>
         </tr>
     `).join('');
 
@@ -151,7 +162,7 @@ function renderRoomSummary(rooms) {
             <thead><tr><th>ประเภท</th><th>ราคาต่อเดือน</th><th>ห้องว่าง</th></tr></thead>
             <tbody>${rows}</tbody>
         </table>
-        <p>ราคาเริ่มต้น ${money(minPrice)} บาท สูงสุด ${money(maxPrice)} บาท เฉลี่ย ${money(avgPrice)} บาทต่อเดือน รวมห้องว่าง ${totalAvailable} ห้อง</p>
+        <p>ราคาเริ่มต้น ${money(minPrice)} บาท สูงสุด ${money(maxPrice)} บาท เฉลี่ย ${money(avgPrice)} บาทต่อเดือน${availabilityEstimated ? ' จำนวนห้องว่างจะตรวจสอบเมื่อเชื่อมต่อฐานข้อมูล' : ` รวมห้องว่าง ${totalAvailable} ห้อง`}</p>
     `;
 }
 
@@ -168,7 +179,7 @@ function renderRooms(rooms) {
         box.setAttribute("data-status", room.isAvailable ? "available" : "full");
 
         const formattedPrice = new Intl.NumberFormat('th-TH').format(room.price);
-        const statusText = room.isAvailable ? `ว่าง ${room.availableCount} ห้อง` : "เต็มแล้ว";
+        const statusText = room.availabilityEstimated ? 'มีห้องว่าง*' : (room.isAvailable ? `ว่าง ${room.availableCount} ห้อง` : "เต็มแล้ว");
         const statusClass = room.isAvailable ? "status-available" : "status-full";
 
         // สร้างแท็กรูปภาพทั้งหมดใน Slider (วนลูปจาก Array)

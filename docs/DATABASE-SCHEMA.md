@@ -2,11 +2,11 @@
 
 ## Sources and Scope
 
-The schema is defined by [`data/setup_database.sql`](../data/setup_database.sql), [`data/migration_rubric.sql`](../data/migration_rubric.sql), and (for archived tenant profiles) [`data/migration_tenant_archive.sql`](../data/migration_tenant_archive.sql), in that order. This document describes the structure after those migrations. `migration_rubric.sql` and `migration_tenant_archive.sql` are safe to re-run; `setup_database.sql` drops its tables first. The archive migration preserves profile and bill rows.
+The schema is defined by [`data/setup_database.sql`](../data/setup_database.sql), [`data/migration_rubric.sql`](../data/migration_rubric.sql), [`data/migration_tenant_archive.sql`](../data/migration_tenant_archive.sql), and [`data/migration_room_inventory.sql`](../data/migration_room_inventory.sql), in that order. This document describes the structure after those migrations. The migrations are safe to re-run; `setup_database.sql` drops its tables first. Archive and room inventory migrations preserve existing profile and bill rows.
 
 The deployed database could not be inspected, so “confirmed” below means confirmed by repository DDL; additional deployed objects or constraints may exist.
 
-The scripts define **8 confirmed tables**, **1 view**, and **1 confirmed foreign key**. Supabase Auth is used by the application, but its managed `auth` schema is not defined by this project SQL and is not included as a project table here.
+The scripts define **9 confirmed tables**, **2 views**, and **1 confirmed foreign key**. Supabase Auth is used by the application, but its managed `auth` schema is not defined by this project SQL and is not included as a project table here.
 
 `SERIAL` columns are PostgreSQL integer columns with sequence-generated defaults. Unless stated otherwise, columns without `NOT NULL` are nullable. Defaults do not imply `NOT NULL`.
 
@@ -114,6 +114,15 @@ Purpose: room types shown on the public pages and used as the rent price for new
 | `images` | `JSONB` | Yes | `'[]'` | Array of image URLs |
 | `facilities` | `JSONB` | Yes | `'[]'` | Array of facility names |
 
+### `room_inventory`
+
+Purpose: maps each physical room number to its size. Anonymous users can read the inventory; only administrators can change it. The migration seeds rooms 101–104 as S, 105–110 as M, and 111–116 as XL, without overwriting existing mappings on rerun.
+
+| Column | Data type | Nullable | Default | Constraints / notes |
+|---|---|---:|---|---|
+| `room_no` | `TEXT` | No | — | Primary key |
+| `room_size` | `TEXT` | No | — | CHECK: `S`, `M`, or `XL` |
+
 ### `announcements`
 
 Purpose: news published by administrators and shown to logged-in tenants.
@@ -144,6 +153,10 @@ Purpose: tenant chat and public booking requests.
 
 Purpose: exposes only `room_no` for tenants who have a room, so public pages can count free rooms without seeing tenant data.
 
+### `room_availability` (view)
+
+Purpose: exposes total, occupied, and available physical room counts by size. Archived profiles and duplicate room assignments do not inflate occupancy.
+
 ## Relationships
 
 | Referencing column → referenced column | Cardinality | Optionality / evidence |
@@ -164,6 +177,7 @@ Row-level security is enabled on every table. `migration_rubric.sql` replaces th
 | `promotions` | Read active | Read active | All |
 | `appointments` | None | None | All |
 | `rooms` | Read | Read | All |
+| `room_inventory` | Read | Read | All |
 | `announcements` | None | Read | All |
 | `messages` | Send booking requests | Own conversation | All |
 

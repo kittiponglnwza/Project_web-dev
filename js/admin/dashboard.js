@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const dateOpts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('current-date').innerText = 'ข้อมูลอัปเดตล่าสุด: ' + now.toLocaleDateString('th-TH', dateOpts);
     
+    await loadRoomInventory();
     await fetchDashboardData();
     await loadAnnouncements();
 
@@ -20,6 +21,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById(id).addEventListener('change', updateReport);
     });
 });
+
+async function loadRoomInventory() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('room_inventory')
+            .select('room_no, room_size');
+        if (error) throw error;
+        setRoomInventory(data);
+    } catch (err) {
+        console.error('Room inventory load error:', err);
+        setRoomInventory([]);
+    }
+}
 
 async function loadAnnouncements() {
     try {

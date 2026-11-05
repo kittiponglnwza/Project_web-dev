@@ -75,42 +75,40 @@ function supabaseRestHeaders() {
 //  Room Availability (Rubric 7)
 // =========================================
 
-const ROOM_TYPE_CAPACITY = { S: 4, M: 6, XL: 6 };
+let roomInventory = [];
 
-/** แปลงเลขห้องเป็นขนาดห้อง: 01-04 = S, 05-10 = M, 11 ขึ้นไป = XL */
-function getRoomSize(roomNo) {
-    const suffix = parseInt(String(roomNo || '').slice(-2), 10);
-    if (suffix >= 1 && suffix <= 4) return 'S';
-    if (suffix >= 5 && suffix <= 10) return 'M';
-    if (suffix >= 11) return 'XL';
-    return '';
+function setRoomInventory(rows) {
+    roomInventory = (rows || [])
+        .filter(row => row && row.room_no && row.room_size)
+        .map(row => ({ room_no: String(row.room_no).trim(), room_size: String(row.room_size).trim().toUpperCase() }))
+        .sort((a, b) => a.room_no.localeCompare(b.room_no, undefined, { numeric: true }));
 }
 
-/** อ่านขนาดห้องจากชื่อประเภท เช่น "Size XL" หรือ "Type S" */
+/** อ่านขนาดห้องจาก inventory ที่โหลดจากฐานข้อมูล */
+function getRoomSize(roomNo) {
+    const normalized = String(roomNo || '').trim();
+    return roomInventory.find(room => room.room_no === normalized)?.room_size || '';
+}
+
+/** อ่าน token ขนาดจากชื่อประเภท แม้มี emoji หรือข้อความต่อท้าย เช่น "Size S 🟢" */
 function getRoomTypeKey(typeName) {
     const parts = String(typeName || '').trim().split(/\s+/);
-    return parts[parts.length - 1];
+    const size = parts.find(part => /^(S|M|XL)$/i.test(part));
+    return size ? size.toUpperCase() : '';
 }
 
 /**
  * คำนวณจำนวนห้องว่างของแต่ละประเภทจากรายการห้องที่มีผู้เช่า
  * @param {Array<object>} rooms - ข้อมูลประเภทห้อง
- * @param {Array<{room_no: string}>} occupiedRows - ห้องที่มีผู้เช่า
+ * @param {Array<{room_size: string, available_rooms: number}>} availabilityRows - สรุปห้องว่างจากฐานข้อมูล
  * @returns {Array<object>} - ข้อมูลห้องพร้อม isAvailable และ availableCount
  */
-function computeRoomAvailability(rooms, occupiedRows) {
-    const uniqueRooms = [...new Set(occupiedRows.map(r => (r.room_no || '').trim()).filter(Boolean))];
-    const occupiedBySize = { S: 0, M: 0, XL: 0 };
-    uniqueRooms.forEach(room => {
-        const size = getRoomSize(room);
-        if (size) occupiedBySize[size]++;
-    });
-
+function computeRoomAvailability(rooms, availabilityRows) {
     return rooms.map(room => {
         const key = getRoomTypeKey(room.type);
-        const capacity = ROOM_TYPE_CAPACITY[key] || 0;
-        const availableCount = Math.max(0, capacity - (occupiedBySize[key] || 0));
-        return { ...room, isAvailable: availableCount > 0, availableCount };
+        const summary = (availabilityRows || []).find(row => String(row.room_size).toUpperCase() === key);
+        const availableCount = Math.max(0, Number(summary?.available_rooms) || 0);
+        return { ...room, isAvailable: availableCount > 0, availableCount, availabilityEstimated: false };
     });
 }
 

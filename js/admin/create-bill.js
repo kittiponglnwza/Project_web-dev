@@ -109,11 +109,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         monthSelect.appendChild(option);
     }
 
+    await loadRoomInventory();
     await loadRoomPrices();
     await loadPromotions();
     await loadTenants();
     renderTable();
 });
+
+async function loadRoomInventory() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('room_inventory')
+            .select('room_no, room_size')
+            .order('room_no', { ascending: true });
+        if (error) throw error;
+        setRoomInventory(data);
+    } catch (err) {
+        console.error('Room inventory load error:', err);
+        setRoomInventory([]);
+    }
+}
 
 async function loadPromotions() {
     try {
@@ -167,7 +182,11 @@ async function loadTenants() {
     try {
         const { data, error } = await supabaseClient.from('tenant_profiles').select('*').neq('role', 'admin').is('archived_at', null).not('room_no', 'is', null);
         if (data) {
-            activeTenants = data.filter(t => t.room_no.trim() !== '');
+            activeTenants = data.filter(t => t.room_no && t.room_no.trim() !== '' && getRoomSize(t.room_no));
+            const unmappedCount = data.filter(t => t.room_no && t.room_no.trim() !== '' && !getRoomSize(t.room_no)).length;
+            if (unmappedCount > 0) {
+                alert(`มีผู้เช่า ${unmappedCount} รายที่เลขห้องไม่มีใน room_inventory จึงไม่รวมในการสร้างบิล กรุณาตรวจสอบการกำหนดห้อง`);
+            }
             document.getElementById('save-all-btn').innerHTML = `<i class='bx bx-save'></i> บันทึกบิลทั้งหมด (${activeTenants.length} ห้อง)`;
         } else if (error) {
             console.error(error);

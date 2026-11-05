@@ -2,7 +2,7 @@ let contacts = {};
 let activeChatEmail = null;
 let tenantProfiles = {}; 
 let isFetching = false;
-let lastMessageCount = 0;
+let lastMessageSignature = '';
 let currentChatTab = 'tenants'; // 'tenants' or 'guests'
 window.isCalendarOpen = false; // หยุด polling ขณะเปิดปฏิทิน (chat-enhancements.js เป็นผู้ตั้งค่า)
 
@@ -277,8 +277,9 @@ async function loadActiveChatMessages(forceScroll = false) {
             messages = data;
         }
 
-        if (messages.length !== lastMessageCount || forceScroll) {
-            lastMessageCount = messages.length;
+        const messageSignature = messages.map(msg => `${msg.id}:${Boolean(msg.is_read)}`).join('|');
+        if (messageSignature !== lastMessageSignature || forceScroll) {
+            lastMessageSignature = messageSignature;
             renderMessages(messages, forceScroll);
         }
     } catch (err) {
@@ -377,6 +378,7 @@ function renderMessages(messages, forceScroll) {
                     <div class="msg-bubble">
                         ${escapeHTML(msg.message)}
                         <span class="msg-time">${timeStr}</span>
+                        ${isAdmin ? `<span class="msg-read-status">${msg.is_read ? 'อ่านแล้ว' : 'ส่งแล้ว'}</span>` : ''}
                     </div>
                     
                     ${isAdmin ? `<button onclick="deleteMessage('${escapeHTML(msg.id)}')" title="ลบข้อความนี้" style="background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer; align-self:center; margin-left:8px;"><i class='bx bx-trash'></i></button>` : ''}

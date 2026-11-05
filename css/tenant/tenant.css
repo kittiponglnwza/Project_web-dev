@@ -1,8 +1,4 @@
-/* ==========================================================
-   Tenant Theme (all tenant/*.html pages)
-   Layout mechanics (.sidebar sizing, .main-content shift) are
-   in base.css — this file only carries the light tenant colors.
-   ========================================================== */
+
 body.tenant-layout { background-color: #f3f4f6; }
 
 .tenant-layout .sidebar { background: #fff; color: #111; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }

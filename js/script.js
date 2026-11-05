@@ -1,13 +1,17 @@
-// ===== Rubric Code Injection =====
-// Window Load Event (DOM Manipulation Bonus)
+// Rubric 6: เพิ่ม Element ด้วย getElementById() ใน window load event
 window.addEventListener('load', () => {
-    // Session Storage Example (Cookies & Session - Get & Set)
-    const hasVisited = sessionStorage.getItem('has_visited_index');
-    if (!hasVisited) {
-        sessionStorage.setItem('has_visited_index', 'true');
-    }
+    // Rubric 9: นับจำนวนการเปิดหน้านี้ใน Session ปัจจุบัน
+    DormSession.init();
+    const visits = Number(DormSession.get('index_visits') || 0) + 1;
+    DormSession.set('index_visits', visits);
+
+    const note = document.createElement('p');
+    note.className = 'visit-note';
+    note.textContent = visits === 1
+        ? 'ยินดีต้อนรับ! นี่คือการเข้าชมครั้งแรกในรอบนี้'
+        : `ยินดีต้อนรับกลับ! คุณเปิดหน้านี้ ${visits} ครั้งในรอบนี้`;
+    document.getElementById('hero-content').appendChild(note);
 });
-// =================================
 
 document.addEventListener("DOMContentLoaded", () => {
     const mobileMenuBtn = document.getElementById("mobile-menu");
@@ -42,6 +46,10 @@ async function fetchRooms() {
         }
 
         const roomsData = await response.json();
+        // ฐานข้อมูลใหม่ที่ยังไม่นำเข้าห้องพัก ให้ใช้ไฟล์สำรอง data/rooms.json
+        if (roomsData.length === 0) {
+            throw new Error("ตาราง rooms ยังไม่มีข้อมูล");
+        }
         // ---------------------------------------------
 
         // 2. ดึงข้อมูลผู้เช่าทั้งหมดที่มีเลขห้อง เพื่อคำนวณห้องที่ถูกจองแล้ว
@@ -61,27 +69,9 @@ async function fetchRooms() {
         }
 
         const tenantsData = await response2.json();
-        const tenantsError = null;
         // --------------------------------------------------------
 
-        let totalOccupied = 0;
-        let occupiedS = 0;
-        let occupiedM = 0;
-        let occupiedXL = 0;
-
-        if (!tenantsError && tenantsData) {
-            // นับห้องที่ไม่ซ้ำกัน
-            const uniqueRooms = [...new Set(tenantsData.map(t => t.room_no ? t.room_no.trim() : '').filter(r => r !== ''))];
-            totalOccupied = uniqueRooms.length;
-
-            // คำนวณแยกตามประเภทห้อง (S: ลงท้าย 01-04, M: ลงท้าย 05-10, XL: ลงท้าย 11+)
-            uniqueRooms.forEach(room => {
-                const suffix = parseInt(room.slice(-2));
-                if (suffix >= 1 && suffix <= 4) occupiedS++;
-                else if (suffix >= 5 && suffix <= 10) occupiedM++;
-                else occupiedXL++;
-            });
-        }
+        const totalOccupied = new Set(tenantsData.map(t => (t.room_no || '').trim()).filter(Boolean)).size;
 
         // 3. อัปเดตป้ายบอกจำนวนห้องว่างรวมที่หน้า Index (สมมติว่าตึกนี้มีทั้งหมด 16 ห้อง ตามที่แอดมินแจ้ง)
         const TOTAL_BUILDING_ROOMS = 16;
@@ -102,30 +92,11 @@ async function fetchRooms() {
             }
         }
         
-        // 4. แปลงข้อมูลและคำนวณจำนวนห้องว่างของแต่ละ Type (S, M, XL) แบบ Real-time
-        // จำนวนห้องทั้งหมดต่อ Type (สมมติว่า S มี 4, M มี 6, XL มี 6)
-        const typeCapacity = { 'S': 4, 'M': 6, 'XL': 6 };
-        
-        const formattedData = roomsData.map(room => {
-            let typeKey = room.type.split(' ')[1] || 'S'; // แกะเอาตัวอักษร S, M, XL ออกมาจากคำว่า "Type S"
-            let capacity = typeCapacity[typeKey] || 4;
-            let occupied = 0;
-            
-            if (typeKey === 'S') occupied = occupiedS;
-            else if (typeKey === 'M') occupied = occupiedM;
-            else if (typeKey === 'XL') occupied = occupiedXL;
+        // 4. คำนวณจำนวนห้องว่างของแต่ละ Type (S, M, XL) จากข้อมูล JSON
+        const formattedData = computeRoomAvailability(roomsData, tenantsData);
 
-            let realAvailableCount = capacity - occupied;
-            if (realAvailableCount < 0) realAvailableCount = 0;
-
-            return {
-                ...room,
-                isAvailable: realAvailableCount > 0,
-                availableCount: realAvailableCount
-            };
-        });
-        
         renderRooms(formattedData);
+        renderRoomSummary(formattedData);
     } catch (error) {
         console.error("Error fetching from Supabase, falling back to local JSON (Rubric 7: JSON):", error);
         // JSON -> Fetch -> Process -> Render UI
@@ -145,11 +116,45 @@ async function fetchRooms() {
             }));
             
             renderRooms(fallbackData);
+            renderRoomSummary(fallbackData);
+
+            const availableTotal = fallbackData.reduce((sum, room) => sum + room.availableCount, 0);
+            document.getElementById('hero-availability').textContent = `มีห้องว่าง ${availableTotal} ห้อง (ข้อมูลสำรอง)`;
         } catch (fetchError) {
             document.getElementById("room-container").innerHTML = "<p style='text-align:center;'>เกิดข้อผิดพลาดในการดึงข้อมูลทั้งจากฐานข้อมูลและไฟล์สำรอง</p>";
         }
     }
 }
+// Rubric 7: ประมวลผลข้อมูล JSON แล้วแสดงเป็นตารางสรุปที่อ่านง่าย
+function renderRoomSummary(rooms) {
+    const summary = document.getElementById('room-summary');
+    if (!summary || rooms.length === 0) return;
+
+    const prices = rooms.map(room => Number(room.price));
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    const avgPrice = Math.round(prices.reduce((sum, price) => sum + price, 0) / prices.length);
+    const totalAvailable = rooms.reduce((sum, room) => sum + room.availableCount, 0);
+    const money = value => Number(value).toLocaleString('th-TH');
+
+    const rows = rooms.map(room => `
+        <tr>
+            <td>${escapeHTML(room.type)}</td>
+            <td>${money(room.price)} บาท</td>
+            <td>${room.availableCount} ห้อง</td>
+        </tr>
+    `).join('');
+
+    summary.innerHTML = `
+        <h3>สรุปประเภทห้องพัก</h3>
+        <table>
+            <thead><tr><th>ประเภท</th><th>ราคาต่อเดือน</th><th>ห้องว่าง</th></tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+        <p>ราคาเริ่มต้น ${money(minPrice)} บาท สูงสุด ${money(maxPrice)} บาท เฉลี่ย ${money(avgPrice)} บาทต่อเดือน รวมห้องว่าง ${totalAvailable} ห้อง</p>
+    `;
+}
+
 // ตัวแปรเก็บสถานะสไลเดอร์ของแต่ละห้อง
 const sliderStates = {};
 
@@ -168,8 +173,8 @@ function renderRooms(rooms) {
 
         // สร้างแท็กรูปภาพทั้งหมดใน Slider (วนลูปจาก Array)
         let imagesHTML = '';
-        room.images.forEach(imgUrl => {
-            imagesHTML += `<img src="${imgUrl}" alt="${room.type}">`;
+        (room.images || []).forEach(imgUrl => {
+            imagesHTML += `<img src="${escapeHTML(imgUrl)}" alt="${escapeHTML(room.type)}">`;
         });
 
         // จัดโครงสร้าง ซ้าย (Slider) ขวา (Details)
@@ -184,11 +189,11 @@ function renderRooms(rooms) {
             </div>
             
             <div class="room-details">
-                <h3>${room.type}</h3>
-                <p class="desc">${room.description}</p>
+                <h3>${escapeHTML(room.type)}</h3>
+                <p class="desc">${escapeHTML(room.description)}</p>
                 <h4 class="price">ราคา: ${formattedPrice} บาท/เดือน</h4>
                 <span class="status-badge ${statusClass}">${statusText}</span>
-                <a href="room-detail.html?id=${room.id}" class="btn-details">ชมรายละเอียดเพิ่มเติม</a>
+                <a href="room-detail.html?id=${encodeURIComponent(room.id)}" class="btn-details">ชมรายละเอียดเพิ่มเติม</a>
             </div>
         `;
 
@@ -203,7 +208,8 @@ function renderRooms(rooms) {
 window.moveSlide = function(sliderId, direction) {
     const track = document.querySelector(`#slider-${sliderId} .slider-track`);
     const totalSlides = track.children.length;
-    
+    if (totalSlides === 0) return;
+
     // ตั้งค่าเริ่มต้นถ้ายังไม่เคยเลื่อน
     if (typeof sliderStates[sliderId] === 'undefined') {
         sliderStates[sliderId] = 0;

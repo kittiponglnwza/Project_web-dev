@@ -4,7 +4,7 @@ let tenantProfiles = {};
 let isFetching = false;
 let lastMessageCount = 0;
 let currentChatTab = 'tenants'; // 'tenants' or 'guests'
-let isCalendarOpen = false; // หยุด polling ขณะเปิดปฏิทิน
+window.isCalendarOpen = false; // หยุด polling ขณะเปิดปฏิทิน (chat-enhancements.js เป็นผู้ตั้งค่า)
 
 function isMessageContactedHelper(msgId) {
     if (!msgId) return false;
@@ -13,41 +13,6 @@ function isMessageContactedHelper(msgId) {
         return !!localStatus[msgId];
     } catch(e) {
         return false;
-    }
-}
-
-function getMockBookingMessages() {
-    const key = 'dorm_mock_booking_messages_v1';
-    let stored = localStorage.getItem(key);
-    if (!stored) {
-        const today = new Date();
-        const initial = [
-            {
-                id: 'msg-seed-booking-1',
-                sender_email: 'system_booking@mydorm.com',
-                receiver_email: 'admin',
-                message: '🔔 แจ้งเตือน! มีลูกค้าสนใจจอง/ดูห้องพัก\nชื่อ: คุณพงศกร ธนโชติ\nเบอร์โทร: 081-445-6789\nวันที่คาดว่าจะเข้าอยู่: 2026-09-10\nID ห้องที่สนใจ: 302',
-                is_read: false,
-                is_contacted: false,
-                created_at: new Date(today.getTime() - 3600000 * 2).toISOString()
-            },
-            {
-                id: 'msg-seed-booking-2',
-                sender_email: 'system_booking@mydorm.com',
-                receiver_email: 'admin',
-                message: '🔔 แจ้งเตือน! มีลูกค้าสนใจจอง/ดูห้องพัก\nชื่อ: คุณสุดารัตน์ พิมพากร\nเบอร์โทร: 089-987-6543\nวันที่คาดว่าจะเข้าอยู่: 2026-09-15\nID ห้องที่สนใจ: 105',
-                is_read: false,
-                is_contacted: false,
-                created_at: new Date(today.getTime() - 1800000).toISOString()
-            }
-        ];
-        localStorage.setItem(key, JSON.stringify(initial));
-        return initial;
-    }
-    try {
-        return JSON.parse(stored);
-    } catch(e) {
-        return [];
     }
 }
 
@@ -94,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // locked setTimeout polling pattern
         const pollData = async () => {
-            if (!isFetching && !isCalendarOpen) {
+            if (!isFetching && !window.isCalendarOpen) {
                 isFetching = true;
                 try {
                     await loadContacts();
@@ -167,27 +132,12 @@ async function loadContacts() {
             }
 
             if (msg.sender_email === tenantEmail && msg.receiver_email === 'admin' && !msg.is_read) {
-                newContacts[tenantEmail].unreadCount++;
                 const isContacted = isMessageContactedHelper(msg.id) || msg.is_contacted === true;
                 if (!isContacted) {
                     newContacts[tenantEmail].unreadCount++;
                 }
             }
         });
-
-        // Ensure system_booking appears even if messages table has no records yet (local fallback)
-        if (!newContacts['system_booking@mydorm.com']) {
-            const mockBookings = getMockBookingMessages();
-            if (mockBookings.length > 0) {
-                const uncontactedCount = mockBookings.filter(m => !isMessageContactedHelper(m.id) && m.is_contacted !== true).length;
-                newContacts['system_booking@mydorm.com'] = {
-                    email: 'system_booking@mydorm.com',
-                    lastMsg: mockBookings[mockBookings.length - 1].message,
-                    time: mockBookings[mockBookings.length - 1].created_at,
-                    unreadCount: uncontactedCount
-                };
-            }
-        }
 
         const contactArray = Object.values(newContacts).sort((a, b) => new Date(b.time) - new Date(a.time));
         
@@ -327,21 +277,12 @@ async function loadActiveChatMessages(forceScroll = false) {
             messages = data;
         }
 
-        // Fallback for system_booking if empty or offline
-        if (activeChatEmail === 'system_booking@mydorm.com' && messages.length === 0) {
-            messages = getMockBookingMessages();
-        }
-
         if (messages.length !== lastMessageCount || forceScroll) {
             lastMessageCount = messages.length;
             renderMessages(messages, forceScroll);
         }
     } catch (err) {
         console.error(err);
-        if (activeChatEmail === 'system_booking@mydorm.com') {
-            const mock = getMockBookingMessages();
-            renderMessages(mock, forceScroll);
-        }
     }
 }
 
@@ -467,18 +408,6 @@ window.toggleMessageContactStatus = async function(msgId, event) {
     localStatus[msgId] = newStatus;
     localStorage.setItem('dorm_messages_contacted_status_v1', JSON.stringify(localStatus));
 
-    // Update in mock list if applicable
-    try {
-        const mockKey = 'dorm_mock_booking_messages_v1';
-        let mockList = JSON.parse(localStorage.getItem(mockKey) || '[]');
-        const target = mockList.find(m => m.id === msgId);
-        if (target) {
-            target.is_contacted = newStatus;
-            target.is_read = newStatus;
-            localStorage.setItem(mockKey, JSON.stringify(mockList));
-        }
-    } catch(e) {}
-
     // 2. ดึงข้อมูลจากการ์ดก่อน (ก่อนที่ DOM จะถูก re-render)
     let bookingData = null;
     if (newStatus && card) {
@@ -533,19 +462,18 @@ window.toggleMessageContactStatus = async function(msgId, event) {
     }
 
     // 4. Supabase update query - await ให้เสร็จก่อน
-    if (window.supabaseClient) {
-        try {
-            const { error } = await supabaseClient
-                .from('messages')
-                .update({ is_contacted: newStatus, is_read: true })
-                .eq('id', msgId);
+    // (const supabaseClient ไม่ใช่ property ของ window จึงเรียกใช้ตรงๆ)
+    try {
+        const { error } = await supabaseClient
+            .from('messages')
+            .update({ is_contacted: newStatus, is_read: true })
+            .eq('id', msgId);
 
-            if (error) {
-                console.warn('Supabase update returned error, kept in local state:', error);
-            }
-        } catch (err) {
-            console.warn('Supabase update offline or failed, kept in local state:', err);
+        if (error) {
+            console.warn('Supabase update returned error, kept in local state:', error);
         }
+    } catch (err) {
+        console.warn('Supabase update offline or failed, kept in local state:', err);
     }
 
     // 5. Update sidebar list unread counts
@@ -562,19 +490,16 @@ window.toggleMessageContactStatus = async function(msgId, event) {
 window.deleteMessage = async function(msgId) {
     if (confirm("แน่ใจหรือไม่ว่าต้องการลบข้อความนี้? (ผู้เช่าก็จะมองไม่เห็นเช่นกัน)")) {
         try {
-            if (window.supabaseClient) {
-                const { error } = await supabaseClient.from('messages').delete().eq('id', msgId);
-                if (error) console.warn(error);
+            const { error } = await supabaseClient.from('messages').delete().eq('id', msgId);
+            if (error) {
+                alert("ลบข้อความไม่สำเร็จ: " + error.message);
+                console.error(error);
+                return;
             }
         } catch (err) {
-            console.warn(err);
+            console.error(err);
+            return;
         }
-        try {
-            const mockKey = 'dorm_mock_booking_messages_v1';
-            let mockList = JSON.parse(localStorage.getItem(mockKey) || '[]');
-            mockList = mockList.filter(m => m.id !== msgId);
-            localStorage.setItem(mockKey, JSON.stringify(mockList));
-        } catch(e) {}
 
         loadActiveChatMessages(true);
         loadContacts();

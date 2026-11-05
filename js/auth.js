@@ -1,19 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // --- Rubric 9: Cookie + Session (Initialize / Get) ---
-    const isRemembered = document.cookie.includes("rememberMe=true");
-    const savedEmail = sessionStorage.getItem("savedEmail");
-    const sessID = sessionStorage.getItem("sessionID");
-    
-    if (isRemembered && savedEmail) {
-        const emailInput = document.getElementById("l_email");
-        const rememberCheckbox = document.getElementById("rememberMe");
-        if (emailInput && rememberCheckbox) {
-            emailInput.value = savedEmail;
-            rememberCheckbox.checked = true;
-            // Session restored from cookie
-        }
+    const rememberedEmail = getCookie("rememberedEmail");
+    const rememberCheckbox = document.getElementById("rememberMe");
+    if (rememberedEmail && rememberCheckbox) {
+        document.getElementById("l_email").value = rememberedEmail;
+        rememberCheckbox.checked = true;
     }
-    // ---------------------------------------------------
+
     // ==========================================
     // ดักจับ Event เมื่อกดลิงก์ "กู้รหัสผ่าน" จากอีเมล
     // ==========================================
@@ -66,9 +58,21 @@ document.addEventListener("DOMContentLoaded", () => {
             const passwordInput = document.getElementById("l_password");
             const btnSubmit = loginForm.querySelector("button[type='submit']");
 
+            const emailError = document.getElementById("emailError");
+            const passwordError = document.getElementById("passwordError");
             const emailVal = emailInput.value.trim();
             const passVal = passwordInput.value;
             const rememberMe = document.getElementById("rememberMe")?.checked;
+
+            // Rubric 3: ตรวจสอบรูปแบบข้อมูลด้วย JS ก่อนส่ง
+            const emailValid = DORM_PATTERNS.email.test(emailVal);
+            const passwordValid = passVal.length >= 6;
+            emailError.innerText = "รูปแบบอีเมลไม่ถูกต้อง";
+            emailError.style.display = emailValid ? "none" : "block";
+            passwordError.style.display = passwordValid ? "none" : "block";
+            emailInput.classList.toggle("invalid", !emailValid);
+            passwordInput.classList.toggle("invalid", !passwordValid);
+            if (!emailValid || !passwordValid) return;
 
             // รัน Loader ที่ปุ่ม
             const originalBtnText = btnSubmit.innerHTML;
@@ -84,20 +88,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (error) throw error;
 
-                // --- Rubric 9: Cookie + Session (Store) ---
-                if (document.getElementById("rememberMe")?.checked) {
-                    document.cookie = "rememberMe=true; max-age=604800; path=/;";
-                    sessionStorage.setItem("savedEmail", emailVal);
-                    sessionStorage.setItem("sessionID", "sess_" + new Date().getTime());
+                // Rubric 9: จำอีเมลไว้ใน Cookie 7 วัน เฉพาะเมื่อผู้ใช้เลือก
+                if (rememberMe) {
+                    setCookie("rememberedEmail", emailVal, 7);
                 } else {
-                    document.cookie = "rememberMe=; max-age=0; path=/;";
-                    sessionStorage.removeItem("savedEmail");
-                    sessionStorage.removeItem("sessionID");
+                    deleteCookie("rememberedEmail");
                 }
-                // ------------------------------------------
 
-                // เช็ค Role จากตารางโปรไฟล์
-                const { data: profile } = await supabaseClient.from('tenant_profiles').select('role').eq('email', data.user.email).single();
+                // Rubric 9: สร้าง Session แล้วเก็บข้อมูลจากฐานข้อมูล
+                let profile = await loadSessionProfile(data.user.email);
+
+                // สมัครแบบต้องยืนยันอีเมลจะยังไม่มีโปรไฟล์ จึงสร้างให้เมื่อเข้าสู่ระบบครั้งแรก
+                if (!profile) {
+                    const { error: profileError } = await supabaseClient
+                        .from('tenant_profiles')
+                        .insert([{ email: data.user.email }]);
+                    if (profileError) console.error("Create profile error:", profileError);
+                    profile = await loadSessionProfile(data.user.email);
+                }
+                DormSession.set("flash", "เข้าสู่ระบบสำเร็จ");
+
                 const isAdmin = profile && profile.role === 'admin';
 
                 alert("เข้าสู่ระบบสำเร็จ!");
@@ -109,8 +119,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             } catch (error) {
                 console.error("Login Error:", error);
-                document.getElementById("emailError").innerText = "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
-                document.getElementById("emailError").style.display = "block";
+                emailError.innerText = "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+                emailError.style.display = "block";
                 emailInput.classList.add("invalid");
                 passwordInput.classList.add("invalid");
             } finally {
@@ -172,9 +182,20 @@ document.addEventListener("DOMContentLoaded", () => {
             mainError.style.display = "none";
 
             // Validation: ตรวจสอบเบอร์โทรด้วย RegEx
-            const phoneRegex = /^0\d{9}$/;
-            if (!phoneRegex.test(phone)) {
+            if (!DORM_PATTERNS.phone.test(phone)) {
                 phoneError.style.display = "block";
+                return;
+            }
+
+            if (!DORM_PATTERNS.email.test(email)) {
+                mainError.innerText = "รูปแบบอีเมลไม่ถูกต้อง";
+                mainError.style.display = "block";
+                return;
+            }
+
+            if (password.length < 6) {
+                mainError.innerText = "รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร";
+                mainError.style.display = "block";
                 return;
             }
 
@@ -206,11 +227,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (error) throw error;
 
-                // นำอีเมลของผู้ใช้ใหม่ไปบันทึกในตารางโปรไฟล์
+                // Supabase ไม่แจ้ง error เมื่ออีเมลซ้ำ แต่จะคืนผู้ใช้ที่ไม่มี identities
+                if (data.user && data.user.identities && data.user.identities.length === 0) {
+                    throw new Error("อีเมลนี้ถูกใช้งานแล้ว");
+                }
+
+                // ถ้าระบบต้องยืนยันอีเมลจะยังไม่มี Session และจะสร้างโปรไฟล์ตอนเข้าสู่ระบบครั้งแรกแทน
                 // (Role จะถูกเซ็ตเป็น 'tenant' อัตโนมัติจาก Default ของ Database เพื่อความปลอดภัย)
-                await supabaseClient.from('tenant_profiles').insert([{ 
-                    email: email
-                }]);
+                if (data.session) {
+                    const { error: profileError } = await supabaseClient
+                        .from('tenant_profiles')
+                        .insert([{ email: email }]);
+                    if (profileError) console.error("Create profile error:", profileError);
+                    await supabaseClient.auth.signOut();
+                }
 
                 alert("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบด้วยอีเมลและรหัสผ่านที่คุณตั้งไว้");
                 window.location.href = "login.html";
@@ -246,7 +276,7 @@ async function checkLoginStatus() {
         }
         
         // เช็ค Role จาก Database
-        const { data: profile } = await supabaseClient.from('tenant_profiles').select('role').eq('email', user.email).single();
+        const { data: profile } = await supabaseClient.from('tenant_profiles').select('role').eq('email', user.email).maybeSingle();
         const isAdmin = profile && profile.role === 'admin';
 
         if (loginBtn) {
@@ -266,22 +296,3 @@ async function checkLoginStatus() {
     }
 }
 
-async function logout() {
-    if(confirm("คุณต้องการออกจากระบบหรือไม่?")) {
-        // --- Rubric 9: Clear Cookie & Session ---
-        document.cookie = "rememberMe=; max-age=0; path=/;";
-        sessionStorage.removeItem("savedEmail");
-        sessionStorage.removeItem("sessionID");
-        // ----------------------------------------
-        // สั่ง Logout ออกจากระบบ Supabase
-        const { error } = await supabaseClient.auth.signOut();
-        if (!error) {
-            // Check if we are in admin or tenant, reload or redirect to login
-            if (window.location.pathname.includes('tenant') || window.location.pathname.includes('admin')) {
-                window.location.href = "../login.html";
-            } else {
-                window.location.reload(); 
-            }
-        }
-    }
-}

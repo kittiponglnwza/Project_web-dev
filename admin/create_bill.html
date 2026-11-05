@@ -20,7 +20,7 @@
         <!-- Promotion Banner -->
         <div id="promo-banner" class="promo-banner" style="display:none;"></div>
 
-        <div class="card">
+        <section class="card" aria-label="บันทึกบิลรายเดือน">
             <div class="form-group" style="max-width: 300px;">
                 <label>ประจำเดือน</label>
                 <select id="b_month" required style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; font-size: 1rem;">
@@ -46,14 +46,17 @@
             </table>
 
             <button type="button" class="btn-submit" id="save-all-btn" onclick="saveAllBills()"><i class="bx bx-save"></i> บันทึกบิลทั้งหมด (16 ห้อง)</button>
-        </div>
+        </section>
+
+        <footer class="app-footer">&copy; 2024 Dorminator System</footer>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js?v=1.2.0"></script>
-    <script src="../js/shared/utils.js"></script>
-    <script src="../js/shared/auth-guard.js"></script>
+    <script src="../js/shared/utils.js?v=1.3.0"></script>
+    <script src="../js/shared/session.js?v=1.3.0"></script>
+    <script src="../js/shared/auth-guard.js?v=1.3.0"></script>
     <script src="../js/shared/components.js"></script>
-    <script src="../js/admin/create-bill.js"></script>
+    <script src="../js/admin/create-bill.js?v=1.3.0"></script>
 </body>
 </html>

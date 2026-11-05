@@ -15,6 +15,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadAnnouncements();
 
     document.getElementById('announcement-form').addEventListener('submit', createAnnouncement);
+
+    ['chart-year-filter', 'report-size-filter', 'report-status-filter'].forEach(id => {
+        document.getElementById(id).addEventListener('change', updateReport);
+    });
 });
 
 async function loadAnnouncements() {
@@ -158,7 +162,7 @@ async function fetchDashboardData() {
 
         // Render Alerts & Initial Chart
         renderAlerts(pendingMaintenance.length, pendingSlips, expiringContracts, (chats ? chats.length : 0));
-        filterChart();
+        updateReport();
     } catch (err) {
         console.error(err);
     }
@@ -220,31 +224,79 @@ function renderAlerts(maintenanceCount, slipsCount, expiryCount, chatCount) {
     }
 }
 
-window.filterChart = function() {
+// Rubric 11: คำนวณรายงานจากเงื่อนไขปี ขนาดห้อง และสถานะบิล
+function updateReport() {
     const selectedYear = document.getElementById('chart-year-filter').value;
-    let revenueByMonth = {};
-    
-    globalBills.forEach(b => {
-        if (b.status === 'paid') {
-            const year = b.month.split(' ')[1] || '';
-            if (selectedYear === 'all' || year === selectedYear) {
-                revenueByMonth[b.month] = (revenueByMonth[b.month] || 0) + b.amount;
-            }
-        }
-    });
-    
-    renderChart(revenueByMonth);
-};
+    const selectedSize = document.getElementById('report-size-filter').value;
+    const selectedStatus = document.getElementById('report-status-filter').value;
 
-function renderChart(revenueByMonth) {
+    const months = {};
+    globalBills.forEach(b => {
+        const year = b.month.split(' ')[1] || '';
+        const status = b.status === 'unpaid' ? 'pending' : b.status;
+        if (selectedYear !== 'all' && year !== selectedYear) return;
+        if (selectedSize !== 'all' && getRoomSize(b.room_no) !== selectedSize) return;
+        if (selectedStatus !== 'all' && status !== selectedStatus) return;
+
+        if (!months[b.month]) {
+            months[b.month] = { month: b.month, count: 0, billed: 0, paid: 0, outstanding: 0, discount: 0 };
+        }
+        const row = months[b.month];
+        row.count++;
+        row.billed += b.amount;
+        row.discount += b.discount_amount || 0;
+        if (status === 'paid') row.paid += b.amount;
+        else row.outstanding += b.amount;
+    });
+
+    const rows = Object.values(months).sort((a, b) => monthSortKey(a.month) - monthSortKey(b.month));
+    renderReportTable(rows);
+    renderChart(rows);
+}
+
+function renderReportTable(rows) {
+    const body = document.getElementById('report-body');
+    const foot = document.getElementById('report-foot');
+    const money = value => value.toLocaleString();
+    const collectionRate = row => row.billed > 0 ? ((row.paid / row.billed) * 100).toFixed(1) + '%' : '-';
+
+    if (rows.length === 0) {
+        body.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>';
+        foot.innerHTML = '';
+        return;
+    }
+
+    const toCells = row => `
+        <td>${money(row.count)}</td>
+        <td>${money(row.billed)}</td>
+        <td>${money(row.paid)}</td>
+        <td>${money(row.outstanding)}</td>
+        <td>${money(row.discount)}</td>
+        <td>${collectionRate(row)}</td>
+    `;
+
+    body.innerHTML = rows.map(row => `<tr><td>${escapeHTML(row.month)}</td>${toCells(row)}</tr>`).join('');
+
+    const total = rows.reduce((sum, row) => ({
+        count: sum.count + row.count,
+        billed: sum.billed + row.billed,
+        paid: sum.paid + row.paid,
+        outstanding: sum.outstanding + row.outstanding,
+        discount: sum.discount + row.discount
+    }), { count: 0, billed: 0, paid: 0, outstanding: 0, discount: 0 });
+
+    foot.innerHTML = `<tr><td>รวมทั้งหมด</td>${toCells(total)}</tr>`;
+}
+
+function renderChart(rows) {
     const ctx = document.getElementById('revenueChart').getContext('2d');
-    
+
     if (revenueChartInstance) {
         revenueChartInstance.destroy();
     }
 
-    const labels = Object.keys(revenueByMonth);
-    const data = labels.map(l => revenueByMonth[l]);
+    const labels = rows.map(row => row.month);
+    const data = rows.map(row => row.paid);
 
     if (labels.length === 0) {
         labels.push('ยังไม่มีข้อมูล');
@@ -260,7 +312,7 @@ function renderChart(revenueByMonth) {
         data: {
             labels: labels,
             datasets: [{
-                label: 'รายรับ (บาท)',
+                label: 'รับชำระแล้ว (บาท)',
                 data: data,
                 backgroundColor: gradient,
                 borderColor: '#3b82f6',
@@ -295,7 +347,7 @@ function renderChart(revenueByMonth) {
             scales: {
                 y: { 
                     beginAtZero: true,
-                    grid: { borderDash: [5, 5] },
+                    border: { dash: [5, 5] },
                     ticks: { font: { family: 'Prompt' } }
                 },
                 x: {

@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="../css/admin/dashboard.css?v=1.2.0">
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
 </head>
 <body class="admin-layout">
 
@@ -63,7 +63,7 @@
 
         <div class="dash-layout">
             <!-- Left Column: Announcements Section -->
-            <div class="card">
+            <section class="card">
                 <div class="card-header">
                     <h3><i class="bx bxs-megaphone"></i> จัดการข่าวประชาสัมพันธ์ (Announcements)</h3>
                 </div>
@@ -100,37 +100,73 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
             <!-- Right Column: Action Alerts -->
-            <div class="card">
+            <aside class="card">
                 <div class="card-header">
                     <h3><i class="bx bxs-bell-ring"></i> สิ่งที่ต้องจัดการด่วน</h3>
                 </div>
                 <div class="alert-list" id="alert-list">
                     <div style="text-align: center; color: #94a3b8; padding: 20px;">กำลังโหลด...</div>
                 </div>
-            </div>
+            </aside>
         </div>
 
-        <!-- Full Width Chart -->
-        <div class="card" style="margin-top: 20px;">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin: 0;"><i class="bx bx-line-chart"></i> สรุปรายรับ (Revenue Trend)</h3>
-                <select id="chart-year-filter" onchange="filterChart()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'Prompt'; font-size: 13px; outline: none; cursor: pointer;">
-                    <option value="all">รวมทุกปี</option>
-                </select>
+        <!-- Rubric 11: รายงานสรุปเชิงสถิติ แบบตาราง กราฟ และกรองข้อมูลได้ -->
+        <section class="card" style="margin-top: 20px;" aria-labelledby="report-title">
+            <div class="card-header" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;">
+                <h3 id="report-title" style="margin: 0;"><i class="bx bx-line-chart"></i> รายงานสรุปรายรับรายเดือน</h3>
+                <div class="report-filters">
+                    <select id="chart-year-filter" aria-label="กรองตามปี">
+                        <option value="all">รวมทุกปี</option>
+                    </select>
+                    <select id="report-size-filter" aria-label="กรองตามขนาดห้อง">
+                        <option value="all">ทุกขนาดห้อง</option>
+                        <option value="S">ห้อง Size S</option>
+                        <option value="M">ห้อง Size M</option>
+                        <option value="XL">ห้อง Size XL</option>
+                    </select>
+                    <select id="report-status-filter" aria-label="กรองตามสถานะบิล">
+                        <option value="all">ทุกสถานะบิล</option>
+                        <option value="paid">ชำระแล้ว</option>
+                        <option value="checking">รอตรวจสลิป</option>
+                        <option value="pending">ค้างชำระ</option>
+                    </select>
+                </div>
             </div>
-            <div style="position: relative; height: 350px; width: 100%;">
+
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>รอบบิล</th>
+                        <th>จำนวนบิล</th>
+                        <th>ยอดเรียกเก็บ (฿)</th>
+                        <th>รับชำระแล้ว (฿)</th>
+                        <th>ค้างรับ (฿)</th>
+                        <th>ส่วนลด (฿)</th>
+                        <th>อัตราเก็บเงิน</th>
+                    </tr>
+                </thead>
+                <tbody id="report-body">
+                    <tr><td colspan="7" style="text-align: center;">กำลังโหลดข้อมูล...</td></tr>
+                </tbody>
+                <tfoot id="report-foot"></tfoot>
+            </table>
+
+            <div style="position: relative; height: 350px; width: 100%; margin-top: 20px;">
                 <canvas id="revenueChart"></canvas>
             </div>
-        </div>
+        </section>
+
+        <footer class="app-footer">&copy; 2024 Dorminator System</footer>
     </main>
 
     <script src="../js/supabase-config.js"></script>
-    <script src="../js/shared/utils.js"></script>
-    <script src="../js/shared/auth-guard.js"></script>
+    <script src="../js/shared/utils.js?v=1.3.0"></script>
+    <script src="../js/shared/session.js?v=1.3.0"></script>
+    <script src="../js/shared/auth-guard.js?v=1.3.0"></script>
     <script src="../js/shared/components.js"></script>
-    <script src="../js/admin/dashboard.js"></script>
+    <script src="../js/admin/dashboard.js?v=1.3.0"></script>
 </body>
 </html>

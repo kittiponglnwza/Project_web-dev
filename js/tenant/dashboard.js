@@ -25,31 +25,57 @@ document.addEventListener("DOMContentLoaded", async () => {
         shortName = nameWithoutTitle.split(' ')[0];
     }
 
-    // โหลดข้อมูล Dashboard (ต้องอยู่นอก if เพื่อให้ทำงานเสมอ)
-    loadDashboardData(user.email);
-    loadTenantAnnouncements();
-    
-    document.getElementById("welcome-text").innerText = "สวัสดี, " + fullName;
+    // Rubric 9: อ่านข้อความแจ้งเตือนจาก Session แล้วลบตัวแปรออก เพื่อให้แสดงแค่ครั้งเดียว
+    const flash = DormSession.get("flash");
+    DormSession.remove("flash");
+
+    document.getElementById("welcome-text").innerText = "สวัสดี, " + fullName + (flash ? ` (${flash})` : "");
     document.getElementById("profile-name").innerText = shortName;
+    document.getElementById("session-info").innerText = "Session ID: " + DormSession.id();
+
+    // โหลดข้อมูล Dashboard ด้วยค่าจาก Session
+    loadDashboardData();
+    loadTenantAnnouncements();
 });
 
-async function loadDashboardData(email) {
+function bahtHTML(amount) {
+    return `${amount.toLocaleString()} <span style="font-size: 1rem; color: #6b7280; font-weight: 400;">บาท</span>`;
+}
+
+// Rubric 9: ใช้ค่าใน Session 2 ค่า (user_email, room_no) เพื่อประมวลผลข้อมูลในฐานข้อมูล
+async function loadDashboardData() {
+    const email = DormSession.get("user_email");
+    const roomNo = DormSession.get("room_no");
+
     try {
         // 1. ดึงยอดบิลค้างชำระรวม
         const { data: bills, error: billsError } = await supabaseClient
             .from('bills')
             .select('amount')
             .eq('email', email)
-            .eq('status', 'pending');
-            
+            .in('status', ['pending', 'unpaid']);
+
         if (billsError) throw billsError;
-        
-        let totalDue = 0;
-        if (bills) {
-            bills.forEach(b => totalDue += b.amount);
+
+        const totalDue = (bills || []).reduce((sum, bill) => sum + bill.amount, 0);
+        document.getElementById("card-due").innerHTML = bahtHTML(totalDue);
+
+        // ยอดที่ผู้เช่าคนนี้ชำระแล้วสำหรับห้องปัจจุบัน
+        const roomPaidEl = document.getElementById("card-room-paid");
+        if (roomNo) {
+            const { data: paidBills, error: paidError } = await supabaseClient
+                .from('bills')
+                .select('amount')
+                .eq('email', email)
+                .eq('room_no', roomNo)
+                .eq('status', 'paid');
+
+            if (paidError) throw paidError;
+            const totalPaid = (paidBills || []).reduce((sum, bill) => sum + bill.amount, 0);
+            roomPaidEl.innerHTML = bahtHTML(totalPaid);
+        } else {
+            roomPaidEl.innerHTML = bahtHTML(0);
         }
-        document.querySelector(".dashboard-cards .card:nth-child(1) .card-value").innerHTML = 
-            totalDue > 0 ? `${totalDue.toLocaleString()} <span style="font-size: 1rem; color: #6b7280; font-weight: 400;">บาท</span>` : `0 <span style="font-size: 1rem; color: #6b7280; font-weight: 400;">บาท</span>`;
 
         // 2. สถานะแจ้งซ่อมล่าสุด
         const { data: requests, error: requestsError } = await supabaseClient
@@ -61,7 +87,7 @@ async function loadDashboardData(email) {
 
         if (requestsError) throw requestsError;
 
-        let mStatusEl = document.querySelector(".dashboard-cards .card:nth-child(2) .card-value");
+        let mStatusEl = document.getElementById("card-maintenance");
         if (requests && requests.length > 0) {
             let r = requests[0];
             if (r.status === 'pending') {
@@ -80,17 +106,9 @@ async function loadDashboardData(email) {
         }
 
         // 3. ข้อมูลห้องพัก
-        const { data: profile, error: profileError } = await supabaseClient
-            .from('tenant_profiles')
-            .select('room_no')
-            .eq('email', email)
-            .single();
-        
-        if (profileError && profileError.code !== 'PGRST116') throw profileError;
-
-        let roomEl = document.querySelector(".dashboard-cards .card:nth-child(3) .card-value");
-        if (profile && profile.room_no) {
-            roomEl.innerHTML = `ห้อง ${escapeHTML(profile.room_no)}`;
+        let roomEl = document.getElementById("card-room");
+        if (roomNo) {
+            roomEl.innerHTML = `ห้อง ${escapeHTML(roomNo)}`;
         } else {
             roomEl.innerHTML = `รอการจัดห้อง`;
             roomEl.style.fontSize = "1.2rem";

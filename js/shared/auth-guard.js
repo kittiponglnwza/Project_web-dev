@@ -34,6 +34,11 @@ async function requireAdmin() {
             return null;
         }
 
+        // แท็บใหม่จะยังไม่มี sessionStorage จึงต้องสร้าง Session ใหม่จากฐานข้อมูล
+        if (!DormSession.id() || DormSession.get('user_email') !== session.user.email) {
+            await loadSessionProfile(session.user.email);
+        }
+
         return { session, profile };
     } catch (err) {
         console.error('Auth guard error:', err);
@@ -59,6 +64,10 @@ async function requireTenant() {
             return null;
         }
 
+        if (!DormSession.id() || DormSession.get('user_email') !== session.user.email) {
+            await loadSessionProfile(session.user.email);
+        }
+
         return { session, user: session.user };
     } catch (err) {
         console.error('Auth guard error:', err);
@@ -72,19 +81,15 @@ async function requireTenant() {
 // =========================================
 
 /**
- * Signs the user out of Supabase, clears cookies and session storage,
+ * Signs the user out of Supabase, terminates the session,
  * and redirects to the login page.
- * This replaces 8 separate logout() implementations across the project.
+ * The "remember me" cookie stays so the login form can prefill the email.
  */
 async function logout() {
     if (!confirm('คุณต้องการออกจากระบบหรือไม่?')) return;
 
-    // --- Rubric 9: Clear Cookie & Session ---
-    document.cookie = 'rememberMe=; max-age=0; path=/;';
-    sessionStorage.removeItem('savedEmail');
-    sessionStorage.removeItem('sessionID');
-    sessionStorage.clear();
-    // ----------------------------------------
+    // Rubric 9: Terminate a session
+    DormSession.terminate();
 
     try {
         await supabaseClient.auth.signOut();

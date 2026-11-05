@@ -19,12 +19,12 @@
         </header>
 
         <!-- Alert Section -->
-        <div class="alert-box" id="expiry-alert">
+        <aside class="alert-box" id="expiry-alert">
             <h4><i class="bx bxs-bell-ring bx-tada"></i> แจ้งเตือน: ผู้เช่าใกล้หมดอายุสัญญา (ภายใน 30 วัน)</h4>
             <ul class="alert-list" id="expiry-list">
                 <!-- Data injected here -->
             </ul>
-        </div>
+        </aside>
 
         <!-- Month Selector Dashboard -->
         <div class="dashboard-header">
@@ -72,14 +72,18 @@
         </section>
 
         <!-- Table Card -->
-        <div class="card">
+        <section class="card" aria-label="รายการบิล">
             <div class="filter-bar">
                 <button class="filter-btn active" onclick="filterBills('all', this)">ทั้งหมด</button>
                 <button class="filter-btn" onclick="filterBills('checking', this)">รอตรวจสลิป 🔴</button>
                 <button class="filter-btn" onclick="filterBills('unpaid', this)">ค้างชำระ🔘</button>
                 <button class="filter-btn" onclick="filterBills('paid', this)">ชำระแล้ว🟢</button>
             </div>
-            
+
+            <div class="list-toolbar" style="margin-top: 15px;">
+                <input type="search" id="bill-search" placeholder="ค้นหาเลขห้อง อีเมล หรือเลขบัตรประชาชน..." aria-label="ค้นหาบิล">
+            </div>
+
             <table>
                 <thead>
                     <tr>
@@ -94,10 +98,13 @@
                     </tr>
                 </thead>
                 <tbody id="bills-table-body">
-                    <tr><td colspan="7" style="text-align: center; padding: 40px;">กำลังโหลดข้อมูล...</td></tr>
+                    <tr><td colspan="8" style="text-align: center; padding: 40px;">กำลังโหลดข้อมูล...</td></tr>
                 </tbody>
             </table>
-        </div>
+            <div id="bills-pagination"></div>
+        </section>
+
+        <footer class="app-footer">&copy; 2024 Dorminator System</footer>
     </main>
 
     <!-- Slip Modal -->
@@ -107,9 +114,10 @@
     </div>
 
     <script src="../js/supabase-config.js?v=1.2.0"></script>
-    <script src="../js/shared/utils.js"></script>
-    <script src="../js/shared/auth-guard.js"></script>
+    <script src="../js/shared/utils.js?v=1.3.0"></script>
+    <script src="../js/shared/session.js?v=1.3.0"></script>
+    <script src="../js/shared/auth-guard.js?v=1.3.0"></script>
     <script src="../js/shared/components.js"></script>
-    <script src="../js/admin/billing.js"></script>
+    <script src="../js/admin/billing.js?v=1.3.0"></script>
 </body>
 </html>

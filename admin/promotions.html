@@ -18,20 +18,22 @@
         </header>
 
         <!-- Active Promotions -->
-        <div class="promo-section">
+        <section class="promo-section">
             <h3 class="section-title"><i class="bx bx-check-circle" style="color:#10b981"></i> โปรโมชั่นที่เปิดใช้งานอยู่</h3>
             <div class="promo-grid" id="active-promos">
                 <div style="text-align: center; color: #94a3b8; padding: 40px;">กำลังโหลด...</div>
             </div>
-        </div>
+        </section>
 
         <!-- Inactive Promotions -->
-        <div class="promo-section">
+        <section class="promo-section">
             <h3 class="section-title"><i class="bx bx-pause-circle" style="color:#94a3b8"></i> โปรโมชั่นที่ปิดอยู่</h3>
             <div class="promo-grid" id="inactive-promos">
                 <div style="text-align: center; color: #94a3b8; padding: 40px;">กำลังโหลด...</div>
             </div>
-        </div>
+        </section>
+
+        <footer class="app-footer">&copy; 2024 Dorminator System</footer>
     </main>
 
     <!-- Create/Edit Promotion Modal -->
@@ -71,7 +73,7 @@
                     </div>
                     <div class="form-group">
                         <label>มูลค่าส่วนลด</label>
-                        <input type="number" id="promo-discount-value" min="0" max="100" value="0" placeholder="เช่น 50">
+                        <input type="number" id="promo-discount-value" min="0" value="0" placeholder="เช่น 50">
                     </div>
                 </div>
                 <div class="form-row">
@@ -100,9 +102,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js?v=1.2.0"></script>
-    <script src="../js/shared/utils.js"></script>
-    <script src="../js/shared/auth-guard.js"></script>
+    <script src="../js/shared/utils.js?v=1.3.0"></script>
+    <script src="../js/shared/session.js?v=1.3.0"></script>
+    <script src="../js/shared/auth-guard.js?v=1.3.0"></script>
     <script src="../js/shared/components.js"></script>
-    <script src="../js/admin/promotions.js?v=1.0.0"></script>
+    <script src="../js/admin/promotions.js?v=1.3.0"></script>
 </body>
 </html>

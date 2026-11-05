@@ -41,7 +41,7 @@ body { background-color: var(--bg-color); color: var(--text-color); line-height:
 .hero { position: relative; text-align: center; min-height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; background: url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1600') fixed no-repeat center center/cover; color: #fff; margin-bottom: 20px; }
 .hero::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); }
 .hero-content { position: relative; z-index: 1; }
-.hero-content h1 { font-size: 3.5rem; margin-bottom: 15px; font-weight: 600; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
+.hero-content h1 { font-size: 1.8rem; margin-bottom: 15px; font-weight: 600; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
 .hero-content p { font-size: 1.2rem; font-weight: 300; text-shadow: 1px 1px 5px rgba(0,0,0,0.8); }
 
 /* Project Info Section */
@@ -104,7 +104,7 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
 .lux-wrapper { max-width: 1150px; margin: 0 auto; padding: 50px 20px; display: flex; flex-direction: column; gap: 40px; }
 .lux-header { margin-bottom: 20px; }
 .lux-category { color: #d4af37; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
-.lux-title { font-size: 2.5rem; color: #111; margin: 10px 0; font-weight: 600; line-height: 1.2; }
+.lux-title { font-size: 1.6rem; color: #111; margin: 10px 0; font-weight: 600; line-height: 1.2; }
 .lux-location { color: #6b7280; font-size: 1rem; display: flex; align-items: center; gap: 5px; font-weight: 300; }
 .lux-divider { border: 0; height: 1px; background: #e5e7eb; margin: 40px 0; }
 
@@ -132,16 +132,16 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
 .lux-btn-reserve:hover { background: #333; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
 
 /* =========================================
-   MODAL เน€เธยเน€เธเธเน€เธยเน€เธเธเน€เธยเน€เธเธเน€เธยเน€เธยเน€เธเธ‘เน€เธย (เน€เธโฌเน€เธยเน€เธเธ”เน€เธยเน€เธเธเน€เธยเน€เธเธเน€เธเธเน€เธย)
+   MODAL ฟอร์มจองห้องพัก
    ========================================= */
 .modal-overlay {
-    display: none; /* เน€เธยเน€เธยเน€เธเธเน€เธยเน€เธโ€ขเน€เธเธเน€เธยเน€เธยเน€เธเธเน€เธเธ…เน€เธโ€เน€เธโฌเน€เธเธเน€เธยเน€เธย */
+    display: none; /* ซ่อนไว้ก่อน */
     position: fixed;
     z-index: 9999;
     left: 0; top: 0;
     width: 100%; height: 100%;
     background-color: rgba(0,0,0,0.6);
-    backdrop-filter: blur(5px); /* เน€เธโฌเน€เธยเน€เธเธ…เน€เธเธเน€เธยเน€เธเธ’เน€เธยเน€เธเธเน€เธเธ…เน€เธเธ‘เน€เธยเน€เธยเน€เธเธเน€เธยเน€เธโ€เน€เธเธเน€เธยเน€เธยเน€เธย */
+    backdrop-filter: blur(5px); /* เบลอพื้นหลัง */
     align-items: center;
     justify-content: center;
     opacity: 0;
@@ -151,9 +151,11 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
 
 .modal-content {
     background-color: #fff;
-    padding: 40px;
+    padding: 25px;
     border-radius: 20px;
-    width: 90%;
+    width: 95%;
+    max-height: 92vh;
+    overflow-y: auto;
     max-width: 480px;
     position: relative;
     box-shadow: 0 25px 50px rgba(0,0,0,0.2);
@@ -181,12 +183,12 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
 }
 .form-group input:focus { border-color: #111; box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.05); }
 
-/* เน€เธเธเน€เธยเน€เธโ€ขเน€เธเธ…เน€เธยเน€เธโฌเน€เธเธเน€เธเธ—เน€เธยเน€เธเธ Validation Error */
+/* สไตล์เมื่อ Validation Error */
 .error-msg { display: none; color: #ef4444; font-size: 0.85rem; margin-top: 8px; font-weight: 500; }
 .form-group input.invalid { border-color: #ef4444; background-color: #fef2f2; }
 .form-group input.invalid:focus { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1); }
 
-/* เน€เธยเน€เธเธเน€เธยเน€เธเธเน€เธยเน€เธเธเน€เธยเน€เธยเน€เธยเน€เธเธ’เน€เธย LINE เน€เธเธเน€เธเธ•เน€เธโฌเน€เธยเน€เธเธ•เน€เธเธเน€เธเธ */
+/* ปุ่มติดต่อทาง LINE */
 .line-btn {
     display: flex; align-items: center; justify-content: center; gap: 10px;
     background-color: #06C755; color: #fff;
@@ -197,6 +199,10 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
 .line-btn:hover { background-color: #05a044; box-shadow: 0 10px 20px rgba(6, 199, 85, 0.2); }
 
 @media (min-width: 768px) {
+    .hero-content h1 { font-size: 3.5rem; }
+    .lux-title { font-size: 2.5rem; }
+    .back-home { top: 40px; right: 50px; }
+    .modal-content { width: 90%; padding: 40px; }
     .menu-toggle { display: none; }
     .nav-menu { display: block; position: static; width: auto; }
     .nav-menu ul { flex-direction: row; }
@@ -251,7 +257,7 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
     justify-content: center;
     background: #fff;
 }
-.back-home { position: absolute; top: 40px; right: 50px; color: #9ca3af; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.3s; font-size: 0.95rem; }
+.back-home { position: absolute; top: 14px; right: 25px; color: #9ca3af; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.3s; font-size: 0.95rem; }
 .back-home:hover { color: #111; }
 
 
@@ -259,7 +265,7 @@ footer { text-align: center; padding: 20px; background-color: var(--primary-colo
 
 
 /* =========================================
-   LUXURY FORM INPUTS (เน€เธยเน€เธเธเน€เธเธเน€เธยเน€เธเธเน€เธเธเน€เธเธเน€เธเธเน€เธเธเน€เธเธเน€เธเธ’)
+   LUXURY FORM INPUTS (ช่องกรอกข้อมูล)
    ========================================= */
 .lux-input {
     width: 100%;
@@ -326,14 +332,11 @@ input[type="email"]:focus {
 /* Rubric Requirements - Explicitly labelled for Audit */
 /* ========================================================= */
 
-/* 1. Universal Selector */
-/* * { margin: 0; padding: 0; } is already at the top of the file */
+/* 1. Universal Selector: * { margin: 0; padding: 0; ... } อยู่ต้นไฟล์ */
 
-/* 2. Type Selector */
-/* body { ... } is already at the top of the file */
+/* 2. Type Selector: body { ... } และ footer { ... } */
 
-/* 3. Class Selector */
-/* .room-box { ... } is heavily used */
+/* 3. Class Selector: .room-box { ... } */
 
 /* 4. ID Selector */
 #loginForm, #registerForm, #bookingForm {
@@ -370,7 +373,7 @@ input[type="text"], input[type="email"], input[type="tel"], input[type="password
     color: #d4af37;
 }
 
-/* 11. Specificity Weight (Big Bonus) */
+/* 11. Specificity Weight (1, 2, 0): ดูตัวอย่างเปรียบเทียบเต็มที่ท้ายไฟล์ */
 #registerForm .lux-input:focus {
     box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
 }
@@ -408,7 +411,7 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
     .stats-grid, .dashboard-cards { grid-template-columns: repeat(2, 1fr) !important; }
 }
 @media (min-width: 1200px) {
-    .stats-grid, .dashboard-cards { grid-template-columns: repeat(3, 1fr) !important; }
+    .dashboard-cards { grid-template-columns: repeat(4, 1fr) !important; }
 }
 
 /* Responsive Forms */
@@ -556,94 +559,76 @@ body.tenant-layout { background-color: var(--app-bg); color: var(--app-text); }
 .tenant-layout .sidebar { background: #fff; }
 .admin-layout .sidebar { background: #fff; }
 
-.main-content { width: 100%; box-sizing: border-box; padding: 20px; position: relative; z-index: 1; }
+.main-content { width: 100%; box-sizing: border-box; padding: 18px; position: relative; z-index: 1; }
+@media (min-width: 768px) {
+    .main-content { padding: 20px; }
+}
 
 
 /* =========================================
-   GAUNTLET LOOP: Mobile Responsive Fixes
+   Mobile First: ค่าเริ่มต้นสำหรับจอมือถือ
+   และขยายเมื่อจอกว้างตั้งแต่ 768px ขึ้นไป
    ========================================= */
 
-/* Header Actions - stack on mobile */
+/* Header Actions - เรียงแนวตั้งบนมือถือ */
 .header-actions {
     flex-wrap: wrap;
     gap: 10px;
+    flex-direction: column;
+    align-items: flex-start !important;
 }
-@media (max-width: 767px) {
-    .header-actions {
-        flex-direction: column;
-        align-items: flex-start !important;
-    }
-    .header-actions h1,
-    .header-actions h2 {
-        font-size: 1.3rem !important;
-    }
+.header-actions h1,
+.header-actions h2 {
+    font-size: 1.3rem !important;
 }
+.top-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+.page-title { font-size: 1.3rem; margin-bottom: 20px; color: #111; }
 
-/* Page Title - smaller on mobile */
-@media (max-width: 767px) {
-    .page-title {
-        font-size: 1.3rem !important;
-    }
-    h1 {
-        font-size: 1.3rem !important;
-    }
-}
-
-/* Filter Bar - wrap on mobile */
+/* Filter Bar */
 .filter-bar {
     flex-wrap: wrap;
 }
 
-/* Dashboard Header - stack on mobile */
-@media (max-width: 767px) {
+/* Dashboard Header - เรียงแนวตั้งบนมือถือ */
+.dashboard-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 10px;
+}
+.month-selector {
+    width: 100%;
+}
+.month-selector select {
+    width: 100%;
+    min-width: 0 !important;
+}
+
+@media (min-width: 768px) {
+    .header-actions {
+        flex-direction: row;
+        align-items: center !important;
+    }
+    .header-actions h1,
+    .header-actions h2 {
+        font-size: 24px !important;
+    }
+    .page-title { font-size: 1.8rem; margin-bottom: 30px; }
     .dashboard-header {
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: 10px;
+        flex-direction: row;
+        align-items: center !important;
     }
     .month-selector {
-        width: 100%;
+        width: auto;
     }
     .month-selector select {
-        width: 100%;
-        min-width: unset !important;
-    }
-}
-
-/* Tables - better mobile touch */
-@media (max-width: 767px) {
-    th, td {
-        padding: 12px 14px !important;
-        font-size: 13px !important;
-    }
-}
-
-/* Cards - reduce padding on mobile */
-@media (max-width: 767px) {
-    .card {
-        padding: 18px !important;
-    }
-    .recent-section {
-        padding: 18px !important;
-    }
-    .main-content {
-        padding: 18px !important;
-    }
-}
-
-/* Modal - full width on mobile */
-@media (max-width: 767px) {
-    .modal {
-        width: 95% !important;
-        max-width: none !important;
-        padding: 20px !important;
-    }
-    .modal-content {
-        width: 95% !important;
-        padding: 25px !important;
-    }
-    .invoice-modal {
-        width: 95% !important;
+        width: auto;
+        min-width: 150px !important;
     }
 }
 
@@ -656,24 +641,6 @@ body.tenant-layout { background-color: var(--app-bg); color: var(--app-text); }
 @media (min-width: 768px) {
     .grid-2 {
         grid-template-columns: repeat(2, 1fr) !important;
-    }
-}
-
-/* Sidebar overlay on mobile - close when clicking outside */
-@media (max-width: 991px) {
-    .sidebar {
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 9999 !important;
-    }
-    .sidebar-links.active {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: inherit;
-        z-index: 9999;
-        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
     }
 }
 
@@ -797,7 +764,7 @@ body.tenant-layout { background-color: var(--app-bg); color: var(--app-text); }
 }
 
 :is(body.admin-layout, body.tenant-layout) :is(.card, .recent-section, .promo-card, .stat-card) {
-    padding: 24px;
+    padding: 18px;
 }
 
 :is(body.admin-layout, body.tenant-layout) .card-header {
@@ -878,9 +845,10 @@ body.tenant-layout { background-color: var(--app-bg); color: var(--app-text); }
 }
 
 :is(body.admin-layout, body.tenant-layout) :is(th, td) {
-    padding: 14px 16px;
+    padding: 12px 14px;
     border-bottom: 1px solid var(--app-border);
     color: var(--app-text);
+    font-size: 13px;
     line-height: 1.5;
 }
 
@@ -1011,6 +979,10 @@ body.admin-layout .apt-btn-submit {
         padding: 20px 12px;
     }
 
+    :is(body.admin-layout, body.tenant-layout) .sidebar-toggle {
+        display: none;
+    }
+
     :is(body.admin-layout, body.tenant-layout) .sidebar-links {
         display: flex !important;
         height: calc(100vh - 92px);
@@ -1025,12 +997,70 @@ body.admin-layout .apt-btn-submit {
     }
 }
 
-@media (max-width: 767px) {
-    :is(body.admin-layout, body.tenant-layout) :is(.card, .recent-section, .stat-card) {
-        padding: 18px;
+@media (min-width: 768px) {
+    :is(body.admin-layout, body.tenant-layout) :is(.card, .recent-section, .promo-card, .stat-card) {
+        padding: 24px;
     }
 
     :is(body.admin-layout, body.tenant-layout) :is(th, td) {
-        padding: 12px 14px;
+        padding: 14px 16px;
+        font-size: 14px;
     }
+
+    :is(body.admin-layout, body.tenant-layout) th {
+        font-size: 0.82rem;
+    }
+}
+
+/* =========================================
+   Rubric 2: Specificity Weight (a, b, c)
+   a = จำนวน ID, b = class / attribute / pseudo-class, c = type / pseudo-element
+   ทั้ง 3 กฎเลือกปุ่มเดียวกัน แต่กฎน้ำหนักสูงสุดจะชนะ
+   ========================================= */
+.btn-details { letter-spacing: 0; }                         /* (0, 1, 0) */
+.room-details .btn-details { letter-spacing: 0.2px; }       /* (0, 2, 0) */
+#rooms .room-details .btn-details { letter-spacing: 0.4px; } /* (1, 2, 0) ชนะ */
+
+/* =========================================
+   ส่วนเสริมตาม Rubric: ตารางสรุป, ค้นหา, แบ่งหน้า, Footer
+   ========================================= */
+.room-summary { max-width: 900px; margin: 20px auto 0; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; text-align: left; }
+.room-summary h3 { color: var(--primary-color); font-size: 1.05rem; font-weight: 600; margin-bottom: 10px; }
+.room-summary table { border-collapse: collapse; }
+.room-summary :is(th, td) { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; text-align: left; font-size: 0.9rem; }
+.room-summary > p { margin-top: 10px; color: #64748b; font-size: 0.9rem; }
+
+.visit-note { margin-top: 12px; color: #fff; font-size: 0.9rem; font-weight: 300; }
+
+.booking-summary { list-style: none; margin: 0 0 20px; padding: 12px 15px; background: #f9fafb; border-radius: 10px; text-align: left; font-size: 0.92rem; }
+.booking-summary li { padding: 3px 0; }
+
+.list-toolbar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+.list-toolbar :is(input, select) { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+
+.pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: 15px; font-size: 14px; color: #64748b; }
+.pager-buttons { display: flex; gap: 6px; }
+.pager-buttons button { padding: 6px 14px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; color: #334155; cursor: pointer; }
+.pager-buttons button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.report-filters { display: flex; flex-direction: column; gap: 10px; }
+.report-filters select { padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; }
+.report-table tfoot td { font-weight: 600; border-top: 2px solid #e2e8f0; }
+.report-table :is(th, td):not(:first-child) { text-align: right; }
+.report-table th:first-child { text-align: left; }
+
+/* ต้องเอาชนะกฎ footer ของหน้าเว็บสาธารณะ จึงเจาะจงถึง class */
+footer.app-footer { background: none; color: #94a3b8; margin-top: 30px; padding: 10px 0 0; font-size: 0.8rem; }
+
+@media (min-width: 768px) {
+    .list-toolbar { flex-direction: row; }
+    .list-toolbar input { flex: 2; }
+    .list-toolbar select { flex: 1; }
+    .report-filters { flex-direction: row; }
+}
+
+/* หน้าสมัครสมาชิก: Mobile First ใช้แบนเนอร์เตี้ย และตรึงเต็มจอเมื่อจอกว้าง */
+.register-banner { background: url('https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat; }
+@media (min-width: 768px) {
+    .register-banner { position: sticky; top: 0; height: 100vh; }
 }

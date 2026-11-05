@@ -16,7 +16,7 @@
     <main class="main-content">
         <header class="top-header">
             <div>
-                <h1 style="font-size: 1.8rem; margin: 0; color: #111;">ยินดีต้อนรับสู่ระบบจัดการผู้เช่า</h1>
+                <h1 class="page-title" style="margin: 0;">ยินดีต้อนรับสู่ระบบจัดการผู้เช่า</h1>
                 <p style="color: #6b7280; margin-top: 5px;" id="welcome-text">กำลังโหลดข้อมูล...</p>
             </div>
             <div style="display: flex; align-items: center;">
@@ -35,35 +35,45 @@
             <div class="card">
                 <div class="card-icon" style="background: #fef3c7; color: #d97706;"><i class="bx bx-wallet"></i></div>
                 <div class="card-title">ยอดค้างชำระเดือนนี้</div>
-                <div class="card-value">4,500 <span style="font-size: 1rem; color: #6b7280; font-weight: 400;">บาท</span></div>
+                <div class="card-value" id="card-due">-</div>
             </div>
             <div class="card">
                 <div class="card-icon" style="background: #d1fae5; color: #059669;"><i class="bx bx-wrench"></i></div>
                 <div class="card-title">สถานะแจ้งซ่อมล่าสุด</div>
-                <div class="card-value" style="font-size: 1.4rem; color: #059669;">เสร็จสิ้น (แอร์ไม่เย็น)</div>
+                <div class="card-value" id="card-maintenance" style="font-size: 1.4rem;">-</div>
             </div>
             <div class="card">
                 <div class="card-icon" style="background: #e0e7ff; color: #4f46e5;"><i class="bx bx-building-house"></i></div>
                 <div class="card-title">ห้องพักของคุณ</div>
-                <div class="card-value" style="font-size: 1.4rem;">ห้อง 302 (Standard)</div>
+                <div class="card-value" id="card-room" style="font-size: 1.4rem;">-</div>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background: #fce7f3; color: #be185d;"><i class="bx bx-check-shield"></i></div>
+                <div class="card-title">ชำระแล้วสำหรับห้องนี้</div>
+                <div class="card-value" id="card-room-paid">-</div>
             </div>
         </section>
 
-        <div class="recent-section">
+        <section class="recent-section" aria-label="ข่าวประชาสัมพันธ์">
             <div class="section-header">ข่าวประชาสัมพันธ์ล่าสุด</div>
             <div id="tenant-announcements">
                 <div style="text-align: center; color: #9ca3af; padding: 20px;">กำลังโหลดประกาศ...</div>
             </div>
-        </div>
+        </section>
+
+        <footer class="app-footer">
+            <p class="session-info" id="session-info"></p>
+        </footer>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js?v=1.2.0"></script>
-    <script src="../js/auth.js?v=1.2.0"></script>
-    <script src="../js/shared/utils.js"></script>
-    <script src="../js/shared/auth-guard.js"></script>
+    <script src="../js/shared/utils.js?v=1.3.0"></script>
+    <script src="../js/shared/session.js?v=1.3.0"></script>
+    <script src="../js/auth.js?v=1.3.0"></script>
+    <script src="../js/shared/auth-guard.js?v=1.3.0"></script>
     <script src="../js/shared/components.js"></script>
-    <script src="../js/tenant/dashboard.js"></script>
+    <script src="../js/tenant/dashboard.js?v=1.3.0"></script>
 
 
 </body></html>

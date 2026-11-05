@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>รายละเอียดห้องพักสุดหรู - Dorminator</title>
     <link rel="stylesheet" href="css/style.css?v=1.1.0">
-    <link rel="stylesheet" href="css/room-detail.css?v=1.1.0">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
@@ -15,23 +14,27 @@
         <p style="text-align: center; padding: 100px; font-size: 1.2rem; color: #888;">กำลังโหลดข้อมูล...</p>
     </main>
 
+    <footer>
+        <p>&copy; 2024 Dorminator System. โปรเจกต์วิชา Web Development.</p>
+    </footer>
+
     <!-- Modal ฟอร์มนัดหมาย/จองห้องพัก -->
     <div id="bookingModal" class="modal-overlay">
-        <div class="modal-content">
+        <section class="modal-content" aria-labelledby="bookingTitle">
             <span class="close-modal">&times;</span>
-            <h2 style="margin-bottom: 20px; color: #111; font-weight: 500;">สนใจจอง / นัดดูห้องพัก</h2>
+            <h2 id="bookingTitle" style="margin-bottom: 20px; color: #111; font-weight: 500;">สนใจจอง / นัดดูห้องพัก</h2>
             
             <!-- ส่วนฟอร์มที่ต้อง Validation -->
             <div id="bookingFormContainer">
                 <form id="bookingForm">
                     <div class="form-group">
                         <label for="b_name">ชื่อ-นามสกุล <span style="color:red;">*</span></label>
-                        <input type="text" id="b_name" required placeholder="กรอกชื่อของคุณ">
+                        <input type="text" id="b_name" required minlength="3" placeholder="กรอกชื่อของคุณ">
                     </div>
                     
                     <div class="form-group">
                         <label for="b_phone">เบอร์โทรศัพท์ <span style="color:red;">*</span></label>
-                        <input type="tel" id="b_phone" required placeholder="เช่น 0812345678">
+                        <input type="tel" id="b_phone" required pattern="0[0-9]{9}" title="ตัวเลข 10 หลัก ขึ้นต้นด้วย 0" placeholder="เช่น 0812345678">
                         <!-- แจ้งเตือนเมื่อกรอกผิดเงื่อนไข RegEx -->
                         <small class="error-msg" id="phoneError">กรุณากรอกเบอร์โทรศัพท์มือถือตัวเลข 10 หลัก (ขึ้นต้นด้วย 0)</small>
                     </div>
@@ -51,7 +54,8 @@
             <div id="bookingSuccess" style="display: none; text-align: center; padding: 20px 0;">
                 <i class='bx bxs-check-circle' style='color:#10b981; font-size: 4rem; margin-bottom:15px;'></i>
                 <h3 style="margin-bottom: 10px; font-weight: 500; color: #111;">บันทึกข้อมูลสำเร็จ!</h3>
-                <p style="color: #666; margin-bottom: 25px; line-height: 1.5;">แอดมินได้รับเรื่องแล้ว จะรีบติดต่อกลับไปที่เบอร์ที่คุณแจ้งไว้โดยเร็วที่</p>
+                <p style="color: #666; margin-bottom: 25px; line-height: 1.5;">แอดมินได้รับเรื่องแล้ว จะรีบติดต่อกลับไปที่เบอร์ที่คุณแจ้งไว้โดยเร็วที่สุด</p>
+                <ul id="bookingSummary" class="booking-summary"></ul>
                 <hr style="border: 0; height: 1px; background: #eee; margin-bottom: 20px;">
                 <p style="margin-bottom: 15px; font-size: 0.95rem;">ต้องการข้อมูลด่วน / แชทกับแอดมินทันที?</p>
                 <!-- ปุ่มเชื่อมไป LINE OA -->
@@ -59,12 +63,14 @@
                     <i class='bx bxl-line' style="font-size: 1.5rem;"></i> คุยผ่าน LINE Official
                 </a>
             </div>
-        </div>
+        </section>
     </div>
     <!-- นำเข้า Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js?v=1.1.0"></script>
-    <script src="js/detail.js"></script>
-    <script src="js/auth.js?v=1.1.0"></script>
+    <script src="js/shared/utils.js?v=1.3.0"></script>
+    <script src="js/shared/session.js?v=1.3.0"></script>
+    <script src="js/detail.js?v=1.3.0"></script>
+    <script src="js/auth.js?v=1.3.0"></script>
 </body>
 </html>

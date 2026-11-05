@@ -2,6 +2,9 @@ let tenantProfiles = [];
 let allBills = [];
 let currentMonthBills = [];
 let uniqueMonths = [];
+let currentStatusFilter = 'all';
+let currentBillPage = 1;
+const BILLS_PER_PAGE = 10;
 
 document.addEventListener("DOMContentLoaded", async () => {
     renderAdminSidebar();
@@ -15,6 +18,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Set update time
     const now = new Date();
     document.getElementById('last-update').innerText = now.toLocaleString('th-TH');
+
+    document.getElementById('bill-search').addEventListener('input', () => {
+        currentBillPage = 1;
+        applyBillFilters();
+    });
 
     await loadTenantsAndCheckExpiry();
     await loadBills();
@@ -67,17 +75,17 @@ async function loadTenantsAndCheckExpiry() {
 
 async function loadBills() {
     try {
+        // ตาราง bills ไม่มี Foreign Key ไป tenant_profiles จึงเชื่อมข้อมูลด้วยอีเมลในหน้านี้แทนการ embed
         const { data, error } = await supabaseClient
             .from('bills')
-            .select(`*,tenant_profiles(
-                id,email,room_no,national_id,address,lease_status,start_date,end_date)`)
+            .select('*')
             .order('created_at', { ascending: false });
 
         if (!error && data) {
             data.forEach(bill => {
                 // ดึงเลขห้องปัจจุบันจาก tenantProfiles เสมอ เพื่อไม่ให้ข้อมูลขัดแย้งกันกรณีเปลี่ยนห้อง
-                // const tenant = tenantProfiles.find(t => t.email === bill.email);\
-                const tenant = bill.tenant_profiles;
+                const tenant = tenantProfiles.find(t => t.email === bill.email);
+                bill.tenant_national_id = tenant ? tenant.national_id : '';
                 if (tenant && tenant.room_no) {
                     bill.room_no = tenant.room_no;
                 } else if (!bill.room_no || bill.room_no === 'null') {
@@ -90,11 +98,12 @@ async function loadBills() {
             // Extract unique months
             uniqueMonths = [...new Set(data.map(b => b.month))];
             const select = document.getElementById('monthSelect');
+            const previousMonth = select.value;
             select.innerHTML = '';
-            
+
             if (uniqueMonths.length === 0) {
                 select.innerHTML = '<option value="">ไม่มีข้อมูลบิล</option>';
-                renderBills([]);
+                window.changeMonth();
                 return;
             }
 
@@ -103,10 +112,12 @@ async function loadBills() {
                 select.innerHTML += `<option value="${escapeHTML(m)}">${escapeHTML(m)}</option>`;
             });
             
-            // Trigger change to load the first month
+            // รักษาเดือนเดิมไว้หลังอนุมัติหรือลบบิล ถ้าไม่มีให้ใช้เดือนล่าสุด
+            if (uniqueMonths.includes(previousMonth)) select.value = previousMonth;
             window.changeMonth();
         } else if (error) {
             console.error(error);
+            document.getElementById('bills-table-body').innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px; color: #ef4444;">โหลดข้อมูลบิลไม่สำเร็จ</td></tr>';
         }
     } catch (err) {
         console.error(err);
@@ -150,24 +161,43 @@ window.changeMonth = function() {
     // Reset filters and render
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector('.filter-btn').classList.add('active'); // set "All" active
-    
-    renderBills(currentMonthBills);
+
+    currentStatusFilter = 'all';
+    currentBillPage = 1;
+    applyBillFilters();
 };
 
 window.filterBills = function(status, btnElement) {
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     btnElement.classList.add('active');
 
-    if(status === 'all') renderBills(currentMonthBills);
-    else renderBills(currentMonthBills.filter(b => b.status === status || (status === 'unpaid' && b.status === 'pending')));
+    currentStatusFilter = status;
+    currentBillPage = 1;
+    applyBillFilters();
 };
+
+// Rubric 8: รวมเงื่อนไขเดือน สถานะ และคำค้นหาจากข้อมูลบิลที่เชื่อมกับข้อมูลผู้เช่า
+function applyBillFilters() {
+    const keyword = document.getElementById('bill-search').value.trim().toLowerCase();
+
+    const bills = currentMonthBills.filter(bill => {
+        const matchStatus = currentStatusFilter === 'all'
+            || bill.status === currentStatusFilter
+            || (currentStatusFilter === 'unpaid' && bill.status === 'pending');
+        const text = [bill.room_no, bill.email, bill.tenant_national_id].join(' ').toLowerCase();
+        return matchStatus && text.includes(keyword);
+    });
+
+    renderBills(bills);
+}
 
 function renderBills(bills) {
     const tbody = document.getElementById('bills-table-body');
     tbody.innerHTML = '';
 
     if (bills.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px;">ไม่มีข้อมูลบิลสำหรับเดือนนี้</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px;">ไม่พบบิลตามเงื่อนไขที่เลือก</td></tr>';
+        renderPager('bills-pagination', 0, 1, BILLS_PER_PAGE, () => {});
         return;
     }
 
@@ -178,7 +208,17 @@ function renderBills(bills) {
         return ra - rb;
     });
 
-    bills.forEach(bill => {
+    // Rubric 8: ตัดหน้าแสดงข้อมูล
+    const lastPage = Math.ceil(bills.length / BILLS_PER_PAGE);
+    currentBillPage = Math.min(currentBillPage, lastPage);
+    const start = (currentBillPage - 1) * BILLS_PER_PAGE;
+
+    renderPager('bills-pagination', bills.length, currentBillPage, BILLS_PER_PAGE, page => {
+        currentBillPage = page;
+        renderBills(bills);
+    });
+
+    bills.slice(start, start + BILLS_PER_PAGE).forEach(bill => {
         const utilTotal = (bill.elec_fee || 0) + (bill.water_fee || 0) + (bill.other_fee || 0);
         const discountAmt = bill.discount_amount || 0;
         

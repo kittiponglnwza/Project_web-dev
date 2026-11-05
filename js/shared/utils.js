@@ -26,6 +26,140 @@ function escapeHTML(str) {
 }
 
 // =========================================
+//  Validation Patterns (Rubric 3)
+// =========================================
+
+const DORM_PATTERNS = {
+    email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    phone: /^0\d{9}$/,
+    nationalId: /^\d{13}$/
+};
+
+// =========================================
+//  Ajax (Rubric 10)
+// =========================================
+
+/**
+ * ดึงข้อมูลด้วย XMLHttpRequest แล้วแปลง responseText จาก JSON เป็น Object
+ * @param {string} url - URL ที่ต้องการดึงข้อมูล
+ * @param {object} [headers] - Request headers
+ * @returns {Promise<any>} - ข้อมูลที่แปลงแล้ว
+ */
+function ajaxGetJSON(url, headers = {}) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        Object.keys(headers).forEach(name => xhr.setRequestHeader(name, headers[name]));
+        xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    resolve(JSON.parse(xhr.responseText));
+                } catch (err) {
+                    reject(err);
+                }
+            } else {
+                reject(new Error('HTTP ' + xhr.status + ': ' + url));
+            }
+        };
+        xhr.onerror = () => reject(new Error('Network error: ' + url));
+        xhr.send();
+    });
+}
+
+/** Headers สำหรับเรียก Supabase REST API โดยตรง */
+function supabaseRestHeaders() {
+    return { apikey: supabaseKey, Authorization: 'Bearer ' + supabaseKey };
+}
+
+// =========================================
+//  Room Availability (Rubric 7)
+// =========================================
+
+const ROOM_TYPE_CAPACITY = { S: 4, M: 6, XL: 6 };
+
+/** แปลงเลขห้องเป็นขนาดห้อง: 01-04 = S, 05-10 = M, 11 ขึ้นไป = XL */
+function getRoomSize(roomNo) {
+    const suffix = parseInt(String(roomNo || '').slice(-2), 10);
+    if (suffix >= 1 && suffix <= 4) return 'S';
+    if (suffix >= 5 && suffix <= 10) return 'M';
+    if (suffix >= 11) return 'XL';
+    return '';
+}
+
+/** อ่านขนาดห้องจากชื่อประเภท เช่น "Size XL" หรือ "Type S" */
+function getRoomTypeKey(typeName) {
+    const parts = String(typeName || '').trim().split(/\s+/);
+    return parts[parts.length - 1];
+}
+
+/**
+ * คำนวณจำนวนห้องว่างของแต่ละประเภทจากรายการห้องที่มีผู้เช่า
+ * @param {Array<object>} rooms - ข้อมูลประเภทห้อง
+ * @param {Array<{room_no: string}>} occupiedRows - ห้องที่มีผู้เช่า
+ * @returns {Array<object>} - ข้อมูลห้องพร้อม isAvailable และ availableCount
+ */
+function computeRoomAvailability(rooms, occupiedRows) {
+    const uniqueRooms = [...new Set(occupiedRows.map(r => (r.room_no || '').trim()).filter(Boolean))];
+    const occupiedBySize = { S: 0, M: 0, XL: 0 };
+    uniqueRooms.forEach(room => {
+        const size = getRoomSize(room);
+        if (size) occupiedBySize[size]++;
+    });
+
+    return rooms.map(room => {
+        const key = getRoomTypeKey(room.type);
+        const capacity = ROOM_TYPE_CAPACITY[key] || 0;
+        const availableCount = Math.max(0, capacity - (occupiedBySize[key] || 0));
+        return { ...room, isAvailable: availableCount > 0, availableCount };
+    });
+}
+
+// =========================================
+//  Pagination (Rubric 8)
+// =========================================
+
+/**
+ * วาดปุ่มเปลี่ยนหน้าลงใน container
+ * @param {string} containerId - id ขององค์ประกอบที่แสดงตัวควบคุม
+ * @param {number} totalItems - จำนวนรายการทั้งหมด
+ * @param {number} page - หน้าปัจจุบัน
+ * @param {number} pageSize - จำนวนรายการต่อหน้า
+ * @param {function(number): void} onChange - เรียกเมื่อเปลี่ยนหน้า
+ */
+function renderPager(containerId, totalItems, page, pageSize, onChange) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '';
+
+    const totalPages = Math.ceil(totalItems / pageSize);
+    if (totalPages <= 1) return;
+
+    const pager = document.createElement('nav');
+    pager.className = 'pager';
+    pager.setAttribute('aria-label', 'เปลี่ยนหน้า');
+
+    const info = document.createElement('span');
+    info.textContent = `หน้า ${page} จาก ${totalPages} (${totalItems} รายการ)`;
+
+    const buttons = document.createElement('div');
+    buttons.className = 'pager-buttons';
+
+    const addButton = (label, target, disabled) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = label;
+        btn.disabled = disabled;
+        btn.addEventListener('click', () => onChange(target));
+        buttons.appendChild(btn);
+    };
+    addButton('ก่อนหน้า', page - 1, page <= 1);
+    addButton('ถัดไป', page + 1, page >= totalPages);
+
+    pager.append(info, buttons);
+    container.appendChild(pager);
+}
+
+// =========================================
 //  Thai Date & Currency Formatting
 // =========================================
 
@@ -55,6 +189,21 @@ function formatDateThai(dateInput, opts = {}) {
     }
 
     return `${day} ${month} ${year}`;
+}
+
+/**
+ * แปลงรอบบิล เช่น "พ.ย. 2569" หรือ "พฤษภาคม 2024" เป็นตัวเลขสำหรับเรียงลำดับ
+ * @param {string} monthText - ข้อความรอบบิล
+ * @returns {number} - ค่าเรียงลำดับ (ปี ค.ศ. x 12 + เดือน) หรือ 0 ถ้าอ่านไม่ได้
+ */
+function monthSortKey(monthText) {
+    const [name, yearText] = String(monthText || '').trim().split(/\s+/);
+    let monthIndex = THAI_MONTHS.indexOf(name);
+    if (monthIndex === -1) monthIndex = THAI_MONTHS_FULL.indexOf(name);
+    let year = parseInt(yearText, 10);
+    if (monthIndex === -1 || isNaN(year)) return 0;
+    if (year > 2400) year -= 543;
+    return year * 12 + monthIndex;
 }
 
 /**

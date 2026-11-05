@@ -9,7 +9,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!auth) return;
     // ===============================================
 
+    document.getElementById('user-search').addEventListener('input', () => {
+        currentPage = 1;
+        applyUserFilters();
+    });
+    document.getElementById('room-filter').addEventListener('change', () => {
+        currentPage = 1;
+        applyUserFilters();
+    });
+
     loadUsers();
+    loadRoomTypes();
 });
 
 async function loadUsers() {
@@ -25,16 +35,16 @@ async function loadUsers() {
             return;
         }
 
-        // Calculate Room Stats
+        // Calculate Room Stats (นับเฉพาะผู้เช่าที่มีห้องจริง ไม่นับห้องทำงานของแอดมิน)
         if (users) {
-            let rooms = users.filter(u => (u.role === 'admin') || (u.role === 'tenant' && u.room_no && u.room_no.trim() !== '')).map(u => u.room_no.trim());
+            let rooms = users.filter(u => u.role !== 'admin' && u.room_no && u.room_no.trim() !== '').map(u => u.room_no.trim());
             let occupiedRooms = [...new Set(rooms)].length;
             document.getElementById('stat-occupied').innerText = occupiedRooms;
             document.getElementById('stat-available').innerText = (16 - occupiedRooms);
         }
 
-        allUsers = users;
-        renderTable(allUsers, currentPage);
+        allUsers = users || [];
+        applyUserFilters();
     } catch (err) {
         console.error(err);
     }
@@ -42,6 +52,26 @@ async function loadUsers() {
 
 let currentPage = 1;
 const rowsPerPage = 5;
+let filteredUsers = [];
+
+// Rubric 8: ค้นหาจากหลายคอลัมน์ร่วมกับตัวกรองสถานะห้อง
+function applyUserFilters() {
+    const keyword = document.getElementById('user-search').value.trim().toLowerCase();
+    const roomFilter = document.getElementById('room-filter').value;
+
+    filteredUsers = allUsers.filter(user => {
+        const text = [user.email, user.room_no, user.national_id, user.role].join(' ').toLowerCase();
+        const hasRoom = Boolean(user.room_no && user.room_no.trim());
+        if (roomFilter === 'has-room' && !hasRoom) return false;
+        if (roomFilter === 'no-room' && hasRoom) return false;
+        return text.includes(keyword);
+    });
+
+    // ป้องกันหน้าว่างเมื่อจำนวนรายการลดลงหลังลบหรือค้นหา
+    const lastPage = Math.max(1, Math.ceil(filteredUsers.length / rowsPerPage));
+    currentPage = Math.min(currentPage, lastPage);
+    renderTable(filteredUsers, currentPage);
+}
 
 function generateRoomOptions(selectedRoom) {
     let options = '<option value="">ยังไม่ระบุห้อง</option>';
@@ -64,6 +94,10 @@ function renderTable(data, page) {
     const startIndex = (page - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     const paginatedData = data.slice(startIndex, endIndex);
+
+    if (paginatedData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px;">ไม่พบผู้ใช้ตามเงื่อนไขที่ค้นหา</td></tr>';
+    }
 
     paginatedData.forEach(user => {
         const isAdmin = user.role === 'admin';
@@ -95,36 +129,76 @@ function renderTable(data, page) {
             </tr>
         `;
     });
-    renderPagination(data.length, page);
+    renderPager('pagination-container', data.length, page, rowsPerPage, newPage => {
+        currentPage = newPage;
+        renderTable(filteredUsers, currentPage);
+    });
 }
 
-function renderPagination(totalItems, currentPage) {
-    const container = document.getElementById('pagination-container');
-    if (!container) return;
-    const totalPages = Math.ceil(totalItems / rowsPerPage);
-    
-    if (totalPages <= 1) {
-        container.innerHTML = '';
-        return;
+// =========================================
+//  Rubric 7: นำข้อมูลจากไฟล์ JSON ไปเก็บลงฐานข้อมูล
+// =========================================
+
+async function loadRoomTypes() {
+    const tbody = document.getElementById('room-types-body');
+    try {
+        const { data, error } = await supabaseClient.from('rooms').select('*').order('id');
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px;">ยังไม่มีข้อมูลในฐานข้อมูล กดปุ่มนำเข้าจาก JSON ได้เลย</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(room => `
+            <tr>
+                <td>${escapeHTML(room.id)}</td>
+                <td>${escapeHTML(room.type)}</td>
+                <td>${Number(room.price).toLocaleString()} บาท</td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: #ef4444;">โหลดข้อมูลประเภทห้องไม่สำเร็จ</td></tr>';
     }
-    
-    let html = `<div style="font-size: 14px; color: #64748b; margin-top: 15px;">แสดงข้อมูลหน้า ${currentPage} จาก ${totalPages} (${totalItems} รายการ)</div><div style="display: flex; gap: 5px; margin-top: 10px;">`;
-    
-    if (currentPage > 1) {
-        html += `<button onclick="changePage(${currentPage - 1})" class="action-btn" style="padding: 5px 15px;">ก่อนหน้า</button>`;
-    }
-    
-    if (currentPage < totalPages) {
-        html += `<button onclick="changePage(${currentPage + 1})" class="action-btn" style="padding: 5px 15px;">ถัดไป</button>`;
-    }
-    
-    html += `</div>`;
-    container.innerHTML = html;
 }
 
-window.changePage = function(newPage) {
-    currentPage = newPage;
-    renderTable(allUsers, currentPage);
+window.importRoomsFromJson = async function() {
+    if (!confirm('นำเข้าข้อมูลจาก data/rooms.json ลงฐานข้อมูล?\nประเภทห้องที่มี id ซ้ำจะถูกเขียนทับ รวมถึงราคาห้องที่ใช้คิดบิลด้วย')) return;
+
+    const btn = document.getElementById('btn-import-rooms');
+    const result = document.getElementById('import-result');
+    btn.disabled = true;
+    result.style.color = '#64748b';
+    result.textContent = 'กำลังนำเข้าข้อมูล...';
+
+    try {
+        const response = await fetch('../data/rooms.json');
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const rooms = await response.json();
+
+        const rows = rooms.map(room => ({
+            id: room.id,
+            type: room.type,
+            description: room.description,
+            price: room.price,
+            images: room.images,
+            facilities: room.facilities
+        }));
+
+        const { error } = await supabaseClient.from('rooms').upsert(rows, { onConflict: 'id' });
+        if (error) throw error;
+
+        result.style.color = '#15803d';
+        result.textContent = `นำเข้าสำเร็จ ${rows.length} ประเภทห้อง`;
+        await loadRoomTypes();
+    } catch (err) {
+        console.error(err);
+        result.style.color = '#ef4444';
+        result.textContent = 'นำเข้าไม่สำเร็จ: ' + err.message;
+    } finally {
+        btn.disabled = false;
+    }
 };
 
 function validateRoomNumber(newRoom, userId) {
@@ -138,7 +212,8 @@ function validateRoomNumber(newRoom, userId) {
     }
 
     // 2. ตรวจสอบห้องซ้ำ
-    const isDuplicate = allUsers.some(u => u.room_no === newRoom && u.id !== userId);
+    // id จาก HTML เป็นข้อความ แต่ id จากฐานข้อมูลเป็นตัวเลข จึงต้องแปลงก่อนเทียบ
+    const isDuplicate = allUsers.some(u => u.room_no === newRoom && String(u.id) !== String(userId));
     if (isDuplicate) {
         alert(`เลขห้อง ${newRoom} มีผู้เช่าคนอื่นใช้อยู่แล้ว! ไม่สามารถตั้งซ้ำได้`);
         return false;
@@ -184,6 +259,8 @@ window.openEditModal = function(userId) {
         document.getElementById('e_address').value = user.address || '';
         document.getElementById('e_start_date').value = user.start_date || '';
         document.getElementById('e_end_date').value = user.end_date || '';
+        document.getElementById('e_emergency_contact').value = user.emergency_contact || '';
+        document.getElementById('e_emergency_phone').value = user.emergency_phone || '';
         const overlay = document.getElementById('edit-modal');
         overlay.style.setProperty('display', 'flex', 'important');
         overlay.style.setProperty('z-index', '9999', 'important');
@@ -219,15 +296,34 @@ document.getElementById('edit-user-form').addEventListener('submit', async (e) =
     
     // ตรวจสอบเงื่อนไขห้อง
     if (!validateRoomNumber(newRoom, id)) return;
-    
+
+    // Rubric 3: ตรวจสอบรูปแบบและความสัมพันธ์ของข้อมูลด้วย JS
+    const nationalId = document.getElementById('e_national_id').value.trim();
+    const emergencyPhone = document.getElementById('e_emergency_phone').value.trim();
+    const startDate = document.getElementById('e_start_date').value;
+    const endDate = document.getElementById('e_end_date').value;
+
+    if (nationalId && !DORM_PATTERNS.nationalId.test(nationalId)) {
+        alert('เลขบัตรประชาชนต้องเป็นตัวเลข 13 หลัก');
+        return;
+    }
+    if (emergencyPhone && !DORM_PATTERNS.phone.test(emergencyPhone)) {
+        alert('เบอร์โทรฉุกเฉินต้องเป็นตัวเลข 10 หลัก ขึ้นต้นด้วย 0');
+        return;
+    }
+    if (startDate && endDate && endDate < startDate) {
+        alert('วันสิ้นสุดสัญญาต้องไม่อยู่ก่อนวันเริ่มสัญญา');
+        return;
+    }
+
     const updates = {
         room_no: newRoom || null,
-        national_id: document.getElementById('e_national_id').value.trim(),
+        national_id: nationalId,
         address: document.getElementById('e_address').value.trim(),
-        start_date: document.getElementById('e_start_date').value || null,
-        end_date: document.getElementById('e_end_date').value || null,
+        start_date: startDate || null,
+        end_date: endDate || null,
         emergency_contact: document.getElementById('e_emergency_contact').value.trim(),
-        emergency_phone: document.getElementById('e_emergency_phone').value.trim(),
+        emergency_phone: emergencyPhone,
     };
 
     try {

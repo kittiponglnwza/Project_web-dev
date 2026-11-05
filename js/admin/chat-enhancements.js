@@ -1,13 +1,6 @@
-/**
- * Admin Chat Enhancements:
- * 1. "Mark as Read & Replied" Feature
- * 2. "Monthly Appointment Calendar" Modal & Management
- */
+
 
 (function () {
-    // =========================================================================
-    // PART 1: MARK AS READ & REPLIED FEATURE
-    // =========================================================================
 
     const REPLIED_STORAGE_KEY = 'dorm_chat_replied_status_v1';
 

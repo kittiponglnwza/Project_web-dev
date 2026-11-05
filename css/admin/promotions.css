@@ -7,7 +7,7 @@
 .promo-section { margin-bottom: 30px; }
 .section-title { color: #334155; font-size: 18px; display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
 
-.promo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+.promo-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
 
 .promo-card { background: #fff; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); padding: 25px; border: 1px solid #f1f5f9; transition: 0.3s; position: relative; overflow: hidden; }
 .promo-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
@@ -53,12 +53,13 @@
 .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Prompt'; font-size: 14px; box-sizing: border-box; outline: none; transition: 0.2s; }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
 .form-group textarea { resize: vertical; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.form-row { display: grid; grid-template-columns: 1fr; gap: 15px; }
 
 .btn-save { width: 100%; background: #0f172a; color: #fff; border: none; padding: 14px; border-radius: 12px; font-family: 'Prompt'; font-size: 15px; font-weight: 500; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
 .btn-save:hover { background: #1e293b; }
 
-@media (max-width: 768px) {
-    .promo-grid { grid-template-columns: 1fr; }
-    .form-row { grid-template-columns: 1fr; }
+/* Mobile First: จอ 768px ขึ้นไปค่อยขยายเป็นหลายคอลัมน์ */
+@media (min-width: 768px) {
+    .promo-grid { grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
+    .form-row { grid-template-columns: 1fr 1fr; }
 }

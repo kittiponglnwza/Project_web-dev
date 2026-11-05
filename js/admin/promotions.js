@@ -174,6 +174,18 @@ window.savePromotion = async function(e) {
     const id = document.getElementById('promo-id').value;
     const type = document.getElementById('promo-type').value;
 
+    // Rubric 3: ตรวจสอบเงื่อนไขที่ Built-in Validation ตรวจไม่ได้ด้วย JS
+    const discountType = document.getElementById('promo-discount-type').value;
+    const discountValue = parseFloat(document.getElementById('promo-discount-value').value) || 0;
+    if (document.getElementById('promo-end').value < document.getElementById('promo-start').value) {
+        alert('วันสิ้นสุดต้องไม่อยู่ก่อนวันเริ่มต้น');
+        return;
+    }
+    if (type !== 'free_common_fee' && (discountValue <= 0 || (discountType === 'percent' && discountValue > 100))) {
+        alert('มูลค่าส่วนลดต้องมากกว่า 0 และแบบเปอร์เซ็นต์ต้องไม่เกิน 100');
+        return;
+    }
+
     const promoData = {
         name: document.getElementById('promo-name').value.trim(),
         description: document.getElementById('promo-desc').value.trim(),

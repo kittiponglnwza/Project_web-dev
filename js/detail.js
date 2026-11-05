@@ -25,6 +25,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const bookingForm = document.getElementById("bookingForm");
     if (bookingForm) {
+        // ห้ามเลือกวันเข้าอยู่ย้อนหลัง
+        const now = new Date();
+        document.getElementById("b_date").min = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+
         bookingForm.addEventListener("submit", async (e) => {
             e.preventDefault(); 
             const phoneInput = document.getElementById("b_phone");
@@ -35,9 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const phoneVal = phoneInput.value.trim();
             const nameVal = nameInput.value.trim();
             const dateVal = dateInput.value;
-            const phoneRegex = /^0\d{9}$/;
 
-            if (!phoneRegex.test(phoneVal)) {
+            if (!DORM_PATTERNS.phone.test(phoneVal)) {
                 phoneInput.classList.add("invalid");
                 phoneError.style.display = "block";
             } else {
@@ -50,10 +53,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> กำลังส่งข้อมูล...";
                 btn.disabled = true;
 
+                let sendFailed = false;
                 try {
                     // Send booking data to admin via messages table
                     const messageText = `🔔 แจ้งเตือน! มีลูกค้าสนใจจอง/ดูห้องพัก\nชื่อ: ${nameVal}\nเบอร์โทร: ${phoneVal}\nวันที่คาดว่าจะเข้าอยู่: ${dateVal || 'ไม่ได้ระบุ'}\nID ห้องที่สนใจ: ${roomId}`;
-                    
+
                     const { error } = await supabaseClient
                         .from('messages')
                         .insert([{
@@ -61,46 +65,78 @@ document.addEventListener("DOMContentLoaded", () => {
                             receiver_email: 'admin',
                             message: messageText
                         }]);
-                        
+
                     if (error) {
                         console.error("Supabase Error:", error);
-                        // ถ้าติด RLS ให้ข้ามไปโชว์ Success เลย (ถือว่าระบบทำงานต่อได้แม้ส่งไม่ได้)
+                        sendFailed = true;
                     }
                 } catch (err) {
                     console.error(err);
+                    sendFailed = true;
                 }
 
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+
+                // ถ้าส่งไม่สำเร็จต้องแจ้งลูกค้า เพราะแอดมินจะไม่ได้รับเรื่องนี้
+                if (sendFailed) {
+                    alert("ส่งข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+                    return;
+                }
+
+                // Rubric 6: ซ่อนฟอร์มและเพิ่ม Element จากข้อมูลที่รับมาจากฟอร์ม
                 document.getElementById("bookingFormContainer").style.display = "none";
                 document.getElementById("bookingSuccess").style.display = "block";
+
+                const summary = document.getElementById("bookingSummary");
+                summary.innerHTML = "";
+                [
+                    `ชื่อ: ${nameVal}`,
+                    `เบอร์โทร: ${phoneVal}`,
+                    `วันที่เข้าอยู่: ${dateVal || 'ไม่ได้ระบุ'}`
+                ].forEach(text => {
+                    const item = document.createElement("li");
+                    item.textContent = text;
+                    summary.appendChild(item);
+                });
             }
         });
     }
 });
 
+// Rubric 10: ใช้ XMLHttpRequest มากกว่า 1 จุดในหน้าเดียว และจัดการ responseText ชนิด JSON
 async function fetchRoomDetail(id) {
+    let jsonRooms = [];
     try {
-        // ใช้ Supabase API ดึงข้อมูลเฉพาะห้องที่มี id ตรงกับ URL
-        const { data, error } = await supabaseClient
-            .from('rooms')
-            .select('*')
-            .eq('id', id)
-            .single(); // เอาแค่ 1 แถว
+        // จุดที่ 1: ไฟล์ JSON สำหรับรายการอุปกรณ์ในห้อง และใช้สำรองเมื่อฐานข้อมูลล่ม
+        jsonRooms = await ajaxGetJSON('data/rooms.json');
+    } catch (error) {
+        console.error("Error loading rooms.json:", error);
+    }
+    const jsonRoom = jsonRooms.find(room => String(room.id) === String(id));
 
-        if (error) throw error;
-        
-        if (data) {
-            // แปลงข้อมูลจาก DB ให้ตรงกับตัวแปรในหน้าเว็บ
-            const room = {
-                ...data,
-                isAvailable: data.is_available,
-                availableCount: data.available_count
-            };
-            renderUltraPremiumDetail(room);
+    let room = null;
+    try {
+        const headers = supabaseRestHeaders();
+        // จุดที่ 2: ข้อมูลห้องจากฐานข้อมูล
+        const rows = await ajaxGetJSON(`${supabaseUrl}/rest/v1/rooms?select=*&id=eq.${encodeURIComponent(id)}`, headers);
+        if (rows.length > 0) {
+            // จุดที่ 3: ห้องที่มีผู้เช่า เพื่อคำนวณจำนวนห้องว่างให้ตรงกับหน้าแรก
+            const occupied = await ajaxGetJSON(`${supabaseUrl}/rest/v1/occupied_rooms?select=room_no`, headers);
+            room = computeRoomAvailability(rows, occupied)[0];
         }
     } catch (error) {
-        console.error("Error fetching detail:", error);
-        document.getElementById("room-detail-container").innerHTML = "<p style='text-align:center; padding: 100px;'>⚠️ ไม่พบข้อมูลห้องพักที่ท่านค้นหา</p>";
+        console.error("Error fetching detail, using rooms.json:", error);
     }
+
+    room = room || jsonRoom;
+    if (!room) {
+        document.getElementById("room-detail-container").innerHTML = "<p style='text-align:center; padding: 100px;'>⚠️ ไม่พบข้อมูลห้องพักที่ท่านค้นหา</p>";
+        return;
+    }
+
+    room.facilities = room.facilities || (jsonRoom ? jsonRoom.facilities : []) || [];
+    renderUltraPremiumDetail(room);
 }
 
 function renderUltraPremiumDetail(room) {
@@ -109,6 +145,7 @@ function renderUltraPremiumDetail(room) {
     const statusText = room.isAvailable ? `Available (${room.availableCount} Rooms)` : "Fully Booked (เต็มแล้ว)";
     const statusColor = room.isAvailable ? "#10b981" : "#ef4444"; 
     // ดึงรูปแรกมาขยายขนาดความละเอียดสำหรับแบนเนอร์ใหญ่
+    room.images = room.images && room.images.length > 0 ? room.images : ['images/1.jpg'];
     let mainImage = room.images[0];
     if (mainImage.includes('images.pexels.com')) {
         mainImage = mainImage.replace(/w=\d+/g, 'w=1920'); // ขยายเป็น 1920px เพื่อความคมชัด
@@ -124,54 +161,65 @@ function renderUltraPremiumDetail(room) {
                 if (highResImg.includes('images.pexels.com')) {
                     highResImg = highResImg.replace(/w=\d+/g, 'w=1200'); 
                 }
-                galleryHTML += `<img src="${highResImg}" alt="Gallery ${index}" class="lux-gallery-img" style="cursor: pointer;" onclick="window.open('${highResImg}', '_blank')">`;
+                galleryHTML += `<a href="${escapeHTML(highResImg)}" target="_blank" rel="noopener"><img src="${escapeHTML(highResImg)}" alt="Gallery ${index}" class="lux-gallery-img"></a>`;
             }
         });
     } else {
         let highResImg = mainImage.replace(/w=\d+/g, 'w=1200');
-        galleryHTML = `<img src="${highResImg}" alt="Gallery 1" class="lux-gallery-img">`;
+        galleryHTML = `<img src="${escapeHTML(highResImg)}" alt="Gallery 1" class="lux-gallery-img">`;
     }
 
+    const facilitiesHTML = room.facilities.length === 0 ? '' : `
+                <section class="lux-section">
+                    <h2>อุปกรณ์ภายในห้อง (Room Facilities)</h2>
+                    <div class="lux-amenities">
+                        ${room.facilities.map(item => `<div class="am-item"><i class='bx bx-check'></i> <span>${escapeHTML(item)}</span></div>`).join('')}
+                    </div>
+                </section>
+    `;
+
     container.innerHTML = `
-        <div class="lux-hero" style="background-image: url('${mainImage}');">
-            <div class="lux-nav">
+        <header class="lux-hero" style="background-image: url('${escapeHTML(mainImage)}');">
+            <nav class="lux-nav">
                 <a href="index.html" class="lux-back">
                     <i class='bx bx-left-arrow-alt'></i> กลับหน้าหลัก
                 </a>
-            </div>
-        </div>
+            </nav>
+        </header>
 
         <div class="lux-wrapper">
-            <div class="lux-main">
-                <div class="lux-header">
+            <article class="lux-main">
+                <header class="lux-header">
                     <span class="lux-category">PREMIUM RESIDENCE</span>
-                    <h1 class="lux-title">${room.type}</h1>
+                    <h1 class="lux-title">${escapeHTML(room.type)}</h1>
                     <p class="lux-location"><i class='bx bx-map'></i> ใจกลางเมือง, เดินทางสะดวก ปลอดภัย</p>
-                </div>
+                </header>
                 <hr class="lux-divider">
-                
-                <div class="lux-section">
+
+                <section class="lux-section">
                     <h2>ภาพรวม (Overview)</h2>
-                    <p class="lux-desc">${room.description}</p>
-                </div>
+                    <p class="lux-desc">${escapeHTML(room.description)}</p>
+                </section>
+
+                ${facilitiesHTML}
 
                 <!-- สลับเอาคลังภาพ (Gallery) ขึ้นมาไว้บน สิ่งอำนวยความสะดวก ตามคำขอ -->
-                <div class="lux-section">
+                <section class="lux-section">
                     <h2>คลังภาพ (Gallery)</h2>
                     <div class="lux-gallery">
                         ${galleryHTML}
                     </div>
-                </div>
-                
+                </section>
+
                 <!-- แผนผังอาคาร (Floor Plan) -->
-                <div class="lux-section">
+                <section class="lux-section">
                     <h2>แผนผังอาคาร (Floor Plan)</h2>
-                    <div style="width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: center;">
+                    <figure style="width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 15px; text-align: center;">
                         <img src="images/floorplan.jpg" alt="แผนผังอาคาร" style="max-width: 100%; height: auto; border-radius: 12px;">
-                    </div>
-                </div>
-                
-                <div class="lux-section">
+                    </figure>
+                </section>
+
+                <section class="lux-section">
                     <h2>สิ่งอำนวยความสะดวก (Amenities)</h2>
                     <div class="lux-amenities">
                         <div class="am-item"><i class='bx bx-cctv'></i> <span>24/7 Security & CCTV</span></div>
@@ -181,10 +229,10 @@ function renderUltraPremiumDetail(room) {
                         <div class="am-item"><i class='bx bx-spray-can'></i> <span>Cleaning Service</span></div>
                         <div class="am-item"><i class='bx bx-key'></i> <span>Keycard Access</span></div>
                     </div>
-                </div>
+                </section>
 
                 <!-- แผนที่ Location (Google Maps) -->
-                <div class="lux-section">
+                <section class="lux-section">
                     <h2>สถานที่ตั้ง (Location)</h2>
                     <div style="width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 15px;">
                         <iframe 
@@ -201,11 +249,11 @@ function renderUltraPremiumDetail(room) {
                         <i class='bx bxs-map' style="color: #ef4444; font-size: 1.3rem; margin-top: 3px;"></i> 
                         <span>ทำเลทอง ใกล้มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ (มจพ.) เดินทางสะดวกสบายด้วยรถสาธารณะ มีร้านสะดวกซื้อ 7-11 ป้ายรถเมล์ และวินมอเตอร์ไซค์หน้าปากซอย</span>
                     </p>
-                </div>
+                </section>
 
-            </div>
+            </article>
 
-            <div class="lux-sidebar">
+            <aside class="lux-sidebar">
                 <div class="lux-booking-card">
                     <div class="lux-price-row">
                         <span class="lux-price">฿${formattedPrice}</span>
@@ -229,7 +277,7 @@ function renderUltraPremiumDetail(room) {
                         สนใจจอง / นัดดูห้องพัก <i class='bx bx-right-arrow-alt'></i>
                     </button>
                 </div>
-            </div>
+            </aside>
         </div>
     `;
 }

@@ -7,17 +7,18 @@
 
 .user-profile { display: flex; align-items: center; gap: 10px; font-weight: 500; }
 
-.dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 40px; }
+.dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 40px; }
 .card { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
 .card-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 15px; }
 .card-title { color: #6b7280; font-size: 0.95rem; margin-bottom: 5px; }
-.card-value { font-size: 1.8rem; font-weight: 600; color: #111; }
+.card-value { font-size: 1.4rem; font-weight: 600; color: #111; }
 
 .recent-section { background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
 .section-header { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; font-size: 1.2rem; font-weight: 600; }
 .btn-home { background: #111; color: #fff; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; transition: 0.3s; margin-right: 15px; }
 .btn-home:hover { background: #d4af37; }
-@media (max-width: 767px) {
-    .card-value { font-size: 1.4rem; }
-    .dashboard-cards { gap: 15px; }
+.session-info { margin-top: 18px; color: #6b7280; font-size: 0.8rem; word-break: break-all; }
+@media (min-width: 768px) {
+    .card-value { font-size: 1.8rem; }
+    .dashboard-cards { gap: 25px; }
 }

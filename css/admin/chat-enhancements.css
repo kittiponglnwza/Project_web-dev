@@ -168,16 +168,25 @@
     border-left: 3px solid #10b981;
 }
 
-/* Responsive adjustment for chat header actions on mobile */
-@media (max-width: 576px) {
+/* Mobile First: ซ่อนข้อความบนปุ่มในจอเล็ก และแสดงเมื่อจอกว้างตั้งแต่ 577px */
+.btn-mark-replied span {
+    display: none;
+}
+.btn-mark-replied {
+    padding: 8px 10px;
+}
+.chat-header-actions {
+    gap: 6px;
+}
+@media (min-width: 577px) {
     .btn-mark-replied span {
-        display: none;
+        display: inline;
     }
     .btn-mark-replied {
-        padding: 8px 10px;
+        padding: 7px 13px;
     }
     .chat-header-actions {
-        gap: 6px;
+        gap: 8px;
     }
 }
 
@@ -300,42 +309,40 @@
     min-height: 480px;
     min-width: 0;
     background: #f8fafc;
-    min-height: 480px;
-    overflow: hidden;
+    flex-direction: column;
 }
 
-@media (max-width: 820px) {
+@media (min-width: 821px) {
     .apt-modal-body {
-        flex-direction: column;
-        overflow-y: auto;
+        flex-direction: row;
+        overflow: hidden;
     }
 }
 
 /* Left Pane: Calendar Grid */
 /* Left Pane: Calendar Grid (Balanced ~58% width) */
 .apt-calendar-pane {
-    flex: 1.15;
-    flex: 0 0 58%;
-    width: 58%;
-    max-width: 58%;
+    flex: none;
+    width: 100%;
+    max-width: 100%;
     min-width: 0;
     padding: 24px;
     background: #ffffff;
-    border-right: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    overflow-y: auto;
+    overflow-y: visible;
 }
 
-@media (max-width: 820px) {
+@media (min-width: 821px) {
     .apt-calendar-pane {
-        flex: none;
-        width: 100%;
-        max-width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #f1f5f9;
-        overflow-y: visible;
+        flex: 0 0 58%;
+        width: 58%;
+        max-width: 58%;
+        border-bottom: none;
+        border-right: 1px solid #f1f5f9;
+        overflow-y: auto;
     }
 }
 
@@ -560,27 +567,25 @@
 /* Right Pane: Day Details & Form */
 /* Right Pane: Day Details & Form (Balanced ~42% width) */
 .apt-details-pane {
-    flex: 1;
-    flex: 0 0 42%;
-    width: 42%;
-    max-width: 42%;
+    flex: none;
+    width: 100%;
+    max-width: 100%;
     min-width: 0;
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 18px;
-    overflow-y: auto;
+    overflow-y: visible;
     box-sizing: border-box;
 }
 
-@media (max-width: 820px) {
+@media (min-width: 821px) {
     .apt-details-pane {
-        flex: none;
-        width: 100%;
-        max-width: 100%;
-        overflow-y: visible;
+        flex: 0 0 42%;
+        width: 42%;
+        max-width: 42%;
+        overflow-y: auto;
     }
-}
 }
 
 .apt-selected-date-header {
@@ -983,13 +988,13 @@
 
 .booking-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 10px 14px;
 }
 
-@media (max-width: 520px) {
+@media (min-width: 521px) {
     .booking-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 

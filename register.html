@@ -5,31 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ลงทะเบียนผู้เช่าใหม่ - Dorminator</title>
     <link rel="stylesheet" href="css/style.css?v=1.1.0">
-    <link rel="stylesheet" href="css/register.css?v=1.1.0">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     
 </head>
 <body class="luxury-body" style="margin: 0; padding: 0;">
 
-    <div class="login-wrapper">
-        
-        <div class="login-left" style="background: url('https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat; position: sticky; top: 0; height: 100vh;">
+    <main class="login-wrapper">
+
+        <aside class="login-left register-banner">
             <div class="login-branding">
                 <h2>Dorminator</h2>
                 <p>ระบบจัดการลงทะเบียนผู้เช่า (Tenant Portal)</p>
             </div>
-        </div>
-        
-        <div class="login-right">
+        </aside>
+
+        <section class="login-right">
             <!-- จัด Header ใหม่ ไม่ให้ทับกัน -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h2 style="font-size: 2.2rem; color: #111; font-weight: 600; margin: 0;">ลงทะเบียน</h2>
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h1 style="font-size: 2.2rem; color: #111; font-weight: 600; margin: 0;">ลงทะเบียน</h1>
                 <a href="login.html" style="color: #9ca3af; text-decoration: none; display: flex; align-items: center; gap: 5px; font-size: 0.95rem; font-weight: 500; transition: 0.3s;" onmouseover="this.style.color='#d4af37'" onmouseout="this.style.color='#9ca3af'">
                     <i class='bx bx-log-in-circle' style="font-size: 1.2rem;"></i> เข้าสู่ระบบ
                 </a>
-            </div>
-            
+            </header>
+
             <p style="color: #6b7280; margin-bottom: 35px; font-weight: 300; font-size: 0.95rem; line-height: 1.6;">
                 สร้างบัญชีผู้เช่าของคุณเพื่อเข้าถึงแผงควบคุมระบบหอพัก จ่ายบิล และแจ้งซ่อมได้อย่างง่ายดาย
             </p>
@@ -51,14 +50,14 @@
                     </div>
                     <div style="flex: 2; min-width: 200px;">
                         <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; color: #374151; font-weight: 500;">ชื่อ - นามสกุลจริง <span style="color:#ef4444">*</span></label>
-                        <input type="text" id="r_fullname" class="lux-input" required placeholder="เช่น สมชาย รักสงบ">
+                        <input type="text" id="r_fullname" class="lux-input" required minlength="3" pattern="[ก-๙a-zA-Z\s.]+" title="กรอกชื่อด้วยตัวอักษรภาษาไทยหรือภาษาอังกฤษ" placeholder="เช่น สมชาย รักสงบ">
                     </div>
                 </div>
 
                 <div style="margin-bottom: 40px;">
                     <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; color: #374151; font-weight: 500;">เบอร์โทรศัพท์มือถือ <span style="color:#ef4444">*</span></label>
                     <div class="lux-input-group">
-                        <input type="tel" id="r_phone" class="lux-input" required pattern="[0-9]{10}" placeholder="เช่น 0812345678">
+                        <input type="tel" id="r_phone" class="lux-input" required pattern="0[0-9]{9}" title="ตัวเลข 10 หลัก ขึ้นต้นด้วย 0" placeholder="เช่น 0812345678">
                         <i class='bx bx-phone'></i>
                     </div>
                     <small class="error-msg" id="phoneError" style="display:none; color:#ef4444; margin-top:8px; font-weight: 500;">กรุณากรอกเบอร์โทรศัพท์ 10 หลัก (ขึ้นต้นด้วย 0)</small>
@@ -70,7 +69,7 @@
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; color: #374151; font-weight: 500;">อีเมล (Email) <span style="color:#ef4444">*</span></label>
                     <div class="lux-input-group">
-                        <input type="email" id="r_email" class="lux-input" required placeholder="example@email.com">
+                        <input type="email" id="r_email" class="lux-input" required pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" title="กรอกอีเมลให้ถูกรูปแบบ เช่น name@email.com" placeholder="example@email.com">
                         <i class='bx bx-envelope'></i>
                     </div>
                 </div>
@@ -79,14 +78,14 @@
                     <div style="flex: 1; min-width: 200px;">
                         <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; color: #374151; font-weight: 500;">รหัสผ่าน <span style="color:#ef4444">*</span></label>
                         <div class="lux-input-group">
-                            <input type="password" id="r_password" class="lux-input" required placeholder="ขั้นต่ำ 6 ตัวอักษร">
+                            <input type="password" id="r_password" class="lux-input" required minlength="6" autocomplete="new-password" placeholder="ขั้นต่ำ 6 ตัวอักษร">
                             <i class='bx bx-lock-alt'></i>
                         </div>
                     </div>
                     <div style="flex: 1; min-width: 200px;">
                         <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; color: #374151; font-weight: 500;">ยืนยันรหัสผ่าน <span style="color:#ef4444">*</span></label>
                         <div class="lux-input-group">
-                            <input type="password" id="r_confirm_password" class="lux-input" required placeholder="กรอกรหัสอีกครั้ง">
+                            <input type="password" id="r_confirm_password" class="lux-input" required minlength="6" autocomplete="new-password" placeholder="กรอกรหัสอีกครั้ง">
                             <i class='bx bx-lock-alt'></i>
                         </div>
                     </div>
@@ -104,13 +103,15 @@
                     สร้างบัญชีผู้เช่า <i class='bx bx-user-plus' style="font-size: 1.3rem;"></i>
                 </button>
             </form>
-            
-        </div>
-    </div>
+
+        </section>
+    </main>
 
     <!-- นำเข้า Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js?v=1.1.0"></script>
-    <script src="js/auth.js?v=1.1.0"></script>
+    <script src="js/shared/utils.js?v=1.3.0"></script>
+    <script src="js/shared/session.js?v=1.3.0"></script>
+    <script src="js/auth.js?v=1.3.0"></script>
 </body>
 </html>

@@ -2,22 +2,33 @@
    Tenant Chat - Responsive conversation layout
    ========================================================== */
 
-/* Overrides for native app feel on mobile */
-@media (max-width: 991px) {
+/* Mobile First: ค่าเริ่มต้นเป็นหน้าแชทเต็มจอแบบแอปมือถือ */
+body.tenant-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh; /* 100dvh works perfectly on iOS/Android */
+    overflow: hidden;
+    margin: 0;
+}
+.sidebar { flex-shrink: 0; position: static !important; }
+.main-content {
+    flex: 1;
+    padding: 0 !important; /* Touch edges of screen */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* จอ 992px ขึ้นไป กลับเป็นเลย์เอาต์ปกติที่มี Sidebar ด้านซ้าย */
+@media (min-width: 992px) {
     body.tenant-layout {
-        display: flex;
-        flex-direction: column;
-        height: 100dvh; /* 100dvh works perfectly on iOS/Android */
-        overflow: hidden;
-        margin: 0;
+        display: block;
+        height: auto;
+        overflow: visible;
     }
-    .sidebar { flex-shrink: 0; position: static !important; }
     .main-content {
-        flex: 1;
-        padding: 0 !important; /* Touch edges of screen */
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
+        display: block;
+        overflow: visible;
     }
 }
 

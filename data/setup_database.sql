@@ -140,7 +140,7 @@ VALUES
 ('Low Season ลด 20%', 'ช่วง มี.ค. - พ.ค. ลดค่าเช่า 20%', 'seasonal', 'percent', 20, 'rent_fee', '2025-03-01', '2025-05-31', true, true),
 ('ฟรีค่าส่วนกลาง', 'ยกเว้นค่าส่วนกลาง (other_fee) ฟรี', 'free_common_fee', 'free_field', 0, 'other_fee', '2024-01-01', '2030-12-31', false, true);
 
--- 5. ���ҧ�Ѵ���� (Appointments)
+-- 5. ตารางนัดหมาย (Appointments)
 DROP TABLE IF EXISTS appointments CASCADE;
 CREATE TABLE appointments (
     id TEXT PRIMARY KEY,
@@ -153,11 +153,11 @@ CREATE TABLE appointments (
 );
 ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
 
--- Policy: Admins ����ö�Ѵ��ùѴ�����������
+-- Policy: Admins สามารถจัดการนัดหมายได้ทั้งหมด
 CREATE POLICY "Admins can manage appointments" ON public.appointments USING (
   EXISTS (SELECT 1 FROM tenant_profiles WHERE email = auth.jwt() ->> 'email' AND role = 'admin')
 );
--- Policy: ��ҹ�������� (����Ѻ�����Ŵ��ԷԹ)
+-- Policy: อ่านได้ทุกคน (สำหรับโหลดปฏิทิน)
 CREATE POLICY "Public read for appointments if needed" ON public.appointments
 FOR SELECT USING (true);
 

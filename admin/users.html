@@ -18,7 +18,7 @@
         </header>
 
         <!-- Room Summary Section -->
-        <div class="grid-3" style="gap: 20px; margin-bottom: 20px;">
+        <section class="grid-3" style="gap: 20px; margin-bottom: 20px;" aria-label="สรุปจำนวนห้องพัก">
             <div style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); text-align: center;">
                 <h4 style="margin: 0 0 5px; color: #64748b; font-weight: 500;">จำนวนห้องพักทั้งหมด</h4>
                 <div style="font-size: 28px; font-weight: 600; color: #0f172a;">16</div>
@@ -31,27 +31,56 @@
                 <h4 style="margin: 0 0 5px; color: #64748b; font-weight: 500;">ห้องว่าง (Available)</h4>
                 <div id="stat-available" style="font-size: 28px; font-weight: 600; color: #10b981;">-</div>
             </div>
-        </div>
+        </section>
 
-        <div class="card">
-            <p style="color: #64748b; margin-top: 0; font-size: 14px;">จัดการข้อมูลส่วนตัว, กำหนดเลขห้องพัก, และลบผู้ใช้ออกจากระบบได้ที่นี่</p>
-            
+        <section class="card" aria-label="รายชื่อผู้เช่า">
+            <p style="color: #64748b; margin-top: 0; margin-bottom: 15px; font-size: 14px;">จัดการข้อมูลส่วนตัว, กำหนดเลขห้องพัก, และลบผู้ใช้ออกจากระบบได้ที่นี่</p>
+
+            <div class="list-toolbar">
+                <input type="search" id="user-search" placeholder="ค้นหาอีเมล เลขห้อง เลขบัตรประชาชน หรือสิทธิ์..." aria-label="ค้นหาผู้ใช้">
+                <select id="room-filter" aria-label="กรองตามสถานะห้อง">
+                    <option value="all">ทุกสถานะห้อง</option>
+                    <option value="has-room">มีห้องแล้ว</option>
+                    <option value="no-room">ยังไม่ระบุห้อง</option>
+                </select>
+            </div>
+
             <table>
                 <thead>
                     <tr>
                         <th style="width: 25%;">อีเมลผู้ใช้ (Email)</th>
                         <th>สิทธิ์การใช้งาน</th>
-                        <th style="width: 20%; text-align: center;">หมายเลขห้องพัก</th>
+                        <th style="text-align: center;">หมายเลขห้องพัก</th>
                         <th style="text-align: center;">กำหนดห้องด่วน</th>
-                        <th style="text-align: center;">จัดการเพิ่มเติม</th>
+                        <th>เลขบัตรประชาชน</th>
+                        <th style="text-align: right;">จัดการเพิ่มเติม</th>
                     </tr>
                 </thead>
                 <tbody id="users-table-body">
-                    <tr><td colspan="5" style="text-align: center;">กำลังโหลดข้อมูล...</td></tr>
+                    <tr><td colspan="6" style="text-align: center;">กำลังโหลดข้อมูล...</td></tr>
                 </tbody>
             </table>
             <div id="pagination-container"></div>
-        </div>
+        </section>
+
+        <!-- Rubric 7: นำข้อมูลจาก data/rooms.json ไปเก็บลงตาราง rooms -->
+        <section class="card" style="margin-top: 20px;" aria-labelledby="room-types-title">
+            <div class="card-header" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;">
+                <h3 id="room-types-title" style="margin: 0;">ประเภทห้องพักในฐานข้อมูล</h3>
+                <button type="button" class="btn-save" id="btn-import-rooms" onclick="importRoomsFromJson()"><i class="bx bx-import"></i> นำเข้าจาก rooms.json</button>
+            </div>
+            <p id="import-result" role="status" style="font-size: 14px; margin-bottom: 10px;"></p>
+            <table>
+                <thead>
+                    <tr><th>รหัส</th><th>ประเภท</th><th>ราคาต่อเดือน</th></tr>
+                </thead>
+                <tbody id="room-types-body">
+                    <tr><td colspan="3" style="text-align: center;">กำลังโหลดข้อมูล...</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <footer class="app-footer">&copy; 2024 Dorminator System</footer>
     </main>
 
     <!-- Modal ดู/แก้ไขข้อมูลผู้เช่า -->
@@ -76,7 +105,7 @@
                     </div>
                     <div class="form-group">
                         <label>รหัสบัตรประชาชน</label>
-                        <input type="text" id="e_national_id" placeholder="x-xxxx-xxxxx-xx-x">
+                        <input type="text" id="e_national_id" inputmode="numeric" pattern="[0-9]{13}" title="ตัวเลข 13 หลัก ไม่ต้องมีขีด" placeholder="ตัวเลข 13 หลัก">
                     </div>
                 </div>
 
@@ -103,7 +132,7 @@
                     </div>
                     <div class="form-group">
                         <label>เบอร์โทรฉุกเฉิน</label>
-                        <input type="text" id="e_emergency_phone" placeholder="08x-xxx-xxxx">
+                        <input type="tel" id="e_emergency_phone" pattern="0[0-9]{9}" title="ตัวเลข 10 หลัก ขึ้นต้นด้วย 0" placeholder="เช่น 0812345678">
                     </div>
                 </div>
 
@@ -113,9 +142,10 @@
     </div>
 
     <script src="../js/supabase-config.js?v=1.2.0"></script>
-    <script src="../js/shared/utils.js"></script>
-    <script src="../js/shared/auth-guard.js"></script>
+    <script src="../js/shared/utils.js?v=1.3.0"></script>
+    <script src="../js/shared/session.js?v=1.3.0"></script>
+    <script src="../js/shared/auth-guard.js?v=1.3.0"></script>
     <script src="../js/shared/components.js"></script>
-    <script src="../js/admin/users.js?v=1.2.1"></script>
+    <script src="../js/admin/users.js?v=1.3.0"></script>
 </body>
 </html>

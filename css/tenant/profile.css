@@ -16,9 +16,6 @@
 .info-group label { color: #6b7280; font-size: 0.85rem; display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
 .info-val { font-size: 1rem; color: #111; font-weight: 500; background: #f9fafb; padding: 12px 15px; border-radius: 8px; border: 1px solid #eee; }
 
-@media (max-width: 768px) {
-    .profile-grid { grid-template-columns: 1fr; }
-}
 @media (min-width: 768px) {
     .recent-section { padding: 40px; }
     .page-title { font-size: 1.8rem; }

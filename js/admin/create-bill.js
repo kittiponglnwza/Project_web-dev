@@ -1,14 +1,29 @@
 let activeTenants = [];
 let activePromotions = [];
+// ราคาสำรองเมื่อโหลดตาราง rooms ไม่ได้
+let roomPrices = { S: 5500, M: 7500, XL: 9000 };
 
 window.getRoomDetails = function(roomNo) {
-    if (!roomNo) return { type: '-', price: 0 };
-    const num = parseInt(roomNo.toString().slice(-2));
-    if (num >= 1 && num <= 4) return { type: 'S', price: 5500 };
-    if (num >= 5 && num <= 10) return { type: 'M', price: 7500 };
-    if (num >= 11 && num <= 99) return { type: 'XL', price: 9000 };
-    return { type: '-', price: 0 };
+    const size = getRoomSize(roomNo);
+    if (!size) return { type: '-', price: 0 };
+    return { type: size, price: roomPrices[size] };
 };
+
+// ใช้ราคาเดียวกับที่แสดงบนหน้าเว็บ เพื่อไม่ให้บิลไม่ตรงกับราคาที่ประกาศ
+async function loadRoomPrices() {
+    try {
+        const { data, error } = await supabaseClient.from('rooms').select('type, price');
+        if (error) throw error;
+        (data || []).forEach(room => {
+            const size = getRoomTypeKey(room.type);
+            if (size in roomPrices && Number(room.price) > 0) {
+                roomPrices[size] = Number(room.price);
+            }
+        });
+    } catch (err) {
+        console.error('Load room prices error:', err);
+    }
+}
 
 function getApplicablePromotions(tenant) {
     const now = new Date();
@@ -94,6 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         monthSelect.appendChild(option);
     }
 
+    await loadRoomPrices();
     await loadPromotions();
     await loadTenants();
     renderTable();
@@ -166,7 +182,7 @@ function renderTable() {
     tbody.innerHTML = '';
 
     if (activeTenants.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px;">ไม่มีผู้เช่าที่มีห้องในระบบ</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px;">ไม่มีผู้เช่าที่มีห้องในระบบ</td></tr>';
         return;
     }
 
@@ -205,9 +221,10 @@ function renderTable() {
             </tr>
         `;
 
-        // Calculate initial row with promotions
-        calculateRow(escapedRoom);
     });
+
+    // ต้องคำนวณหลังเพิ่มครบทุกแถว เพราะ tbody.innerHTML += จะสร้าง Element ใหม่ทุกครั้ง
+    activeTenants.forEach(tenant => calculateRow(escapeHTML(tenant.room_no)));
 }
 
 window.calculateRow = function(roomNo) {
@@ -245,6 +262,20 @@ window.saveAllBills = async function() {
     const month = document.getElementById('b_month').value;
     if (!month) {
         alert("กรุณาระบุประจำเดือน");
+        return;
+    }
+
+    // ป้องกันการออกบิลซ้ำในรอบบิลเดียวกัน
+    const { data: existingBills, error: existingError } = await supabaseClient
+        .from('bills')
+        .select('id')
+        .eq('month', month)
+        .limit(1);
+    if (existingError) {
+        alert('ตรวจสอบบิลเดิมไม่สำเร็จ: ' + existingError.message);
+        return;
+    }
+    if (existingBills.length > 0 && !confirm(`เดือน "${month}" มีบิลอยู่แล้ว ต้องการสร้างเพิ่มอีกชุดใช่หรือไม่?`)) {
         return;
     }
 

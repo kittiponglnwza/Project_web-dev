@@ -435,37 +435,33 @@ table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
     color: inherit;
     display: block; /* Mobile Base */
 }
-.sidebar-links {
-    display: none; /* Mobile Base */
-    flex: 1;
-    width: 100%;
-    flex-direction: column;
-}
-.sidebar-links.active {
+.sidebar-menu { display: none; flex: 1; min-height: 0; flex-direction: column; }
+.sidebar-menu.active {
     display: flex;
-    position: absolute;
-    top: 100%;
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 84px);
+    right: 0;
+    bottom: 0;
     left: 0;
-    width: 100%;
-    background: inherit; /* Use parent's background (#fff or #0f172a) */
-    height: calc(100vh - 70px);
-    height: calc(100dvh - 70px);
-    box-sizing: border-box;
-    overflow-y: auto;
-    overscroll-behavior: contain;
     z-index: 9999;
+    box-sizing: border-box;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--app-surface);
     box-shadow: 0 10px 15px rgba(0,0,0,0.1);
 }
+.sidebar-links { display: flex; flex: 1 1 auto; min-height: 0; flex-direction: column; width: 100%; overflow-y: auto; overscroll-behavior: contain; }
+.sidebar-footer { flex: 0 0 auto; padding: 8px 12px max(12px, env(safe-area-inset-bottom)); border-top: 1px solid var(--app-border); background: var(--app-surface); }
+.sidebar-footer a { display: flex; min-height: 42px; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--app-radius-control); color: var(--app-muted); font-size: 0.92rem; line-height: 1.4; text-decoration: none; }
+.sidebar-footer a:hover { background: #fef2f2; color: var(--app-danger); }
 
 /* Desktop Enhancement */
 @media (min-width: 992px) {
     .sidebar-toggle {
         display: none;
     }
-    .sidebar-links {
-        display: flex !important;
-        height: calc(100vh - 100px); /* Account for logo */
-    }
+    .sidebar-menu { display: flex !important; min-height: 0; }
+    .sidebar-links { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 }
 
 /* =========================================
@@ -537,8 +533,8 @@ body.tenant-layout { background-color: var(--app-bg); color: var(--app-text); }
 .admin-layout .sidebar-links a i { font-size: 20px; margin-right: 15px; }
 .admin-layout .sidebar-links a:hover,
 .admin-layout .sidebar-links a.active { background: #eff6ff; color: #1d4ed8; border-left: 4px solid transparent; }
-.admin-layout .sidebar-links a.logout { margin-top: auto; border-top: 1px solid #edf1f5; color: #64748b; padding-top: 15px; }
-.admin-layout .sidebar-links a.logout:hover { background: #fef2f2; color: #b42318; border-left: 4px solid transparent; }
+.admin-layout .sidebar-footer a.logout { color: #64748b; }
+.admin-layout .sidebar-footer a.logout:hover { background: #fef2f2; color: #b42318; }
 
 /* =========================================
    TENANT SIDEBAR THEME
@@ -549,14 +545,14 @@ body.tenant-layout { background-color: var(--app-bg); color: var(--app-text); }
 .tenant-layout .sidebar-links a.nav-link i { font-size: 1.4rem; }
 .tenant-layout .sidebar-links a.nav-link:hover { background: #f8fafc; color: #1d4ed8; }
 .tenant-layout .sidebar-links a.nav-link.active { background: #eff6ff; color: #1d4ed8; border-left-color: transparent; font-weight: 500; }
-.tenant-layout .sidebar-links a.logout-btn { margin-top: auto; color: #64748b; border-top: 1px solid #edf1f5; padding-top: 15px; }
-.tenant-layout .sidebar-links a.logout-btn:hover { background: #fef2f2; color: #b42318; border-left-color: transparent; }
+.tenant-layout .sidebar-footer a.logout-btn { color: #64748b; }
+.tenant-layout .sidebar-footer a.logout-btn:hover { background: #fef2f2; color: #b42318; }
 
 /* General Sidebar Fixes */
 .sidebar { width: 100%; display: flex; flex-direction: column; padding: 15px 0; z-index: 9999; position: sticky; top: 0; transition: 0.3s; }
 .sidebar-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-bottom: 0; position: relative; z-index: 10000; }
 .sidebar-toggle { font-size: 28px; cursor: pointer; display: block; padding: 10px; margin: -10px; /* bigger touch target */ }
-.sidebar-links { display: none; flex: 1; flex-direction: column; width: 100%; }
+.sidebar-menu { display: none; flex: 1; min-height: 0; flex-direction: column; }
 
 /* Ensure sidebar always has a solid background on mobile (prevents content showing through) */
 .tenant-layout .sidebar { background: #fff; }
@@ -729,24 +725,7 @@ body.tenant-layout { background-color: var(--app-bg); color: var(--app-text); }
     color: var(--app-accent-hover) !important;
 }
 
-:is(body.admin-layout, body.tenant-layout) .sidebar-links a.logout,
-:is(body.admin-layout, body.tenant-layout) .sidebar-links a.logout-btn {
-    margin-top: auto;
-    padding-top: 14px;
-    padding-bottom: max(14px, env(safe-area-inset-bottom));
-    border-top: 1px solid var(--app-border);
-    border-radius: 0 0 var(--app-radius-control) var(--app-radius-control);
-    color: var(--app-muted);
-    position: sticky;
-    bottom: 0;
-    z-index: 1;
-    flex-shrink: 0;
-    background: var(--app-surface);
-    box-shadow: 0 -8px 14px rgba(15, 23, 42, 0.04);
-}
-
-:is(body.admin-layout, body.tenant-layout) .sidebar-links a.logout:hover,
-:is(body.admin-layout, body.tenant-layout) .sidebar-links a.logout-btn:hover {
+:is(body.admin-layout, body.tenant-layout) .sidebar-footer a:hover {
     background: #fef2f2;
     color: var(--app-danger);
 }
@@ -993,11 +972,18 @@ body.admin-layout .apt-btn-submit {
         display: none;
     }
 
-    :is(body.admin-layout, body.tenant-layout) .sidebar-links {
+    :is(body.admin-layout, body.tenant-layout) .sidebar-menu {
         display: flex !important;
-        height: calc(100vh - 92px);
-        overflow-y: auto;
+        position: static;
+        height: auto;
+        overflow: hidden;
         box-shadow: none;
+    }
+
+    :is(body.admin-layout, body.tenant-layout) .sidebar-links {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
     }
 
     :is(body.admin-layout, body.tenant-layout) .main-content {

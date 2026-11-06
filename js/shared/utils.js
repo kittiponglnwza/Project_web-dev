@@ -249,10 +249,10 @@ function formatCurrency(num) {
  */
 function initSidebar() {
     const toggle = document.querySelector('.sidebar-toggle');
-    const links = document.querySelector('.sidebar-links');
-    if (toggle && links) {
+    const menu = document.querySelector('.sidebar-menu');
+    if (toggle && menu) {
         toggle.addEventListener('click', function () {
-            links.classList.toggle('active');
+            menu.classList.toggle('active');
         });
     }
 }

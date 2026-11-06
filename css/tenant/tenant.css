@@ -7,5 +7,5 @@ body.tenant-layout { background-color: #f3f4f6; }
 .tenant-layout .sidebar-links a.nav-link i { font-size: 1.4rem; }
 .tenant-layout .sidebar-links a.nav-link:hover { background: #f9fafb; color: #d4af37; }
 .tenant-layout .sidebar-links a.nav-link.active { background: #faf5e5; color: #d4af37; border-left-color: #d4af37; font-weight: 500; }
-.tenant-layout .sidebar-links a.logout-btn { margin-top: auto; color: #ef4444; border-top: 1px solid #eee; padding-top: 15px; }
-.tenant-layout .sidebar-links a.logout-btn:hover { background: #fef2f2; color: #ef4444; border-left-color: #ef4444; }
+.tenant-layout .sidebar-footer a.logout-btn { color: #ef4444; }
+.tenant-layout .sidebar-footer a.logout-btn:hover { background: #fef2f2; color: #ef4444; }

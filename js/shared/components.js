@@ -19,14 +19,18 @@ function renderAdminSidebar() {
                 <i class="bx bx-menu"></i>
             </div>
         </div>
-        <div class="sidebar-links" style="flex: 1;">
-            <a href="dashboard.html"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
-            <a href="billing.html"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
-            <a href="promotions.html"><i class="bx bx-gift"></i> โปรโมชั่น</a>
-            <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
-            <a href="maintenance.html"><i class="bx bx-wrench"></i> รายการแจ้งซ่อม</a>
-            <a href="chat.html"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
-            <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+        <div class="sidebar-menu">
+            <div class="sidebar-links">
+                <a href="dashboard.html"><i class="bx bxs-dashboard"></i> ภาพรวม (Dashboard)</a>
+                <a href="billing.html"><i class="bx bx-receipt"></i> จัดการบิล / ตรวจสลิป</a>
+                <a href="promotions.html"><i class="bx bx-gift"></i> โปรโมชั่น</a>
+                <a href="users.html"><i class="bx bx-user-pin"></i> จัดการผู้เช่า / ห้องพัก</a>
+                <a href="maintenance.html"><i class="bx bx-wrench"></i> รายการแจ้งซ่อม</a>
+                <a href="chat.html"><i class="bx bxs-message-dots"></i> ข้อความ (Chat)</a>
+            </div>
+            <div class="sidebar-footer">
+                <a href="#" class="logout" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+            </div>
         </div>
     `;
 
@@ -44,13 +48,17 @@ function renderTenantSidebar() {
                 <i class="bx bx-menu"></i>
             </div>
         </div>
-        <div class="sidebar-links" style="flex: 1;">
-            <a href="dashboard.html" class="nav-link"><i class="bx bx-grid-alt"></i> ภาพรวม (Dashboard)</a>
-            <a href="billing.html" class="nav-link"><i class="bx bx-receipt"></i> รายการค้างชำระ</a>
-            <a href="maintenance.html" class="nav-link"><i class="bx bx-wrench"></i> แจ้งซ่อม/ปัญหา</a>
-            <a href="profile.html" class="nav-link"><i class="bx bx-user"></i> ข้อมูลส่วนตัว</a>
-            <a href="chat.html" class="nav-link"><i class="bx bx-message-square-dots"></i> ติดต่อนิติบุคคล</a>
-            <a href="#" class="nav-link logout-btn" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+        <div class="sidebar-menu">
+            <div class="sidebar-links">
+                <a href="dashboard.html" class="nav-link"><i class="bx bx-grid-alt"></i> ภาพรวม (Dashboard)</a>
+                <a href="billing.html" class="nav-link"><i class="bx bx-receipt"></i> รายการค้างชำระ</a>
+                <a href="maintenance.html" class="nav-link"><i class="bx bx-wrench"></i> แจ้งซ่อม/ปัญหา</a>
+                <a href="profile.html" class="nav-link"><i class="bx bx-user"></i> ข้อมูลส่วนตัว</a>
+                <a href="chat.html" class="nav-link"><i class="bx bx-message-square-dots"></i> ติดต่อนิติบุคคล</a>
+            </div>
+            <div class="sidebar-footer">
+                <a href="#" class="nav-link logout-btn" onclick="logout()"><i class="bx bx-log-out"></i> ออกจากระบบ</a>
+            </div>
         </div>
     `;
 

@@ -6,5 +6,5 @@ body.admin-layout { background-color: #f8fafc; }
 .admin-layout .sidebar-links a i { font-size: 20px; margin-right: 15px; }
 .admin-layout .sidebar-links a:hover,
 .admin-layout .sidebar-links a.active { background: #1e293b; color: #fff; border-left: 4px solid #facc15; }
-.admin-layout .sidebar-links a.logout { margin-top: auto; border-top: 1px solid #1e293b; color: #f87171; padding-top: 15px; }
-.admin-layout .sidebar-links a.logout:hover { background: #fee2e2; color: #ef4444; border-left: 4px solid #ef4444; }
+.admin-layout .sidebar-footer a.logout { color: #f87171; }
+.admin-layout .sidebar-footer a.logout:hover { background: #fee2e2; color: #ef4444; }
